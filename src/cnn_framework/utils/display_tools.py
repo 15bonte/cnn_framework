@@ -4,13 +4,18 @@ import numpy as np
 import psutil
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import ConfusionMatrixDisplay
+from skimage.exposure import equalize_adapthist
 import torch
+from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
+import matplotlib.font_manager as fm
+from pint import UnitRegistry
 
 from .preprocessing import (
     normalize_array,
     zero_one_scaler,
 )
 from .tools import get_image_type_max
+
 
 def display_confusion_matrix(
     results, class_names, save_path=None, show=False, extension="pdf", normalize=None
@@ -118,6 +123,7 @@ def make_image_tiff_displayable(image, mean_std):
 
     return normalized_image
 
+
 def display_progress(
     message, current, total, precision=1, additional_message="", cpu_memory=False
 ):
@@ -139,7 +145,6 @@ def display_progress(
 
 
 def generate_size_bar(image_width, ax, scale, unit, bar_width_ratio=1 / 3):
-
     # Initial bar width
     bar_width = int(image_width * bar_width_ratio)
     # Corresponding value to write

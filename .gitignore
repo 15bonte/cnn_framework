@@ -1,2 +1,3 @@
 tutorials/wandb
 src/cnn_framework.egg-info
+*.json

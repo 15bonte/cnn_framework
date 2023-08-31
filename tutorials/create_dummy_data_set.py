@@ -2,6 +2,7 @@ import os
 import numpy as np
 from skimage import io
 
+
 def generate_square(image_size, nb_channels, color):
     # Create black image with square in the middle
     image = np.zeros((image_size, image_size, nb_channels), dtype=np.uint8)
@@ -20,7 +21,9 @@ def generate_square(image_size, nb_channels, color):
             ] = np.random.randint(0, 255)
     else:
         image[
-            random_y : random_y + image_size // 2, random_x : random_x + image_size // 2, :,
+            random_y : random_y + image_size // 2,
+            random_x : random_x + image_size // 2,
+            :,
         ] = color
     return image
 
@@ -41,14 +44,14 @@ def generate_circle(image_size, nb_channels, color):
             image[:, :, channel] = np.random.randint(0, 255)
             for x in range(image_size):
                 for y in range(image_size):
-                    if (x - center_x) ** 2 + (y - center_y) ** 2 > radius ** 2:
+                    if (x - center_x) ** 2 + (y - center_y) ** 2 > radius**2:
                         image[y, x, channel] = 0
     else:
         for channel, channel_color in enumerate(color):
             image[:, :, channel] = channel_color
             for x in range(image_size):
                 for y in range(image_size):
-                    if (x - center_x) ** 2 + (y - center_y) ** 2 > radius ** 2:
+                    if (x - center_x) ** 2 + (y - center_y) ** 2 > radius**2:
                         image[y, x, channel] = 0
 
     return image
@@ -60,12 +63,11 @@ def main(image_size, nb_channels, nb_elements_per_class, save_dir, extension, sa
         os.makedirs(save_dir)
 
     for idx in range(nb_elements_per_class):
-
         square_image = generate_square(
             image_size, nb_channels, color=[255, 255, 0] if same_color else None
         )
         io.imsave(f"{save_dir}/random_{idx}_c0.{extension}", square_image)
-        
+
         circle_image = generate_circle(
             image_size, nb_channels, color=[255, 0, 255] if same_color else None
         )
@@ -78,6 +80,8 @@ if __name__ == "__main__":
     NB_ELEMENTS_PER_CLASS = 100
     SAVE_DIR = ""
     EXTENSION = "tiff"
-    SAME_COLOR = True  # if True, square are all yellow and circle are all purple, if False, random colors
+    SAME_COLOR = (
+        True  # if True, square are all yellow and circle are all purple, if False, random colors
+    )
 
     main(IMAGE_SIZE, NB_CHANNELS, NB_ELEMENTS_PER_CLASS, SAVE_DIR, EXTENSION, SAME_COLOR)
