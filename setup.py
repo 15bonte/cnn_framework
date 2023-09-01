@@ -3,6 +3,10 @@ from setuptools import find_packages, setup
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+# Package dependencies
+with open("requirements.txt", encoding="utf-8") as f:
+    REQUIREMENTS = [l.strip() for l in f.readlines() if l]
+
 setup(
     name="cnn_framework",
     version="0.0.0",
@@ -18,5 +22,5 @@ setup(
     ],
     package_dir={"": "src"},
     packages=find_packages(where="src"),
-    install_requires=[],
+    install_requires=REQUIREMENTS,
 )
