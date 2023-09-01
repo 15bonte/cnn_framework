@@ -9,7 +9,7 @@ with open("requirements.txt", encoding="utf-8") as f:
 
 setup(
     name="cnn_framework",
-    version="0.0.0",
+    version="0.0.2",
     author="Thomas Bonte",
     author_email="thomas.bonte@mines-paristech.fr",
     description="CNN framework",
