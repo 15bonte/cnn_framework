@@ -83,10 +83,13 @@ class ModelManager:
         self.parameters_path = os.path.join(self.params.models_folder, "parameters.csv")
 
         # Display current git hash to follow up
-        current_file_path = Path(__file__).parent.resolve()
-        repo = git.Repo(current_file_path, search_parent_directories=True)
-        sha = repo.head.object.hexsha
-        print(f"Current commit hash: {sha}")
+        try:
+            current_file_path = Path(__file__).parent.resolve()
+            repo = git.Repo(current_file_path, search_parent_directories=True)
+            sha = repo.head.object.hexsha
+            print(f"Current commit hash: {sha}")
+        except:  # if not a git repository
+            sha = "unknown"
 
         # Used in prediction
         self.image_index = 0
@@ -131,13 +134,17 @@ class ModelManager:
                 # ... log the ground truth image
                 plt.imshow(target_np[channel], cmap="gray")
                 self.writer.add_figure(
-                    f"{name}/{image_name}/{channel}/groundtruth", plt.gcf(), current_batch,
+                    f"{name}/{image_name}/{channel}/groundtruth",
+                    plt.gcf(),
+                    current_batch,
                 )
 
                 plt.imshow(prediction_np[channel], cmap="gray")
                 # ... log the model output image
                 self.writer.add_figure(
-                    f"{name}/{image_name}/{channel}/predicted", plt.gcf(), current_batch,
+                    f"{name}/{image_name}/{channel}/predicted",
+                    plt.gcf(),
+                    current_batch,
                 )
 
     def compute_loss(
@@ -232,7 +239,6 @@ class ModelManager:
             for batch_index, dl_element in enumerate(
                 self.dl["train"]
             ):  # indexes, inputs, targets, adds
-
                 self.training_information.batch_index = batch_index
 
                 # Perform training loop
@@ -277,7 +283,10 @@ class ModelManager:
                 with torch.no_grad():
                     for dl_element in self.dl["val"]:
                         loss = self.compute_loss(
-                            dl_element, val_metric, loss_function, self.dl["val"],
+                            dl_element,
+                            val_metric,
+                            loss_function,
+                            self.dl["val"],
                         )
                         val_loss += loss
 
@@ -415,7 +424,8 @@ class ModelManager:
             else:
                 image_to_save = make_image_tiff_displayable(data_image, None)
             stack.save_image(
-                image_to_save, f"{self.params.output_dir}/{name}_{data_type}.tiff",
+                image_to_save,
+                f"{self.params.output_dir}/{name}_{data_type}.tiff",
             )
 
     def batch_predict(
@@ -423,7 +433,6 @@ class ModelManager:
     ):
         all_predictions_np = []
         for batch_idx, dl_element in enumerate(test_dl):
-
             # Reshape in case of multiple images stacked together
             # Transform shape to (S, C, H, W) to mimic (B, C, H, W)
             if len(dl_element.input.shape) == 5:  # (B, S, C, H, W) = (1, S, C, H, W)
@@ -449,7 +458,6 @@ class ModelManager:
                 continue
 
             for idx in range(dl_element.target.shape[0]):
-
                 if self.image_index in images_to_save:
                     image_id = (batch_idx * test_dl.batch_size) + idx
                     image_name = test_dl.dataset.names[image_id].split(".")[0]
@@ -485,9 +493,9 @@ class ModelManager:
             # mean_std may be saved in parent folders
             # Iterate over parent folders to find mean_std.json
             mean_std_path = None
-            potential_paths = [self.params.model_load_path,] + list(
-                Path(self.params.model_load_path).parents
-            )
+            potential_paths = [
+                self.params.model_load_path,
+            ] + list(Path(self.params.model_load_path).parents)
             for parent_folder in potential_paths:
                 mean_std_path = f"{parent_folder}/mean_std.json"
                 if os.path.isfile(mean_std_path):
@@ -499,7 +507,9 @@ class ModelManager:
                 mean_std = adapt_mean_std(raw_mean_std)
                 test_dl.dataset.mean_std = mean_std
 
-    def predict(self, test_dl, return_predictions=False, nb_images_to_save=10, compute_own_mean_std=False):
+    def predict(
+        self, test_dl, return_predictions=False, nb_images_to_save=10, compute_own_mean_std=False
+    ):
         """
         If return_predictions is True, returns predictions and do not save images
 
@@ -508,11 +518,11 @@ class ModelManager:
         test_dl : DataLoader
             DataLoader for test set
         return_predictions : bool, optional
-            If True, returns predictions, by default False  
+            If True, returns predictions, by default False
         nb_images_to_save : int, optional
             Number of images to save, by default 10
             nb_images_to_save == -1 => save all images
-            
+
         """
 
         # Create folder to save predictions
