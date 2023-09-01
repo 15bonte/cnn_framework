@@ -2,6 +2,7 @@ from ..utils.VAEModelParams import VAEModelParams
 
 from ..utils.dimensions import Dimensions
 
+
 class DummyVAEModelParams(VAEModelParams):
     """
     VAE model params.
@@ -14,7 +15,7 @@ class DummyVAEModelParams(VAEModelParams):
 
         self.num_epochs = 10
 
-        self.nb_modalities = 1  # RGB or grayscale
+        self.nb_modalities = 3  # RGB or grayscale
         self.nb_stacks_per_modality = 1
 
         self.nb_classes = 2  # square, circle

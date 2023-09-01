@@ -3,7 +3,7 @@ import os
 from pythae.pipelines import TrainingPipeline
 from pythae.trainers import BaseTrainerConfig
 from pythae.trainers.training_callbacks import WandbCallback
-from pythae.models import AutoModel, FucciVAEConfig, FucciVAE
+from pythae.models import AutoModel, BetaVAE, BetaVAEConfig
 
 from .data_set import DummyVAEDataSet
 from .model_params import DummyVAEModelParams
@@ -45,12 +45,8 @@ def main(params):
     )
 
     # Set up the model configuration
-    my_vae_config = FucciVAEConfig(
-        gamma=params.gamma,
-        delta=params.delta,
-        nb_classes=params.nb_classes,
+    my_vae_config = BetaVAEConfig(
         reconstruction_loss=params.reconstruction_loss,
-        kld_loss=params.kld_loss,
         input_dim=(
             params.nb_modalities * params.nb_stacks_per_modality,
             params.input_dimensions.height,
@@ -68,14 +64,12 @@ def main(params):
         # Update modifiable parameters
         vae_model.model_config = my_vae_config
         vae_model.beta = my_vae_config.beta
-        vae_model.gamma = my_vae_config.gamma
-        vae_model.delta = my_vae_config.delta
     else:
         encoder = CustomEncoder(params, my_vae_config)
         print(f"Number of parameters in encoder: {sum(p.numel() for p in encoder.parameters())}")
         decoder = CustomDecoder(params, my_vae_config)
         print(f"Number of parameters in decoder: {sum(p.numel() for p in decoder.parameters())}")
-        vae_model = FucciVAE(encoder=encoder, decoder=decoder, model_config=my_vae_config)
+        vae_model = BetaVAE(encoder=encoder, decoder=decoder, model_config=my_vae_config)
 
     # Build the Pipeline
     pipeline = TrainingPipeline(training_config=my_training_config, model=vae_model)
@@ -94,8 +88,8 @@ def main(params):
     wandb_cb.setup(
         training_config=my_training_config,  # training config
         model_config=my_vae_config,  # model config
-        project_name="vae-dummy",  # specify your wandb project
-        entity_name="cbio-bis",  # specify your wandb entity
+        project_name=params.wandb_project,  # specify your wandb project
+        entity_name=params.wandb_entity,  # specify your wandb entity
         run_name=params.format_now,  # name of the run
     )
     callbacks.append(wandb_cb)  # Add it to the callbacks list
@@ -110,10 +104,6 @@ def main(params):
     # Test and save images
     manager = VAEModelManager(vae_model, params, MeanSquaredErrorMetric)
     manager.predict(test_dl)
-    manager.write_useful_information()
-
-    # Evaluate logistic regression from latent space to classify between G1, S, G2
-    evaluate_logistic_regression(loader_generator, manager, params, display_matrix=False)
 
 
 if __name__ == "__main__":

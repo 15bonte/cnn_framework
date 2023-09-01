@@ -19,10 +19,18 @@ class DecoderBlock(nn.Module):
     def __init__(self, in_channels, out_channels, use_batchnorm):
         super().__init__()
         self.conv1 = md.Conv2dReLU(
-            in_channels, out_channels, kernel_size=3, padding=1, use_batchnorm=use_batchnorm,
+            in_channels,
+            out_channels,
+            kernel_size=3,
+            padding=1,
+            use_batchnorm=use_batchnorm,
         )
         self.conv2 = md.Conv2dReLU(
-            out_channels, out_channels, kernel_size=3, padding=1, use_batchnorm=use_batchnorm,
+            out_channels,
+            out_channels,
+            kernel_size=3,
+            padding=1,
+            use_batchnorm=use_batchnorm,
         )
 
     def forward(self, x):
@@ -46,7 +54,8 @@ class CustomDecoder(BaseDecoder):
             self.first_square_size = self.first_square_size // 2
 
         self.fc = nn.Linear(
-            args.latent_dim, self.head_channels * self.first_square_size * self.first_square_size,
+            args.latent_dim,
+            self.head_channels * self.first_square_size * self.first_square_size,
         )
         blocks = [
             DecoderBlock(in_ch, out_ch, use_batchnorm=True)
@@ -54,17 +63,12 @@ class CustomDecoder(BaseDecoder):
         ]
         self.blocks = nn.ModuleList(blocks)
 
-        # FUCCI reconstruction
+        # Reconstruction
         self.segmentation_head = SegmentationHead(
             in_channels=out_channels[-1],
             out_channels=params.out_channels,
             activation=None,
             kernel_size=3,
-        )
-
-        # Mask reconstruction
-        self.mask_segmentation_head = SegmentationHead(
-            in_channels=out_channels[-1], out_channels=1, activation="sigmoid", kernel_size=3,
         )
 
     def forward(self, z: torch.Tensor):
@@ -75,10 +79,7 @@ class CustomDecoder(BaseDecoder):
         for decoder_block in self.blocks:
             x = decoder_block(x)
 
-        fucci_reconstruction = self.segmentation_head(x)
-        mask_reconstruction = self.mask_segmentation_head(x)
-
-        reconstruction = torch.cat([fucci_reconstruction, mask_reconstruction], dim=1)
+        reconstruction = self.segmentation_head(x)
         output = ModelOutput(reconstruction=reconstruction)
 
         return output

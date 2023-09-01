@@ -159,12 +159,18 @@ class AbstractDataSet(Dataset):
             data_set_output.input = np.moveaxis(transformed["image"], 2, 0)
         # Target and no additional images
         elif data_set_output.target_is_image() and not data_set_output.additional_is_image():
-            transformed = self.transforms(image=data_set_output[0], mask=data_set_output[1])
-            data_set_output.input = (np.moveaxis(transformed["image"], 2, 0),)
-            data_set_output.target_image = (np.moveaxis(transformed["mask"], 2, 0),)
+            fake_input = np.concatenate((data_set_output.input, data_set_output.target), axis=-1)
+            transformed = self.transforms(image=fake_input)
+            # Split image and target
+            transformed_input = transformed["image"][:, :, : data_set_output.input.shape[-1]]
+            transformed_target = transformed["image"][:, :, data_set_output.input.shape[-1] :]
+            data_set_output.input = np.moveaxis(transformed_input, 2, 0)
+            data_set_output.target = np.moveaxis(transformed_target, 2, 0)
         # No target and additional images
         elif not data_set_output.target_is_image() and data_set_output.additional_is_image():
-            transformed = self.transforms(image=data_set_output[0], mask=data_set_output[2])
+            transformed = self.transforms(
+                image=data_set_output.input, mask=data_set_output.additional
+            )
             data_set_output.input = np.moveaxis(transformed["image"], 2, 0)
             data_set_output.additional = np.moveaxis(transformed["mask"], 2, 0)
         # Target and additional images

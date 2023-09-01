@@ -15,20 +15,13 @@ class DummyVAEDataSet(AbstractDataSet):
         # Data sources
         self.input_data_source = DataSource(
             [self.data_manager.get_microscopy_image_path],
-            [(ProjectMethods.Channel, ([0], 2))],
+            [(ProjectMethods.Channel, ([0, 1, 2], 2))],
             [NormalizeMethods.none],
         )
 
         self.output_data_source = DataSource(
             [self.data_manager.get_microscopy_image_path],
             [(ProjectMethods.Channel, ([0, 1, 2], 2))],
-            [NormalizeMethods.none],
-        )
-
-        # Mask
-        self.additional_data_source = DataSource(
-            [self.data_manager.get_microscopy_image_path],
-            [(ProjectMethods.Channel, ([0], 2))],
             [NormalizeMethods.none],
         )
 
@@ -84,6 +77,5 @@ class DummyVAEDataSet(AbstractDataSet):
             data=raw_inputs.input,
             target=raw_inputs.target,
             id=idx,
-            mask=raw_inputs.additional,
             category=category,
         )
