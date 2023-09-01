@@ -156,7 +156,7 @@ class ModelParams:
         self.out_channels = 0  # output
 
         # Input data set
-        self.data_dir = ""
+        self.data_dir = os.path.join(os.environ["userprofile"], "data", "dummy")
 
         # Data split
         self.train_ratio = 0.8
@@ -172,16 +172,16 @@ class ModelParams:
         self.test_file = ""
 
         # Tensorboard parameters
-        self.tensorboard_folder_path = os.path.join(os.environ['userprofile'], "tensorboard\local")
+        self.tensorboard_folder_path = os.path.join(os.environ["userprofile"], "tensorboard\local")
         self.plot_step = 10
         # Number of different epochs where to plot images
         self.nb_plot_images = 2
         self.nb_tensorboard_images_max = 8
 
         # Output folders - models & predictions
-        self.models_folder = os.path.join(os.environ['userprofile'], "models\local")
+        self.models_folder = os.path.join(os.environ["userprofile"], "models\local")
         self.model_save_name = f"{self.name}.pt"
-        self.output_dir = os.path.join(os.environ['userprofile'], "predictions\local")
+        self.output_dir = os.path.join(os.environ["userprofile"], "predictions\local")
 
         # Path to load model to predict
         self.model_load_path = ""
@@ -206,7 +206,6 @@ class ModelParams:
         return f"epochs {self.num_epochs} | batch {self.batch_size} | lr {self.learning_rate} | weight decay {self.weight_decay} | dropout {self.dropout}"
 
     def update(self, args=None):
-
         if args is not None:
             if args.job_id:
                 self.job_id = args.job_id
