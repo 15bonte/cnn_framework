@@ -12,7 +12,6 @@ class VAEModelManager(ModelManager):
         # Read data loader element
         dl_element["data"] = dl_element["data"].to(self.device)
         dl_element["target"] = dl_element["target"].to(self.device)
-        dl_element["mask"] = dl_element["mask"].to(self.device)
         dl_element["category"] = dl_element["category"].to(self.device)
 
         # Compute the model output
@@ -31,7 +30,6 @@ class VAEModelManager(ModelManager):
         # Read data loader element
         dl_element["data"] = dl_element["data"].to(self.device)
         dl_element["target"] = dl_element["target"].to(self.device)
-        dl_element["mask"] = dl_element["mask"].to(self.device)
         dl_element["category"] = dl_element["category"].to(self.device)
 
         # Compute the model output
@@ -41,9 +39,6 @@ class VAEModelManager(ModelManager):
         # Update metric
         dl_metric.update(model_output["recon_x"], dl_element["target"])
 
-        # # Ad one dimension to mask at the second place
-        # model_output["recon_mask"] = model_output["recon_mask"].unsqueeze(1)
-
     def batch_predict(
         self, test_dl, images_to_save, num_batches_test, test_metric, do_not_save_images
     ):
@@ -52,15 +47,10 @@ class VAEModelManager(ModelManager):
 
         all_predictions_np = []
         for batch_idx, dl_element in enumerate(test_dl):
-
             # Run prediction
             self.model_prediction(dl_element, test_metric, test_dl)
             if not do_not_save_images:  # standard use
-                predictions, prediction_masks = (
-                    dl_element.prediction["recon_x"],
-                    dl_element.prediction["recon_mask"],
-                )
-                prediction_masks = prediction_masks.unsqueeze(1)
+                predictions = dl_element.prediction["recon_x"]
             else:  # return embedding
                 predictions = dl_element.prediction.z
 
@@ -70,18 +60,12 @@ class VAEModelManager(ModelManager):
             # Get numpy elements
             inputs_np = dl_element["data"].cpu().numpy()
             targets_np = dl_element["target"].cpu().numpy()
-            masks_np = dl_element["mask"].cpu().numpy()
 
             # Save few images
             if do_not_save_images:
                 continue
 
-            # Concatenate masks and prediction masks
-            prediction_masks = prediction_masks.cpu().numpy()
-            truth_prediction_masks_np = np.concatenate((masks_np, prediction_masks), axis=1)
-
             for idx in range(dl_element["target"].shape[0]):
-
                 if self.image_index in images_to_save:
                     image_id = (batch_idx * test_dl.batch_size) + idx
                     image_name = test_dl.dataset.names[image_id].split(".")[0]
@@ -90,13 +74,11 @@ class VAEModelManager(ModelManager):
                     input_np = inputs_np[idx, ...].squeeze()
                     target_np = targets_np[idx, ...].squeeze()
                     prediction_np = predictions_np[idx, ...].squeeze()
-                    truth_prediction_mask_np = truth_prediction_masks_np[idx, ...].squeeze()
 
                     dl_element_numpy = DatasetOutput(
                         input=input_np,
                         target_image=target_np,
                         prediction=prediction_np,
-                        additional=truth_prediction_mask_np,
                     )
 
                     self.save_results(
@@ -157,7 +139,6 @@ class VAEModelManager(ModelManager):
     def write_images_to_tensorboard(self, current_batch, dl_element, name):
         # Get numpy arrays
         targets_np = dl_element["target"]
-        masks_np = dl_element["mask"]
         image_indexes_np = dl_element["id"]
 
         # Get images name
@@ -167,9 +148,7 @@ class VAEModelManager(ModelManager):
         image_names = [current_dl_file_names[image_index] for image_index in image_indexes_np]
 
         # Log the results images
-        for i, (mask_np, target_np, image_name) in enumerate(
-            zip(masks_np, targets_np, image_names)
-        ):
+        for i, (target_np, image_name) in enumerate(zip(targets_np, image_names)):
             # Do not save too many images
             if i == self.params.nb_tensorboard_images_max:
                 break
@@ -177,11 +156,7 @@ class VAEModelManager(ModelManager):
                 # ... log the ground truth image
                 plt.imshow(target_np[channel], cmap="gray")
                 self.writer.add_figure(
-                    f"{name}/{image_name}/{channel}/fucci", plt.gcf(), current_batch,
-                )
-            for channel in range(mask_np.shape[0]):
-                plt.imshow(mask_np[channel], cmap="gray")
-                # ... log the model output image
-                self.writer.add_figure(
-                    f"{name}/{image_name}/{channel}/mask", plt.gcf(), current_batch,
+                    f"{name}/{image_name}/{channel}/output",
+                    plt.gcf(),
+                    current_batch,
                 )
