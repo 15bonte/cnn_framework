@@ -231,7 +231,7 @@ class ModelManager:
         scaler = GradScaler(enabled=self.params.fp16_precision)
 
         for epoch in range(self.epochs):
-            self.training_information.epoch = epoch
+            self.training_information.epoch = epoch + 1
             # Start by lr_scheduler as warmup starts by 0 otherwise
             lr_scheduler.step()
             # Enumerate mini batches
@@ -239,7 +239,7 @@ class ModelManager:
             for batch_index, dl_element in enumerate(
                 self.dl["train"]
             ):  # indexes, inputs, targets, adds
-                self.training_information.batch_index = batch_index
+                self.training_information.batch_index = batch_index + 1
 
                 # Perform training loop
                 with autocast(enabled=self.params.fp16_precision):
@@ -271,7 +271,7 @@ class ModelManager:
                     "Training in progress",
                     self.training_information.get_current_batch() + 1,
                     self.training_information.get_total_batches(),
-                    additional_message=f"Local step {batch_index} | Epoch {epoch}",
+                    additional_message=f"Local step {self.training_information.batch_index} | Epoch {self.training_information.epoch}",
                 )
 
             evaluate = len(self.dl["val"]) > 0
@@ -305,7 +305,7 @@ class ModelManager:
                 torch.save(self.model.state_dict(), self.model_save_path_early_stopping)
                 best_val_loss = val_loss
                 best_val_score = val_score
-                model_epoch = epoch
+                model_epoch = self.training_information.epoch
 
         # Save model at last epoch
         torch.save(self.model.state_dict(), self.model_save_path)
