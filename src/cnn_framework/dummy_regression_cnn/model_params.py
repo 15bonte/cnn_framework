@@ -12,6 +12,10 @@ class DummyModelParams(ModelParams):
 
         self.input_dimensions = Dimensions(height=128, width=128)
 
+        self.train_ratio = 0.8
+        self.val_ratio = 0.2
+        self.test_ratio = 0.2
+
         self.num_epochs = 30
         self.learning_rate = 5e-2
 
