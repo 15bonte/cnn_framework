@@ -1,6 +1,6 @@
 # CNN framework
 
-Run CNN models for classification, regression, VAE, contrastive learning with any data set.
+Run CNN models for classification, regression, segmentation, VAE, contrastive learning with any data set.
 
 ## Installation
 

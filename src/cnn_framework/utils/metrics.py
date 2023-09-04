@@ -41,7 +41,7 @@ class DetectionMeanAveragePrecision(AbstractMetric):
         return self.metric.compute().item(), None
 
     def reset(self):
-        self.metric = MeanAveragePrecision()
+        self.metric = MeanAveragePrecision().to(self.device)
 
 
 class PCC(AbstractMetric):
@@ -57,7 +57,7 @@ class PCC(AbstractMetric):
         return self.metric.compute().item(), None
 
     def reset(self):
-        self.metric = PearsonCorrCoef()
+        self.metric = PearsonCorrCoef().to(self.device)
 
 
 class IoU(AbstractMetric):

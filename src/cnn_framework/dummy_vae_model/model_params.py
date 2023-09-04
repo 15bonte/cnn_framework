@@ -13,7 +13,7 @@ class DummyVAEModelParams(VAEModelParams):
 
         self.input_dimensions = Dimensions(height=128, width=128)
 
-        self.num_epochs = 10
+        self.num_epochs = 30
 
         self.nb_modalities = 3  # RGB or grayscale
         self.nb_stacks_per_modality = 1
