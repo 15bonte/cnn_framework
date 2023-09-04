@@ -1,4 +1,4 @@
-from argparse import Namespace
+from pathlib import Path
 import random
 from datetime import datetime
 import os
@@ -156,7 +156,7 @@ class ModelParams:
         self.out_channels = 0  # output
 
         # Input data set
-        self.data_dir = os.path.join(os.environ["userprofile"], "data", "dummy")
+        self.data_dir = os.path.join(str(Path.home()), "data", "dummy")
 
         # Data split
         self.train_ratio = 0
@@ -172,16 +172,16 @@ class ModelParams:
         self.test_file = ""
 
         # Tensorboard parameters
-        self.tensorboard_folder_path = os.path.join(os.environ["userprofile"], "tensorboard\local")
+        self.tensorboard_folder_path = os.path.join(str(Path.home()), "tensorboard/local")
         self.plot_step = 10
         # Number of different epochs where to plot images
         self.nb_plot_images = 2
         self.nb_tensorboard_images_max = 8
 
         # Output folders - models & predictions
-        self.models_folder = os.path.join(os.environ["userprofile"], "models\local")
+        self.models_folder = os.path.join(str(Path.home()), "models/local")
         self.model_save_name = f"{self.name}.pt"
-        self.output_dir = os.path.join(os.environ["userprofile"], "predictions\local")
+        self.output_dir = os.path.join(str(Path.home()), "predictions/local")
 
         # Path to load model to predict
         self.model_load_path = ""

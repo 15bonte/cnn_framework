@@ -48,8 +48,8 @@ class TrainingInformation:
         self.num_batches_train = None
         self.epochs = epochs
         # Training follow-up
-        self.epoch = 0
-        self.batch_index = 0
+        self.epoch = None  # starts at 1
+        self.batch_index = None  # starts at 1
 
     def check_validity(self) -> None:
         if self.num_batches_train is None:
@@ -61,7 +61,7 @@ class TrainingInformation:
 
     def get_current_batch(self) -> int:
         self.check_validity()
-        return self.epoch * self.num_batches_train + self.batch_index
+        return (self.epoch - 1) * self.num_batches_train + self.batch_index
 
 
 class ModelManager:
@@ -269,7 +269,7 @@ class ModelManager:
                 self.log_images(dl_element, "train")
                 display_progress(
                     "Training in progress",
-                    self.training_information.get_current_batch() + 1,
+                    self.training_information.get_current_batch(),
                     self.training_information.get_total_batches(),
                     additional_message=f"Local step {self.training_information.batch_index} | Epoch {self.training_information.epoch}",
                 )
