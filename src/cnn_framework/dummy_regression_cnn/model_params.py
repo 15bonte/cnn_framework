@@ -12,8 +12,8 @@ class DummyModelParams(ModelParams):
 
         self.input_dimensions = Dimensions(height=128, width=128)
 
-        self.num_epochs = 10
-        self.learning_rate = 1e-2
+        self.num_epochs = 30
+        self.learning_rate = 5e-2
 
         self.nb_classes = 1
         self.nb_modalities = 3

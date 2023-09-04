@@ -89,7 +89,8 @@ class ClassificationAccuracy(AbstractMetric):
         targets_argmax = torch.argmax(targets, dim=1)
         # Update metric
         self.metric.update(
-            predictions_argmax, targets_argmax,
+            predictions_argmax,
+            targets_argmax,
         )
         # Update current values
         self.true = torch.cat((self.true, targets_argmax))
@@ -119,7 +120,7 @@ class DummyMetric(AbstractMetric):
 
 
 class IntrinsicDimensionMetric(AbstractMetric):
-    """Estimate local intrinsic dimension (dimension in k-nearest-neighborhoods around each point) """
+    """Estimate local intrinsic dimension (dimension in k-nearest-neighborhoods around each point)"""
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -195,10 +196,12 @@ class AUROCMetric(AbstractMetric):
         targets_argmax = torch.argmax(targets, dim=1)
         # Update metric
         self.metric.update(
-            predictions, targets_argmax,
+            predictions,
+            targets_argmax,
         )
         self.alternative_metric.update(
-            predictions, targets_argmax,
+            predictions,
+            targets_argmax,
         )
         # Update current values
         self.true = torch.cat((self.true, targets_argmax))
@@ -222,9 +225,13 @@ class AUROCMetric(AbstractMetric):
             roc_auc = sklearn_metrics.auc(local_fpr, local_tpr)
             plt.title("Receiver Operating Characteristic")
             plt.plot(
-                local_fpr, local_tpr, label="AUC = %0.2f" % roc_auc,
+                local_fpr,
+                local_tpr,
+                label="AUC = %0.2f" % roc_auc,
             )
-            plt.title(f"ROC curve for class {class_id}",)
+            plt.title(
+                f"ROC curve for class {class_id}",
+            )
             plt.legend(loc="lower right")
             plt.plot([0, 1], [0, 1], "r--")
             plt.xlim([0, 1])
@@ -249,7 +256,8 @@ class MeanSquaredErrorMetric(AbstractMetric):
     def update(self, predictions, targets, _=None):
         # Update metric
         self.metric.update(
-            predictions, targets,
+            predictions,
+            targets,
         )
 
     def get_score(self):
@@ -257,3 +265,23 @@ class MeanSquaredErrorMetric(AbstractMetric):
 
     def reset(self):
         self.metric = MeanSquaredError(squared=True).to(self.device)
+
+
+class MeanErrorMetric(AbstractMetric):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.name = "MeanError"
+        self.metric = MeanSquaredError(squared=False).to(self.device)
+
+    def update(self, predictions, targets, _=None):
+        # Update metric
+        self.metric.update(
+            predictions,
+            targets,
+        )
+
+    def get_score(self):
+        return -self.metric.compute().item(), None
+
+    def reset(self):
+        self.metric = MeanSquaredError(squared=False).to(self.device)

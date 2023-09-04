@@ -8,23 +8,22 @@ def generate_square(image_size, nb_channels, color):
     image = np.zeros((image_size, image_size, nb_channels), dtype=np.uint8)
 
     # Square
+    square_size = np.random.randint(2 * image_size / 5, 2 * image_size / 3)
+
     # Top left random corner
-    random_x = np.random.randint(0, image_size // 2)
-    random_y = np.random.randint(0, image_size // 2)
+    random_x = np.random.randint(0, image_size - square_size)
+    random_y = np.random.randint(0, image_size - square_size)
 
     if color is None:
-        for channel in range(nb_channels):
-            image[
-                random_y : random_y + image_size // 2,
-                random_x : random_x + image_size // 2,
-                channel,
-            ] = np.random.randint(0, 255)
-    else:
-        image[
-            random_y : random_y + image_size // 2,
-            random_x : random_x + image_size // 2,
-            :,
-        ] = color
+        # First channel is always 255 as it is used for segmentation
+        color = [255, np.random.randint(0, 255), np.random.randint(0, 255)]
+
+    image[
+        random_y : random_y + square_size,
+        random_x : random_x + square_size,
+        :,
+    ] = [255, np.random.randint(0, 255), np.random.randint(0, 255)]
+
     return image
 
 
@@ -33,26 +32,23 @@ def generate_circle(image_size, nb_channels, color):
     image = np.zeros((image_size, image_size, nb_channels), dtype=np.uint8)
 
     # Circle
-    # Center
-    center_x = np.random.randint(image_size // 4, 3 * image_size // 4)
-    center_y = np.random.randint(image_size // 4, 3 * image_size // 4)
+
     # Radius
-    radius = image_size // 4
+    radius = np.random.randint(image_size / 5, image_size / 3)
+
+    # Center
+    center_x = np.random.randint(radius, image_size - radius)
+    center_y = np.random.randint(radius, image_size - radius)
 
     if color is None:
-        for channel in range(nb_channels):
-            image[:, :, channel] = np.random.randint(0, 255)
-            for x in range(image_size):
-                for y in range(image_size):
-                    if (x - center_x) ** 2 + (y - center_y) ** 2 > radius**2:
-                        image[y, x, channel] = 0
-    else:
-        for channel, channel_color in enumerate(color):
-            image[:, :, channel] = channel_color
-            for x in range(image_size):
-                for y in range(image_size):
-                    if (x - center_x) ** 2 + (y - center_y) ** 2 > radius**2:
-                        image[y, x, channel] = 0
+        color = [255, np.random.randint(0, 255), np.random.randint(0, 255)]
+
+    for channel, channel_color in enumerate(color):
+        image[:, :, channel] = channel_color
+        for x in range(image_size):
+            for y in range(image_size):
+                if (x - center_x) ** 2 + (y - center_y) ** 2 > radius**2:
+                    image[y, x, channel] = 0
 
     return image
 
@@ -63,7 +59,7 @@ def generate_data_set(
     nb_channels=3,
     nb_elements_per_class=100,
     extension="tiff",
-    same_color=True,  # if True, square are all yellow and circle are all purple, if False, random colors
+    same_color=False,  # if True, square are all yellow and circle are all purple, if False, random colors
 ):
     # Create save_dir if it does not exist
     if not os.path.exists(save_dir):
