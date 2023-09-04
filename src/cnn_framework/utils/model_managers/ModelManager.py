@@ -204,7 +204,7 @@ class ModelManager:
         batch_index = self.training_information.batch_index
         epoch = self.training_information.epoch
 
-        epochs_to_plot = np.linspace(0, self.epochs - 1, self.params.nb_plot_images, dtype=int)
+        epochs_to_plot = np.linspace(1, self.epochs, self.params.nb_plot_images, dtype=int)
 
         # Condition to apply only for training
         batch_condition = True if name == "val" else batch_index == num_batches_train - 1
