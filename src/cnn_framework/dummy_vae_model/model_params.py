@@ -23,8 +23,8 @@ class DummyVAEModelParams(VAEModelParams):
         self.depth = 5
 
         self.train_ratio = 0.8
-        self.val_ratio = 0.2
-        self.test_ratio = 0.2
+        self.val_ratio = 0.1
+        self.test_ratio = 0.1
 
         self.learning_rate = 1e-4
         self.weight_decay = 0.05

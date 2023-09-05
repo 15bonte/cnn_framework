@@ -14,8 +14,8 @@ class DummyModelParams(ModelParams):
         self.learning_rate = 1e-4
 
         self.train_ratio = 0.8
-        self.val_ratio = 0.2
-        self.test_ratio = 0.2
+        self.val_ratio = 0.1
+        self.test_ratio = 0.1
 
         self.out_channels = 1
         self.nb_modalities = 3
