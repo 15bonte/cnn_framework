@@ -3,11 +3,11 @@ import json
 import os
 import time
 from typing import Type
+from pathlib import Path
 from matplotlib import pyplot as plt
 import numpy as np
-from bigfish import stack
+from skimage import io
 import git
-from pathlib import Path
 
 import torch
 from torch.utils.tensorboard import SummaryWriter
@@ -423,9 +423,9 @@ class ModelManager:
                 image_to_save = make_image_tiff_displayable(data_image, target_mean_std)
             else:
                 image_to_save = make_image_tiff_displayable(data_image, None)
-            stack.save_image(
-                image_to_save,
+            io.imsave(
                 f"{self.params.output_dir}/{name}_{data_type}.tiff",
+                image_to_save,
             )
 
     def batch_predict(

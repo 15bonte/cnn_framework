@@ -1,6 +1,6 @@
 import os
 from matplotlib import pyplot as plt
-from bigfish import stack
+from skimage import io
 import numpy as np
 import torch
 
@@ -37,19 +37,21 @@ class CnnModelManager(ModelManager):
             ["input", "additional"],
             [mean_std, None],  # No normalization for additional data
         ):
-
             if data_image is None:  # case when additional data is None
                 continue
             image_to_save = make_image_tiff_displayable(data_image, data_mean_std)
 
             # Save inputs with prediction and ground truth in name
-            stack.save_image(
-                image_to_save,
+            io.imsave(
                 f"{folder_to_save}/{name}_{data_type}_g{ground_truth_class}_p{prediction_class}.tiff",
+                image_to_save,
             )
 
     def write_images_to_tensorboard(
-        self, current_batch, dl_element, name,
+        self,
+        current_batch,
+        dl_element,
+        name,
     ):
         # Get numpy arrays
         numpy_dl_element = dl_element.get_numpy_dataset_output()
@@ -83,7 +85,9 @@ class CnnModelManager(ModelManager):
             input_mat = make_image_matplotlib_displayable(input_np, self.dl[name].dataset.mean_std)
             plt.imshow(input_mat)
             self.writer.add_figure(
-                f"{name}/{image_name}", plt.gcf(), current_batch,
+                f"{name}/{image_name}",
+                plt.gcf(),
+                current_batch,
             )
 
     def model_prediction(self, dl_element: DatasetOutput, dl_metric, _):

@@ -2,6 +2,7 @@ from abc import abstractmethod
 import json
 import numpy as np
 from bigfish import stack
+from skimage import io
 
 from ..enum import NormalizeMethods, ProjectMethods
 from ..preprocessing import (
@@ -22,7 +23,7 @@ class AbstractReader:
     normalize : NormalizeMethods
         Method to normalize the image
     project : ProjectMethods
-        Method to project the image 
+        Method to project the image
         Can be a either a method, or a tuple (method, parameter), or a list of tuples
         Parameters are:
             - Maximum: int, dimension to project
@@ -33,7 +34,7 @@ class AbstractReader:
         Path to the mean and std file
     respect_initial_type : bool
         If True, the image will be kept in the same type as the original file.
-        If False, the image will be converted to be adapted to torch. 
+        If False, the image will be converted to be adapted to torch.
     """
 
     def __init__(
@@ -44,7 +45,7 @@ class AbstractReader:
         mean_std_path=None,
         respect_initial_type=False,
     ):
-        raw_image = stack.read_image(file_path, sanity_check=False)  # Unknown dimensions order
+        raw_image = io.imread(file_path)
 
         # Type management
         if not respect_initial_type:
@@ -131,6 +132,12 @@ class AbstractReader:
 
     @abstractmethod
     def display_info(
-        self, unit=None, scale=None, save_path="", dimensions=None, show=True, verbose=True,
+        self,
+        unit=None,
+        scale=None,
+        save_path="",
+        dimensions=None,
+        show=True,
+        verbose=True,
     ):
         pass

@@ -1,5 +1,5 @@
 from matplotlib import pyplot as plt
-from bigfish import stack
+from skimage import io
 import numpy as np
 
 from ..data_sets.DatasetOutput import DatasetOutput
@@ -23,7 +23,6 @@ class RegressionModelManager(ModelManager):
             ["input", "additional"],
             [mean_std, None],  # No normalization for additional data
         ):
-
             if data_image is None:
                 continue
             image_to_save = make_image_tiff_displayable(data_image, data_mean_std)
@@ -34,13 +33,16 @@ class RegressionModelManager(ModelManager):
                 prediction_np = np.array([prediction_np])
             ground_truth = "_".join([str(local_target) for local_target in target_np])
             prediction = "_".join([str(local_prediction) for local_prediction in prediction_np])
-            stack.save_image(
-                image_to_save,
+            io.imsave(
                 f"{self.params.output_dir}/{name}_{data_type}_g{ground_truth}_p{prediction}.tiff",
+                image_to_save,
             )
 
     def write_images_to_tensorboard(
-        self, current_batch, dl_element, name,
+        self,
+        current_batch,
+        dl_element,
+        name,
     ):
         # Get numpy arrays
         numpy_dl_element = dl_element.get_numpy_dataset_output()
@@ -76,7 +78,9 @@ class RegressionModelManager(ModelManager):
             input_mat = make_image_matplotlib_displayable(input_np, self.dl[name].dataset.mean_std)
             plt.imshow(input_mat)
             self.writer.add_figure(
-                f"{name}/{image_name}", plt.gcf(), current_batch,
+                f"{name}/{image_name}",
+                plt.gcf(),
+                current_batch,
             )
 
     def model_prediction(self, dl_element, dl_metric, _):

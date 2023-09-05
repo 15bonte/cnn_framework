@@ -1,7 +1,6 @@
 import slideio
 import numpy as np
 import matplotlib.pyplot as plt
-from bigfish import stack
 
 from ..enum import NormalizeMethods, ProjectMethods
 from ..preprocessing import normalize_array
@@ -45,7 +44,7 @@ class CIZReader:
             stacks.append(block)
         array_stacks = np.asarray(stacks)  # DHW
         if name in self.project:  # Project only if asked
-            array_stacks = stack.maximum_projection(array_stacks)  # HW
+            array_stacks = array_stacks.max(axis=0)  # HW
             array_stacks = np.expand_dims(array_stacks, axis=0)  # DHW, D=1
         return array_stacks
 
