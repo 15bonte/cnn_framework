@@ -45,12 +45,15 @@ class DummyVAEDataSet(AbstractDataSet):
                 ]
             )
 
+    def generate_raw_images(self, filename):
+        return DatasetOutput(
+            input=self.input_data_source.get_image(filename, axis_to_merge=2),
+        )
+
     def __getitem__(self, idx):
         # Read file and generate images
         filename = self.names[idx]
-        raw_inputs = DatasetOutput(
-            input=self.input_data_source.get_image(filename, axis_to_merge=2),
-        )
+        raw_inputs = self.generate_raw_images(filename)
 
         # Category (0 for squares, 1 for circles)
         one_hot_probabilities = self.read_output(filename, one_hot=True)
