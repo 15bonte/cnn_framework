@@ -81,7 +81,9 @@ class ClassificationAccuracy(AbstractMetric):
         super().__init__(*args)
         self.name = "ClassificationAccuracy"
         self.true, self.pred = torch.empty(0).to(self.device), torch.empty(0).to(self.device)
-        self.metric = Accuracy(task="multiclass", num_classes=self.num_classes).to(self.device)
+        self.metric = Accuracy(
+            task="multiclass", num_classes=self.num_classes, average="macro"
+        ).to(self.device)
 
     def update(self, predictions, targets, _=None):
         # From vector to classification
@@ -100,7 +102,7 @@ class ClassificationAccuracy(AbstractMetric):
         return self.metric.compute().item(), (self.true, self.pred)
 
     def reset(self):
-        self.metric = Accuracy(task="multiclass", num_classes=self.num_classes).to(self.device)
+        self.metric = Accuracy(task="multiclass", num_classes=self.num_classes, average="macro").to(self.device)
         self.true, self.pred = torch.empty(0).to(self.device), torch.empty(0).to(self.device)
 
 
