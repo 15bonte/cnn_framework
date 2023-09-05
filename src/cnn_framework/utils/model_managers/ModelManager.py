@@ -48,8 +48,8 @@ class TrainingInformation:
         self.num_batches_train = None
         self.epochs = epochs
         # Training follow-up
-        self.epoch = None  # starts at 1
-        self.batch_index = None  # starts at 1
+        self.epoch = 1  # starts at 1
+        self.batch_index = 1  # starts at 1
 
     def check_validity(self) -> None:
         if self.num_batches_train is None:

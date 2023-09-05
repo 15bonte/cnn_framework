@@ -110,9 +110,8 @@ class AbstractDataSet(Dataset):
         self.set_transforms()
         self.check_order()
 
-    @abstractmethod
-    def generate_raw_images(self, filename) -> DatasetOutput:
-        raise NotImplementedError
+    def generate_raw_images(self, _) -> DatasetOutput:
+        return DatasetOutput()
 
     def read_output(self, filename, one_hot=False):
         """

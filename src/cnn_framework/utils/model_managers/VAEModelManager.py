@@ -1,6 +1,5 @@
 import os
 from matplotlib import pyplot as plt
-import numpy as np
 
 from ..data_sets.DatasetOutput import DatasetOutput
 from ..display_tools import display_progress
@@ -11,7 +10,6 @@ class VAEModelManager(ModelManager):
     def compute_loss(self, dl_element, dl_metric, _=None, __=None):
         # Read data loader element
         dl_element["data"] = dl_element["data"].to(self.device)
-        dl_element["target"] = dl_element["target"].to(self.device)
         dl_element["category"] = dl_element["category"].to(self.device)
 
         # Compute the model output
@@ -19,7 +17,7 @@ class VAEModelManager(ModelManager):
         dl_element.prediction = model_output["recon_x"]
 
         # Update metric
-        dl_metric.update(model_output["recon_x"], dl_element["target"])
+        dl_metric.update(model_output["recon_x"], dl_element["data"])
 
         return model_output["loss"]
 
@@ -29,7 +27,6 @@ class VAEModelManager(ModelManager):
         """
         # Read data loader element
         dl_element["data"] = dl_element["data"].to(self.device)
-        dl_element["target"] = dl_element["target"].to(self.device)
         dl_element["category"] = dl_element["category"].to(self.device)
 
         # Compute the model output
@@ -37,7 +34,7 @@ class VAEModelManager(ModelManager):
         dl_element.prediction = model_output
 
         # Update metric
-        dl_metric.update(model_output["recon_x"], dl_element["target"])
+        dl_metric.update(model_output["recon_x"], dl_element["data"])
 
     def batch_predict(
         self, test_dl, images_to_save, num_batches_test, test_metric, do_not_save_images
@@ -59,25 +56,22 @@ class VAEModelManager(ModelManager):
 
             # Get numpy elements
             inputs_np = dl_element["data"].cpu().numpy()
-            targets_np = dl_element["target"].cpu().numpy()
 
             # Save few images
             if do_not_save_images:
                 continue
 
-            for idx in range(dl_element["target"].shape[0]):
+            for idx in range(dl_element["data"].shape[0]):
                 if self.image_index in images_to_save:
                     image_id = (batch_idx * test_dl.batch_size) + idx
                     image_name = test_dl.dataset.names[image_id].split(".")[0]
 
                     # Get element at index
                     input_np = inputs_np[idx, ...].squeeze()
-                    target_np = targets_np[idx, ...].squeeze()
                     prediction_np = predictions_np[idx, ...].squeeze()
 
                     dl_element_numpy = DatasetOutput(
                         input=input_np,
-                        target_image=target_np,
                         prediction=prediction_np,
                     )
 
@@ -138,7 +132,7 @@ class VAEModelManager(ModelManager):
 
     def write_images_to_tensorboard(self, current_batch, dl_element, name):
         # Get numpy arrays
-        targets_np = dl_element["target"]
+        inputs_np = dl_element["data"]
         image_indexes_np = dl_element["id"]
 
         # Get images name
@@ -148,15 +142,15 @@ class VAEModelManager(ModelManager):
         image_names = [current_dl_file_names[image_index] for image_index in image_indexes_np]
 
         # Log the results images
-        for i, (target_np, image_name) in enumerate(zip(targets_np, image_names)):
+        for i, (input_np, image_name) in enumerate(zip(inputs_np, image_names)):
             # Do not save too many images
             if i == self.params.nb_tensorboard_images_max:
                 break
-            for channel in range(target_np.shape[0]):
+            for channel in range(input_np.shape[0]):
                 # ... log the ground truth image
-                plt.imshow(target_np[channel], cmap="gray")
+                plt.imshow(input_np[channel], cmap="gray")
                 self.writer.add_figure(
-                    f"{name}/{image_name}/{channel}/output",
+                    f"{name}/{image_name}/{channel}/input",
                     plt.gcf(),
                     current_batch,
                 )

@@ -11,9 +11,10 @@ class CustomEncoder(BaseEncoder):
     def __init__(self, params, args):
         BaseEncoder.__init__(self)
 
+        in_channels = params.nb_modalities * params.nb_stacks_per_modality
         self.conv_layers = get_encoder(
             params.encoder_name,
-            in_channels=params.nb_modalities,
+            in_channels=in_channels,
             weights="imagenet",
             depth=params.depth,
             drop_rate=params.dropout,
@@ -22,7 +23,7 @@ class CustomEncoder(BaseEncoder):
         # Infer size of images after convolutions
         # Create random input to infer size of output
         random_input = torch.randn(
-            1, params.nb_modalities, params.input_dimensions.height, params.input_dimensions.width
+            1, in_channels, params.input_dimensions.height, params.input_dimensions.width
         )
         random_output = self.conv_layers(random_input)
         output_size = random_output[-1].flatten().size(dim=0)

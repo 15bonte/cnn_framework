@@ -20,6 +20,9 @@ from segmentation_models_pytorch.encoders.timm_gernet import timm_gernet_encoder
 
 from segmentation_models_pytorch.encoders.timm_universal import TimmUniversalEncoder
 
+# Modified from segmentation_models_pytorch to enable drop_out parameter change 
+# Look for "Only change from original code" 
+
 encoders = {}
 encoders.update(resnet_encoders)
 encoders.update(dpn_encoders)

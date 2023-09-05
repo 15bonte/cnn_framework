@@ -66,7 +66,7 @@ class CustomDecoder(BaseDecoder):
         # Reconstruction
         self.segmentation_head = SegmentationHead(
             in_channels=out_channels[-1],
-            out_channels=params.out_channels,
+            out_channels=params.nb_modalities * params.nb_stacks_per_modality,
             activation=None,
             kernel_size=3,
         )

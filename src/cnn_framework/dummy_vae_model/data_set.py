@@ -19,12 +19,6 @@ class DummyVAEDataSet(AbstractDataSet):
             [NormalizeMethods.none],
         )
 
-        self.output_data_source = DataSource(
-            [self.data_manager.get_microscopy_image_path],
-            [(ProjectMethods.Channel, ([0, 1, 2], 2))],
-            [NormalizeMethods.none],
-        )
-
     def set_transforms(self):
         height, width = self.params.input_dimensions.to_tuple(False)
         if self.is_train:
@@ -51,17 +45,12 @@ class DummyVAEDataSet(AbstractDataSet):
                 ]
             )
 
-    def generate_raw_images(self, filename):
-        return DatasetOutput(
-            input=self.input_data_source.get_image(filename, axis_to_merge=2),
-            target_image=self.output_data_source.get_image(filename, axis_to_merge=2),
-            additional=self.additional_data_source.get_image(filename, axis_to_merge=2),
-        )
-
     def __getitem__(self, idx):
         # Read file and generate images
         filename = self.names[idx]
-        raw_inputs = self.generate_raw_images(filename)
+        raw_inputs = DatasetOutput(
+            input=self.input_data_source.get_image(filename, axis_to_merge=2),
+        )
 
         # Category (0 for squares, 1 for circles)
         one_hot_probabilities = self.read_output(filename, one_hot=True)
@@ -75,7 +64,6 @@ class DummyVAEDataSet(AbstractDataSet):
 
         return DatasetOutputVAE(
             data=raw_inputs.input,
-            target=raw_inputs.target,
             id=idx,
             category=category,
         )

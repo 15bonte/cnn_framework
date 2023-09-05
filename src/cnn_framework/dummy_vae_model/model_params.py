@@ -15,11 +15,10 @@ class DummyVAEModelParams(VAEModelParams):
 
         self.num_epochs = 30
 
-        self.nb_modalities = 3  # RGB or grayscale
+        self.nb_modalities = 3  # RGB
         self.nb_stacks_per_modality = 1
 
         self.nb_classes = 2  # square, circle
-        self.out_channels = 3  # R, G, B
         self.depth = 5
 
         self.train_ratio = 0.8
@@ -30,13 +29,11 @@ class DummyVAEModelParams(VAEModelParams):
         self.weight_decay = 0.05
         self.beta1 = 0.91
         self.beta2 = 0.995
-        self.reconstruction_loss = "mse"  # "l1", "bce" or "mse"
-        self.kld_loss = "standard"  # "standard" or "cl-vae"
+        self.reconstruction_loss = "mse"  # "mse"
+        self.kld_loss = "standard"  # "standard"
         self.encoder_name = "timm-efficientnet-b0"
 
         self.latent_dim = 16
         self.beta = 1  # weight of KLD loss
-        self.gamma = 0  # weight of classification loss
-        self.delta = 0  # weight of segmentation loss
 
         self.model_pretrained_path = ""
