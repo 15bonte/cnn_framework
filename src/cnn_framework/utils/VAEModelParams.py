@@ -16,7 +16,6 @@ class VAEModelParams(ModelParams):
         self.nb_stacks_per_modality = 1
 
         self.nb_classes = 3  # G1, S, G2
-        self.out_channels = 2  # FUCCI red and green
         self.depth = 5
 
         self.learning_rate = 1e-3
