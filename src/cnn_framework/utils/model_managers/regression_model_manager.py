@@ -1,35 +1,21 @@
-import os
 from matplotlib import pyplot as plt
 from skimage import io
 import numpy as np
-import torch
 
 from ..data_sets.dataset_output import DatasetOutput
-from .ModelManager import ModelManager
+from .model_manager import ModelManager
 from ..display_tools import (
-    display_confusion_matrix,
     make_image_matplotlib_displayable,
     make_image_tiff_displayable,
 )
 
 
-class CnnModelManager(ModelManager):
+class RegressionModelManager(ModelManager):
     def save_results(self, name, dl_element: DatasetOutput, mean_std):
         input_np = dl_element.input
         target_np = dl_element.target
         prediction_np = dl_element.prediction
         add_np = dl_element.additional
-
-        prediction_class = np.argmax(prediction_np, axis=0)
-        ground_truth_class = np.argmax(target_np, axis=0)
-
-        # Choose folder to save
-        folder_to_save = (
-            os.path.join(self.params.output_dir, "right")
-            if prediction_class == ground_truth_class
-            else os.path.join(self.params.output_dir, "wrong")
-        )
-        os.makedirs(folder_to_save, exist_ok=True)
 
         # Save inputs, targets & predictions as tiff images
         for data_image, data_type, data_mean_std in zip(
@@ -37,13 +23,18 @@ class CnnModelManager(ModelManager):
             ["input", "additional"],
             [mean_std, None],  # No normalization for additional data
         ):
-            if data_image is None:  # case when additional data is None
+            if data_image is None:
                 continue
             image_to_save = make_image_tiff_displayable(data_image, data_mean_std)
 
             # Save inputs with prediction and ground truth in name
+            if len(target_np.shape) == 0:  # case where regression predicts only one value
+                target_np = np.array([target_np])
+                prediction_np = np.array([prediction_np])
+            ground_truth = "_".join([str(local_target) for local_target in target_np])
+            prediction = "_".join([str(local_prediction) for local_prediction in prediction_np])
             io.imsave(
-                f"{folder_to_save}/{name}_{data_type}_g{ground_truth_class}_p{prediction_class}.tiff",
+                f"{self.params.output_dir}/{name}_{data_type}_g{ground_truth}_p{prediction}.tiff",
                 image_to_save,
             )
 
@@ -77,8 +68,10 @@ class CnnModelManager(ModelManager):
             if i == self.params.nb_tensorboard_images_max:
                 break
             # Get class with max probability
-            prediction = np.argmax(prediction_np, axis=0)
-            ground_truth = np.argmax(target_np, axis=0)
+            ground_truth = ",".join([str(int(local_target)) for local_target in target_np])
+            prediction = ",".join(
+                [str(int(local_prediction)) for local_prediction in prediction_np]
+            )
 
             # Log input image
             plt.title(f"Ground truth {ground_truth} - Predicted {prediction}")
@@ -90,18 +83,15 @@ class CnnModelManager(ModelManager):
                 current_batch,
             )
 
-    def model_prediction(self, dl_element: DatasetOutput, dl_metric, _):
+    def model_prediction(self, dl_element, dl_metric, _):
         """
-        Function to generate outputs from inputs for given model
-        Careful, softmax is applied here and not in the model.
+        Function to generate outputs from inputs for given model.
+        No softmax is applied here.
         """
         dl_element.to_device(self.device)
 
-        predictions = torch.softmax(self.model(dl_element.input.float()), dim=-1)
+        predictions = self.model(dl_element.input.float())
         dl_element.prediction = predictions
 
         # Update metric
         dl_metric.update(predictions, dl_element.target, dl_element.additional)
-
-    def plot_confusion_matrix(self, results):
-        display_confusion_matrix(results, self.params.class_names, self.params.output_dir)

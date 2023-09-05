@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 
-from .AbstractReader import AbstractReader
+from .abstract_reader import AbstractReader
 from ..display_tools import generate_size_bar
 
 
@@ -10,7 +10,6 @@ class PngReader(AbstractReader):
     """
 
     def display_info(self, unit=None, scale=None, save_path="", dimensions=None, _=True, __=True):
-
         image_to_plot = self.get_processed_image()
 
         if dimensions is not None:

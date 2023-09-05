@@ -1,4 +1,4 @@
-from .CnnParser import CnnParser
+from .cnn_parser import CnnParser
 
 
 class TransferParser(CnnParser):

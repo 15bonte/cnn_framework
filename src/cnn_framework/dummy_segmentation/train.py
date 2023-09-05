@@ -5,10 +5,10 @@ from .data_set import DummyDataSet
 from .model_params import DummyModelParams
 from .model import UNet
 
-from ..utils.parsers.CnnParser import CnnParser
+from ..utils.parsers.cnn_parser import CnnParser
 from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
-from ..utils.model_managers.ModelManager import ModelManager
-from ..utils.DataManagers import DefaultDataManager
+from ..utils.model_managers.model_manager import ModelManager
+from ..utils.data_managers import DefaultDataManager
 from ..utils.metrics import PCC
 
 

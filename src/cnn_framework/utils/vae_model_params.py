@@ -1,4 +1,4 @@
-from .ModelParams import ModelParams
+from .model_params import ModelParams
 from .dimensions import Dimensions
 
 

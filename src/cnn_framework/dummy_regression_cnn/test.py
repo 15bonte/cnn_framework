@@ -5,10 +5,10 @@ from .model_params import DummyModelParams
 from .model import DummyCnn
 
 from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
-from ..utils.model_managers.RegressionModelManager import RegressionModelManager
-from ..utils.DataManagers import DefaultDataManager
+from ..utils.model_managers.regression_model_manager import RegressionModelManager
+from ..utils.data_managers import DefaultDataManager
 from ..utils.metrics import MeanSquaredErrorMetric
-from ..utils.parsers.CnnParser import CnnParser
+from ..utils.parsers.cnn_parser import CnnParser
 
 
 def main(params):

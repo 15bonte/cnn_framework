@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 from PIL.TiffTags import TAGS
 
-from .AbstractReader import AbstractReader
+from .abstract_reader import AbstractReader
 from ..display_tools import generate_size_bar
 from ..enum import ProjectMethods
 
@@ -16,7 +16,13 @@ class TiffReader(AbstractReader):
     """
 
     def display_info(
-        self, unit=None, scale=None, save_path="", dimensions=None, show=True, verbose=True,
+        self,
+        unit=None,
+        scale=None,
+        save_path="",
+        dimensions=None,
+        show=True,
+        verbose=True,
     ):
         if verbose:
             with Image.open(self.file_path) as img:
@@ -85,5 +91,8 @@ if __name__ == "__main__":
     DIMENSIONS = {"min_x": 806 - 200, "max_x": 806 + 200, "min_y": 764 - 120, "max_y": 764 + 200}
     SAVE_PATH = None  # only for basic for now
 
-    reader = TiffReader(TIFF_FILE_TO_DISPLAY, project=[CHANNEL_PROJECTION, FRAME_PROJECTION],)
+    reader = TiffReader(
+        TIFF_FILE_TO_DISPLAY,
+        project=[CHANNEL_PROJECTION, FRAME_PROJECTION],
+    )
     reader.display_info(UNIT, SCALE, SAVE_PATH, DIMENSIONS)

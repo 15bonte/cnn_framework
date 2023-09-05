@@ -7,10 +7,10 @@ from .model import DummyCnn
 from ..utils.data_loader_generators.classifier_data_loader_generator import (
     ClassifierDataLoaderGenerator,
 )
-from ..utils.model_managers.CnnModelManager import CnnModelManager
-from ..utils.DataManagers import DefaultDataManager
+from ..utils.model_managers.cnn_model_manager import CnnModelManager
+from ..utils.data_managers import DefaultDataManager
 from ..utils.metrics import ClassificationAccuracy
-from ..utils.parsers.CnnParser import CnnParser
+from ..utils.parsers.cnn_parser import CnnParser
 
 
 def main(params):

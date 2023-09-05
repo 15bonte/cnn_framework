@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from ..data_sets.dataset_output import DatasetOutput
 from ..display_tools import make_image_matplotlib_displayable
 from ..metrics import AbstractMetric
-from .ModelManager import ModelManager
+from .model_manager import ModelManager
 
 
 class ContrastiveModelManager(ModelManager):

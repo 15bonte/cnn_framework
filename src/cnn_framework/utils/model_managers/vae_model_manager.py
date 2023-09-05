@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 
 from ..data_sets.dataset_output import DatasetOutput
 from ..display_tools import display_progress
-from .ModelManager import ModelManager
+from .model_manager import ModelManager
 
 
 class VAEModelManager(ModelManager):

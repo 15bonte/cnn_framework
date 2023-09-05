@@ -15,7 +15,7 @@ from torch.cuda.amp import GradScaler, autocast
 from torch.optim.lr_scheduler import StepLR
 import torch.nn as nn
 
-from ..ModelParams import ModelParams
+from ..model_params import ModelParams
 from ..data_sets.dataset_output import DatasetOutput
 from ..metrics import AbstractMetric
 from ..tools import random_sample
