@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 from albumentations import Compose
 
 from ..readers.tiff_reader import TiffReader
-from .DatasetOutput import DatasetOutput
+from .dataset_output import DatasetOutput
 from ..enum import NormalizeMethods, ProjectMethods
 from ..tools import read_categories_probability_from_name, to_one_hot
 

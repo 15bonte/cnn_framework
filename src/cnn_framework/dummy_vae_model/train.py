@@ -9,10 +9,10 @@ from .data_set import DummyVAEDataSet
 from .model_params import DummyVAEModelParams
 
 from ..utils.DataManagers import DefaultDataManager
-from ..utils.data_loader_generators.DataLoaderGenerator import DataLoaderGenerator
+from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
 from ..utils.metrics import MeanSquaredErrorMetric
 from ..utils.model_managers.ModelManager import ModelManager
-from ..utils.model_managers.VAEModelManager import VAEModelManager
+from ..utils.model_managers.vae_model_manager import VAEModelManager
 from ..utils.parsers.VAEParser import VAEParser
 
 from .decoder import CustomDecoder

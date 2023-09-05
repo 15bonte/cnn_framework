@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 from skimage import io
 import numpy as np
 
-from ..data_sets.DatasetOutput import DatasetOutput
+from ..data_sets.dataset_output import DatasetOutput
 from .ModelManager import ModelManager
 from ..display_tools import (
     make_image_matplotlib_displayable,

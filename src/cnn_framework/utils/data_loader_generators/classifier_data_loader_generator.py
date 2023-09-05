@@ -2,7 +2,7 @@ import random
 import numpy as np
 from collections import Counter
 
-from .DataLoaderGenerator import DataLoaderGenerator
+from .data_loader_generator import DataLoaderGenerator
 
 
 constant_seeded_rd = random.Random(10)

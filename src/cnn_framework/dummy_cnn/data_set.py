@@ -1,7 +1,7 @@
 import albumentations as A
 
-from ..utils.data_sets.AbstractDataSet import AbstractDataSet, DataSource
-from ..utils.data_sets.DatasetOutput import DatasetOutput
+from ..utils.data_sets.abstract_data_set import AbstractDataSet, DataSource
+from ..utils.data_sets.dataset_output import DatasetOutput
 from ..utils.enum import NormalizeMethods, ProjectMethods
 
 

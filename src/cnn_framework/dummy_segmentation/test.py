@@ -1,7 +1,7 @@
 import torch
 
 from ..utils.DataManagers import DefaultDataManager
-from ..utils.data_loader_generators.DataLoaderGenerator import DataLoaderGenerator
+from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
 from ..utils.metrics import PCC
 from ..utils.model_managers.ModelManager import ModelManager
 from ..utils.parsers.CnnParser import CnnParser

@@ -4,7 +4,7 @@ from .data_set import DummyCnnDataSet
 from .model_params import DummyModelParams
 from .model import DummyCnn
 
-from ..utils.data_loader_generators.ClassifierDataLoaderGenerator import (
+from ..utils.data_loader_generators.classifier_data_loader_generator import (
     ClassifierDataLoaderGenerator,
 )
 from ..utils.model_managers.CnnModelManager import CnnModelManager

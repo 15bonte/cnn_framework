@@ -5,7 +5,7 @@ from torch.utils.data._utils.collate import default_collate
 
 from ..DataManagers import DefaultDataManager
 from ..ModelParams import DataSplit
-from ..data_sets.DatasetOutput import DatasetOutput
+from ..data_sets.dataset_output import DatasetOutput
 from ..tools import handle_image_type
 
 

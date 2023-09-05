@@ -4,7 +4,7 @@ from .data_set import DummyRegressionCnnDataSet
 from .model_params import DummyModelParams
 from .model import DummyCnn
 
-from ..utils.data_loader_generators.DataLoaderGenerator import DataLoaderGenerator
+from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
 from ..utils.model_managers.RegressionModelManager import RegressionModelManager
 from ..utils.DataManagers import DefaultDataManager
 from ..utils.metrics import MeanSquaredErrorMetric

@@ -16,10 +16,10 @@ from torch.optim.lr_scheduler import StepLR
 import torch.nn as nn
 
 from ..ModelParams import ModelParams
-from ..data_sets.DatasetOutput import DatasetOutput
+from ..data_sets.dataset_output import DatasetOutput
 from ..metrics import AbstractMetric
 from ..tools import random_sample
-from ..data_loader_generators.DataLoaderGenerator import get_mean_and_std
+from ..data_loader_generators.data_loader_generator import get_mean_and_std
 from ..display_tools import (
     display_progress,
     make_image_tiff_displayable,

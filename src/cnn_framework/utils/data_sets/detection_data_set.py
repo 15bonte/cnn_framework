@@ -1,7 +1,7 @@
 import json
 from abc import abstractmethod
 
-from .AbstractDataSet import AbstractDataSet
+from .abstract_data_set import AbstractDataSet
 
 
 class DetectionDataSet(AbstractDataSet):

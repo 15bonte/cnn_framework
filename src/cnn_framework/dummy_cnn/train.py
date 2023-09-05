@@ -9,7 +9,7 @@ from .data_set import DummyCnnDataSet
 from .model_params import DummyModelParams
 from .model import DummyCnn
 
-from ..utils.data_loader_generators.ClassifierDataLoaderGenerator import (
+from ..utils.data_loader_generators.classifier_data_loader_generator import (
     ClassifierDataLoaderGenerator,
 )
 from ..utils.model_managers.CnnModelManager import CnnModelManager
@@ -32,7 +32,9 @@ def main(params):
     manager = CnnModelManager(model, params, ClassificationAccuracy)
 
     optimizer = optim.Adam(
-        model.parameters(), lr=float(params.learning_rate), betas=(params.beta1, params.beta2),
+        model.parameters(),
+        lr=float(params.learning_rate),
+        betas=(params.beta1, params.beta2),
     )  # define the optimization
     loss_function = nn.CrossEntropyLoss()  # define the loss function
 

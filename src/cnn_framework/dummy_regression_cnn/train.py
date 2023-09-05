@@ -9,7 +9,7 @@ from .data_set import DummyRegressionCnnDataSet
 from .model_params import DummyModelParams
 from .model import DummyCnn
 
-from ..utils.data_loader_generators.DataLoaderGenerator import DataLoaderGenerator
+from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
 from ..utils.model_managers.RegressionModelManager import RegressionModelManager
 from ..utils.DataManagers import DefaultDataManager
 from ..utils.metrics import MeanSquaredErrorMetric
@@ -30,7 +30,9 @@ def main(params):
     manager = RegressionModelManager(model, params, MeanSquaredErrorMetric)
 
     optimizer = optim.Adam(
-        model.parameters(), lr=float(params.learning_rate), betas=(params.beta1, params.beta2),
+        model.parameters(),
+        lr=float(params.learning_rate),
+        betas=(params.beta1, params.beta2),
     )  # define the optimization
     loss_function = nn.L1Loss()  # define the loss function
 

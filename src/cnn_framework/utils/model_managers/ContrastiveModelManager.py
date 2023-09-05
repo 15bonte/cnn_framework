@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 import torch
 import torch.nn.functional as F
 
-from ..data_sets.DatasetOutput import DatasetOutput
+from ..data_sets.dataset_output import DatasetOutput
 from ..display_tools import make_image_matplotlib_displayable
 from ..metrics import AbstractMetric
 from .ModelManager import ModelManager
@@ -77,7 +77,9 @@ class ContrastiveModelManager(ModelManager):
         current_dl_file_names = [
             file_name.split(".")[0] for file_name in self.dl[name].dataset.names
         ]
-        image_names = [current_dl_file_names[image_index] for image_index in numpy_dl_element.index]
+        image_names = [
+            current_dl_file_names[image_index] for image_index in numpy_dl_element.index
+        ]
 
         # Current data set mean & std
         mean_std = self.dl[name].dataset.mean_std
@@ -91,12 +93,16 @@ class ContrastiveModelManager(ModelManager):
                 break
             plt.imshow(make_image_matplotlib_displayable(input_np, mean_std=mean_std))
             self.writer.add_figure(
-                f"{name}/{image_name}/first_transformed", plt.gcf(), current_batch,
+                f"{name}/{image_name}/first_transformed",
+                plt.gcf(),
+                current_batch,
             )
 
             plt.imshow(make_image_matplotlib_displayable(input_np_bis, mean_std=mean_std))
             self.writer.add_figure(
-                f"{name}/{image_name}/second_transformed", plt.gcf(), current_batch,
+                f"{name}/{image_name}/second_transformed",
+                plt.gcf(),
+                current_batch,
             )
 
     def save_results(self, _, __, ___):

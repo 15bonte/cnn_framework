@@ -1,7 +1,7 @@
 import os
 from matplotlib import pyplot as plt
 
-from ..data_sets.DatasetOutput import DatasetOutput
+from ..data_sets.dataset_output import DatasetOutput
 from ..display_tools import display_progress
 from .ModelManager import ModelManager
 
