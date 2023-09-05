@@ -8,7 +8,7 @@ from ..utils.data_loader_generators.classifier_data_loader_generator import (
     ClassifierDataLoaderGenerator,
 )
 from ..utils.model_managers.cnn_model_manager import CnnModelManager
-from ..utils.data_managers import DefaultDataManager
+from ..utils.data_managers.default_data_manager import DefaultDataManager
 from ..utils.metrics import ClassificationAccuracy
 from ..utils.parsers.cnn_parser import CnnParser
 

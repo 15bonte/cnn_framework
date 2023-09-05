@@ -3,8 +3,8 @@ import random
 from datetime import datetime
 import os
 
-from .dimensions import Dimensions
-from .tools import extract_patterns
+from ..dimensions import Dimensions
+from ..tools import extract_patterns
 
 
 class DataSplit:
@@ -123,7 +123,7 @@ class DataSplit:
         )
 
 
-class ModelParams:
+class BaseModelParams:
     """
     Model params base class.
     """

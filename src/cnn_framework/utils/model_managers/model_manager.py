@@ -15,7 +15,7 @@ from torch.cuda.amp import GradScaler, autocast
 from torch.optim.lr_scheduler import StepLR
 import torch.nn as nn
 
-from ..model_params import ModelParams
+from ..model_params.base_model_params import BaseModelParams
 from ..data_sets.dataset_output import DatasetOutput
 from ..metrics import AbstractMetric
 from ..tools import random_sample
@@ -69,7 +69,9 @@ class ModelManager:
     Class with all useful functions to train, test, ... a CNN-based model
     """
 
-    def __init__(self, model: nn.Module, params: ModelParams, metric_class: Type[AbstractMetric]):
+    def __init__(
+        self, model: nn.Module, params: BaseModelParams, metric_class: Type[AbstractMetric]
+    ):
         # Device to train model
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

@@ -8,7 +8,7 @@ from pythae.models import AutoModel, BetaVAE, BetaVAEConfig
 from .data_set import DummyVAEDataSet
 from .model_params import DummyVAEModelParams
 
-from ..utils.data_managers import DefaultDataManager
+from ..utils.data_managers.default_data_manager import DefaultDataManager
 from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
 from ..utils.metrics import MeanSquaredErrorMetric
 from ..utils.model_managers.model_manager import ModelManager

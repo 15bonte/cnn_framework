@@ -3,8 +3,8 @@ import torch
 from torch.utils.data import DataLoader, WeightedRandomSampler
 from torch.utils.data._utils.collate import default_collate
 
-from ..data_managers import DefaultDataManager
-from ..model_params import DataSplit
+from ..data_managers.default_data_manager import DefaultDataManager
+from ..model_params.base_model_params import DataSplit
 from ..data_sets.dataset_output import DatasetOutput
 from ..tools import handle_image_type
 

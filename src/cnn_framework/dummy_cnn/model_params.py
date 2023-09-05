@@ -1,8 +1,8 @@
-from ..utils.model_params import ModelParams
+from ..utils.model_params.base_model_params import BaseModelParams
 from ..utils.dimensions import Dimensions
 
 
-class DummyModelParams(ModelParams):
+class DummyModelParams(BaseModelParams):
     """
     Dummy model params.
     """

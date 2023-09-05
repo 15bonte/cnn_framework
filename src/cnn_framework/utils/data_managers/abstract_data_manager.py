@@ -1,13 +1,6 @@
-import os
 import random
 
-from .dimensions import Dimensions
-
-
-def read_type_from_image_path_function(function):
-    str_fct = function.__name__
-    start, end = "get_", "_image_path"
-    return str_fct[str_fct.find(start) + len(start) : str_fct.rfind(end)]
+from ..dimensions import Dimensions
 
 
 class AbstractDataManager:
@@ -96,11 +89,3 @@ class AbstractDataManager:
 
     def get_bounding_boxes_path(self):
         return ""
-
-
-class DefaultDataManager(AbstractDataManager):
-    def get_distinct_files(self):
-        return os.listdir(self.data_set_dir)
-
-    def get_microscopy_image_path(self, file):
-        return os.path.join(self.data_set_dir, file)

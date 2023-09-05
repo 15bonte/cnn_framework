@@ -1,8 +1,8 @@
-from .model_params import ModelParams
-from .dimensions import Dimensions
+from .base_model_params import BaseModelParams
+from ..dimensions import Dimensions
 
 
-class VAEModelParams(ModelParams):
+class VAEModelParams(BaseModelParams):
     """
     VAE model params.
     """

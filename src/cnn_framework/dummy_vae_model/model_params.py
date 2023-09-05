@@ -1,4 +1,4 @@
-from ..utils.vae_model_params import VAEModelParams
+from ..utils.model_params.vae_model_params import VAEModelParams
 
 from ..utils.dimensions import Dimensions
 
