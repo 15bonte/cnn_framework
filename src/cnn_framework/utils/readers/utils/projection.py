@@ -1,5 +1,6 @@
 from typing import Optional, List
-from cnn_framework.utils.enum import ProjectMethods
+
+from ...enum import ProjectMethods
 
 
 class Projection:
