@@ -17,8 +17,7 @@ class DummyVAEDataSet(AbstractDataSet):
         # Data sources
         self.input_data_source = ImagesReader(
             [self.data_manager.get_microscopy_image_path],
-            [Projection(method=ProjectMethods.Channel, channels=[0, 1, 2], axis=2)],
-            [NormalizeMethods.none],
+            [[Projection(method=ProjectMethods.Channel, channels=[0, 1, 2], axis=2)]],
         )
 
     def set_transforms(self):

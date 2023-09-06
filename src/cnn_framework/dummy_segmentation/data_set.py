@@ -14,13 +14,13 @@ class DummyDataSet(AbstractDataSet):
         # Data sources
         self.input_data_source = ImagesReader(
             [self.data_manager.get_microscopy_image_path],
-            [Projection(method=ProjectMethods.Channel, channels=[0, 1, 2], axis=2)],
+            [[Projection(method=ProjectMethods.Channel, channels=[0, 1, 2], axis=2)]],
         )
 
         # First channel is always 255
         self.output_data_source = ImagesReader(
             [self.data_manager.get_microscopy_image_path],
-            [Projection(method=ProjectMethods.Channel, channels=[0], axis=2)],
+            [[Projection(method=ProjectMethods.Channel, channels=[0], axis=2)]],
         )
 
     def set_transforms(self):

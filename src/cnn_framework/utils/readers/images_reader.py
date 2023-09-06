@@ -10,21 +10,24 @@ from .utils.projection import Projection
 
 class ImagesReader:
     def __init__(
-        self, functions=None, projections=Optional[List[Projection]], normalizations=None
+        self,
+        functions=None,
+        projections: Optional[List[List[Projection]]] = None,
+        normalizations=None,
     ):
         self.functions = [] if functions is None else functions
 
         if projections is not None:
-            assert len(functions) == len(projections)
+            assert len(self.functions) == len(projections)
             self.projections = projections
         else:
-            self.projections = [Projection(method=ProjectMethods.none)] * len(functions)
+            self.projections = [[Projection(method=ProjectMethods.none)]] * len(self.functions)
 
         if normalizations is not None:
-            assert len(functions) == len(normalizations)
+            assert len(self.functions) == len(normalizations)
             self.normalizations = normalizations
         else:
-            self.normalizations = [NormalizeMethods.none] * len(functions)
+            self.normalizations = [NormalizeMethods.none] * len(self.functions)
 
     def is_empty(self):
         return len(self.functions) == 0

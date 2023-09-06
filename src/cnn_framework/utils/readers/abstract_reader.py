@@ -48,8 +48,12 @@ class AbstractReader:
         mean_std_path=None,
         respect_initial_type=False,
     ):
-        self.file_path = file_path
-        self._image = None
+        # Read image from file
+        self.image = io.imread(file_path)
+        # Type management
+        if not respect_initial_type:
+            self.image = handle_image_type(self.image)
+
         self.respect_initial_type = respect_initial_type
 
         self.preprocessing_done = False
@@ -60,56 +64,38 @@ class AbstractReader:
         self.file_path = file_path
         self.mean_std_path = mean_std_path
 
-    @property
-    def image(self) -> np.ndarray:
-        if self._image is not None:
-            return self._image
-
-        # Read image from file
-        raw_image = io.imread(self.file_path)
-        # Type management
-        if not self.respect_initial_type:
-            raw_image = handle_image_type(raw_image)
-
-        self._image = raw_image
-        return self._image
-
     def get_processed_image(self):
         if not self.preprocessing_done:
-            self.preprocess_image()
-        return self._image
-
-    def preprocess_image(self):
-        # NB: used to be a copy here, do not know why...
-        # Project
-        for projection in self.project:
-            self.project_image(projection)
-        # Normalize
-        self.normalize_image()
+            # Project
+            for projection in self.project:
+                self.project_image(projection)
+            # Normalize
+            self.normalize_image()
         self.preprocessing_done = True
+        return self.image
 
     def get_dimensions(self):
-        return self._image.shape
+        return self.image.shape
 
     def normalize_image(self):
         if self.normalize == NormalizeMethods.none:
             pass
         elif self.normalize == NormalizeMethods.ZeroOneScaler:
-            self._image = zero_one_scaler(self._image)
+            self.image = zero_one_scaler(self.image)
         elif self.normalize == NormalizeMethods.Standardize:
-            self._image = normalize_array(self._image, None)
+            self.image = normalize_array(self.image, None)
         elif self.normalize == NormalizeMethods.StandardizeImageNet:
-            type_factor = np.iinfo(self._image.dtype).max
+            type_factor = np.iinfo(self.image.dtype).max
             mean_std = {
                 0: {"mean": 0.485 * type_factor, "std": 0.229 * type_factor},
                 1: {"mean": 0.456 * type_factor, "std": 0.224 * type_factor},
                 2: {"mean": 0.406 * type_factor, "std": 0.225 * type_factor},
             }
-            self._image = normalize_array(self._image, mean_std) / type_factor
+            self.image = normalize_array(self.image, mean_std) / type_factor
         elif self.normalize == NormalizeMethods.CustomStandardize:
             with open(self.mean_std_path, "r") as points_file:
                 mean_std = json.load(points_file)
-            self._image = normalize_array(self._image, mean_std)
+            self.image = normalize_array(self.image, mean_std)
         else:
             raise ValueError("Unknown normalization method")
 
@@ -118,13 +104,13 @@ class AbstractReader:
         if projection.method == ProjectMethods.none:
             pass
         elif projection.method == ProjectMethods.Maximum:
-            self._image = self._image.max(axis=projection.axis)
+            self.image = self.image.max(axis=projection.axis)
         elif projection.method == ProjectMethods.Mean:
-            self._image = self._image.mean(axis=projection.axis).astype(self._image.dtype)
+            self.image = self.image.mean(axis=projection.axis).astype(self.image.dtype)
         elif projection.method == ProjectMethods.Focus:
-            self._image = stack.focus_projection(self._image, proportion=projection.proportion)
+            self.image = stack.focus_projection(self.image, proportion=projection.proportion)
         elif projection.method == ProjectMethods.Channel:
-            self._image = np.take(self._image, projection.channels, axis=projection.axis).squeeze()
+            self.image = np.take(self.image, projection.channels, axis=projection.axis).squeeze()
         else:
             raise ValueError("Unknown projection method")
 

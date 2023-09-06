@@ -4,7 +4,7 @@ from ..utils.readers.utils.projection import Projection
 from ..utils.readers.images_reader import ImagesReader
 from ..utils.data_sets.abstract_data_set import AbstractDataSet
 from ..utils.data_sets.dataset_output import DatasetOutput
-from ..utils.enum import NormalizeMethods, ProjectMethods
+from ..utils.enum import ProjectMethods
 
 
 class DummyCnnDataSet(AbstractDataSet):
@@ -15,8 +15,13 @@ class DummyCnnDataSet(AbstractDataSet):
         nb_channels = self.params.nb_modalities
         self.input_data_source = ImagesReader(
             [self.data_manager.get_microscopy_image_path],
-            [Projection(method=ProjectMethods.Channel, channels=list(range(nb_channels)), axis=2)],
-            [NormalizeMethods.none],
+            [
+                [
+                    Projection(
+                        method=ProjectMethods.Channel, channels=list(range(nb_channels)), axis=2
+                    )
+                ]
+            ],
         )
 
     def set_transforms(self):
@@ -53,5 +58,4 @@ class DummyCnnDataSet(AbstractDataSet):
         return DatasetOutput(
             input=self.input_data_source.get_image(filename, axis_to_merge=2),
             target_array=probabilities,
-            additional=self.additional_data_source.get_image(filename, axis_to_merge=2),
         )

@@ -601,7 +601,7 @@ class ModelManager:
             f.write(f"{self.params.test_number};")
             f.write(f"{self.params.num_epochs};")
             f.write(f"{self.params.learning_rate};")
-            training_time = self.information["training_time"]
+            training_time = self.information["training_time"] if "training_time" in self.information else 0
             f.write(f"{training_time};")
             score = self.information["score"]
             f.write(f"{score};\n")

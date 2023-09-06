@@ -16,7 +16,13 @@ class DummyRegressionCnnDataSet(AbstractDataSet):
         nb_channels = self.params.nb_modalities
         self.input_data_source = ImagesReader(
             [self.data_manager.get_microscopy_image_path],
-            [Projection(method=ProjectMethods.Channel, channels=list(range(nb_channels)), axis=2)],
+            [
+                [
+                    Projection(
+                        method=ProjectMethods.Channel, channels=list(range(nb_channels)), axis=2
+                    )
+                ]
+            ],
         )
 
     def set_transforms(self):
