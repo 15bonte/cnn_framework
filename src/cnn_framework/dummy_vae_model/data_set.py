@@ -3,9 +3,11 @@ import numpy as np
 
 from pythae.data.datasets import DatasetOutput as DatasetOutputVAE
 
+from ..utils.readers.utils.projection import Projection
 from ..utils.data_sets.dataset_output import DatasetOutput
 from ..utils.enum import NormalizeMethods, ProjectMethods
-from ..utils.data_sets.abstract_data_set import AbstractDataSet, DataSource
+from ..utils.data_sets.abstract_data_set import AbstractDataSet
+from ..utils.readers.images_reader import ImagesReader
 
 
 class DummyVAEDataSet(AbstractDataSet):
@@ -13,9 +15,9 @@ class DummyVAEDataSet(AbstractDataSet):
         super().__init__(*args, **kwargs)
 
         # Data sources
-        self.input_data_source = DataSource(
+        self.input_data_source = ImagesReader(
             [self.data_manager.get_microscopy_image_path],
-            [(ProjectMethods.Channel, ([0, 1, 2], 2))],
+            [Projection(method=ProjectMethods.Channel, channels=[0, 1, 2], axis=2)],
             [NormalizeMethods.none],
         )
 

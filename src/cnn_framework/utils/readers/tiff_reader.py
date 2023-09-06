@@ -4,6 +4,8 @@ import numpy as np
 from PIL import Image
 from PIL.TiffTags import TAGS
 
+from .utils.projection import Projection
+
 from .abstract_reader import AbstractReader
 from ..display_tools import generate_size_bar
 from ..enum import ProjectMethods
@@ -81,8 +83,12 @@ if __name__ == "__main__":
     )
 
     # NB: display is ugly with several images...
-    CHANNEL_PROJECTION = (ProjectMethods.Channel, ([2], 3))  # channel 2 on axis 3
-    FRAME_PROJECTION = (ProjectMethods.Channel, ([57], 0))  # channel 57 on axis 0
+    CHANNEL_PROJECTION = Projection(
+        method=ProjectMethods.Channel, channels=[2], axis=3
+    )  # channel 2 on axis 3
+    FRAME_PROJECTION = Projection(
+        method=ProjectMethods.Channel, channels=[57], axis=0
+    )  # channel 57 on axis 0
 
     UNIT, SCALE = (
         "µm",

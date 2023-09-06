@@ -1,7 +1,9 @@
 import albumentations as A
 import numpy as np
 
-from ..utils.data_sets.abstract_data_set import AbstractDataSet, DataSource
+from ..utils.readers.utils.projection import Projection
+from ..utils.data_sets.abstract_data_set import AbstractDataSet
+from ..utils.readers.images_reader import ImagesReader
 from ..utils.data_sets.dataset_output import DatasetOutput
 from ..utils.enum import NormalizeMethods, ProjectMethods
 
@@ -12,10 +14,9 @@ class DummyRegressionCnnDataSet(AbstractDataSet):
 
         # Data sources
         nb_channels = self.params.nb_modalities
-        self.input_data_source = DataSource(
+        self.input_data_source = ImagesReader(
             [self.data_manager.get_microscopy_image_path],
-            [(ProjectMethods.Channel, (list(range(nb_channels)), 2))],
-            [NormalizeMethods.none],
+            [Projection(method=ProjectMethods.Channel, channels=list(range(nb_channels)), axis=2)],
         )
 
     def set_transforms(self):
