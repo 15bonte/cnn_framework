@@ -588,7 +588,7 @@ class ModelManager:
         if not os.path.exists(self.params.global_results_path):
             with open(self.params.global_results_path, "w") as f:
                 f.write(
-                    "model;model id;train set size;val set size;test set size;epochs;learning rate;score;\n"
+                    "model;model id;train set size;val set size;test set size;epochs;learning rate;training_time;score;\n"
                 )
             f.close()
 
