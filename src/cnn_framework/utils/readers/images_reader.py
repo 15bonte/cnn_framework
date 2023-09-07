@@ -6,6 +6,7 @@ from ..readers.tiff_reader import TiffReader
 from ..enum import NormalizeMethods, ProjectMethods
 
 from .utils.projection import Projection
+from .utils.normalization import Normalization
 
 
 class ImagesReader:
@@ -27,7 +28,9 @@ class ImagesReader:
             assert len(self.functions) == len(normalizations)
             self.normalizations = normalizations
         else:
-            self.normalizations = [NormalizeMethods.none] * len(self.functions)
+            self.normalizations = [Normalization(method=NormalizeMethods.none)] * len(
+                self.functions
+            )
 
     def is_empty(self):
         return len(self.functions) == 0

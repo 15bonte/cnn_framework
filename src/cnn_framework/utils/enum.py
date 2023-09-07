@@ -5,7 +5,6 @@ class NormalizeMethods(Enum):
     ZeroOneScaler = 1
     Standardize = 2
     StandardizeImageNet = 3
-    CustomStandardize = 4
     none = -1
 
 
