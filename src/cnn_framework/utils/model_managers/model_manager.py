@@ -191,9 +191,9 @@ class ModelManager:
                     current_batch,
                 )
 
-            # ... log running accuracy
+            # ... log running metric
             score, _ = train_metric.get_score()
-            self.writer.add_scalar("train/accuracy", score, current_batch)
+            self.writer.add_scalar(f"train/{train_metric.get_name()}", score, current_batch)
             train_metric.reset()
 
     def log_val_progress(self, val_metric: AbstractMetric) -> None:
@@ -205,9 +205,9 @@ class ModelManager:
             val_dl_length = len(self.dl["val"])
             self.writer.add_scalar(f"val/{name}", loss.item() / val_dl_length, current_batch)
 
-        # ...log the running accuracy
+        # ...log the running metric
         score, _ = val_metric.get_score()
-        self.writer.add_scalar("val/accuracy", score, current_batch)
+        self.writer.add_scalar(f"val/{val_metric.get_name()}", score, current_batch)
         return score
 
     def log_images(self, dl_element: DatasetOutput, name: str):

@@ -15,6 +15,9 @@ class AbstractMetric:
         self.device = device
         self.num_classes = num_classes
 
+    def get_name(self):
+        return self.__class__.__name__
+
     @abstractmethod
     def update(self, predictions, targets, adds=None):
         pass
@@ -102,7 +105,9 @@ class ClassificationAccuracy(AbstractMetric):
         return self.metric.compute().item(), (self.true, self.pred)
 
     def reset(self):
-        self.metric = Accuracy(task="multiclass", num_classes=self.num_classes, average="macro").to(self.device)
+        self.metric = Accuracy(
+            task="multiclass", num_classes=self.num_classes, average="macro"
+        ).to(self.device)
         self.true, self.pred = torch.empty(0).to(self.device), torch.empty(0).to(self.device)
 
 
