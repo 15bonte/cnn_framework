@@ -100,6 +100,7 @@ class ModelManager:
         self.epochs = int(self.params.num_epochs)
         self.train_loss_manager = None
         self.val_loss_manager = None
+        self.lr_scheduler = None
 
         # Useful information
         self.information = {"git_hash": sha}
@@ -225,7 +226,7 @@ class ModelManager:
             # Plot last training batch of epoch
             self.write_images_to_tensorboard(current_batch, dl_element, name)
 
-    def fit_core(self, optimizer, lr_scheduler):
+    def fit_core(self, optimizer):
         # Batch information
         self.training_information.num_batches_train = len(self.dl["train"])
         best_val_loss, best_val_score = np.Infinity, -np.Infinity
@@ -240,7 +241,7 @@ class ModelManager:
         for epoch in range(self.epochs):
             self.training_information.epoch = epoch + 1
             # Start by lr_scheduler as warmup starts by 0 otherwise
-            lr_scheduler.step()
+            self.lr_scheduler.step()
             # Enumerate mini batches
             self.model.train()  # set model to train mode
             for batch_index, dl_element in enumerate(
@@ -358,7 +359,9 @@ class ModelManager:
 
         # Define lr_scheduler
         if lr_scheduler is None:
-            lr_scheduler = StepLR(optimizer, step_size=1, gamma=1)  # Constant lr
+            self.lr_scheduler = StepLR(optimizer, step_size=1, gamma=1)  # Constant lr
+        else:
+            self.lr_scheduler = lr_scheduler
 
         # Monitor training time
         start = time.time()
@@ -372,7 +375,7 @@ class ModelManager:
             self.val_loss_manager = LossManager(loss_function)
 
         # Core fit function with training loop
-        self.fit_core(optimizer, lr_scheduler)
+        self.fit_core(optimizer)
 
         self.writer.close()
         end = time.time()
