@@ -184,16 +184,16 @@ class ModelManager:
         if current_batch % plot_step == plot_step - 1:  # every plot_step mini-batches...
             # ... log the running loss
             running_losses = self.train_loss_manager.get_running_losses()
-            for running_loss in running_losses:
+            for name, loss in running_losses:
                 self.writer.add_scalar(
-                    f"train/{running_loss[0]}/loss",
-                    running_loss[1].item() / plot_step,
+                    f"train/{name}",
+                    loss.item() / plot_step,
                     current_batch,
                 )
 
             # ... log running accuracy
             score, _ = train_metric.get_score()
-            self.writer.add_scalar(f"train/{j}/accuracy", score, current_batch)
+            self.writer.add_scalar("train/accuracy", score, current_batch)
             train_metric.reset()
 
     def log_val_progress(self, val_metric: AbstractMetric) -> None:
@@ -201,13 +201,13 @@ class ModelManager:
 
         # ...log the running loss
         running_losses = self.val_loss_manager.get_running_losses()
-        for name, loss in enumerate(running_losses):
+        for name, loss in running_losses:
             val_dl_length = len(self.dl["val"])
-            self.writer.add_scalar(f"val/{name}/loss", loss.item() / val_dl_length, current_batch)
+            self.writer.add_scalar(f"val/{name}", loss.item() / val_dl_length, current_batch)
 
         # ...log the running accuracy
         score, _ = val_metric.get_score()
-        self.writer.add_scalar("val/0/accuracy", score, current_batch)
+        self.writer.add_scalar("val/accuracy", score, current_batch)
         return score
 
     def log_images(self, dl_element: DatasetOutput, name: str):

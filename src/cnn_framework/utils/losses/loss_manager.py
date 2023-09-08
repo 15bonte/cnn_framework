@@ -21,7 +21,7 @@ class LossManager:
         Return a list of tuples (loss_name, loss_value)
         """
         named_running_losses = []
-        for i, loss in enumerate(self.running_losses):
-            named_running_losses.append((loss.__class__.__name__, self.running_losses[i]))
+        for i, loss_function in enumerate(self.losses_function):
+            named_running_losses.append((loss_function.__class__.__name__, self.running_losses[i]))
             self.running_losses[i] = 0
         return named_running_losses
