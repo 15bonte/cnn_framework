@@ -1,7 +1,9 @@
+from typing import Optional
 from matplotlib import pyplot as plt
 import torch
 import torch.nn.functional as F
 
+from ..losses.loss_manager import LossManager
 from ..data_sets.dataset_output import DatasetOutput
 from ..display_tools import make_image_matplotlib_displayable
 from ..metrics import AbstractMetric
@@ -13,7 +15,7 @@ class ContrastiveModelManager(ModelManager):
         self,
         dl_element: DatasetOutput,
         dl_metric: AbstractMetric,
-        loss_function=None,
+        loss_manager: Optional[LossManager] = None,
         data_loader=None,
     ):
         # Read data loader element
@@ -58,11 +60,11 @@ class ContrastiveModelManager(ModelManager):
         # Update metric
         dl_metric.update(logits, labels)
 
-        if loss_function is None:
+        if loss_manager is None:
             return None, all_inputs[batch_size:]
 
         # Compute loss
-        loss, _ = loss_function(logits, labels)
+        loss, _ = loss_manager(logits, labels)
 
         # Use other inputs as fake predictions
         dl_element.prediction = all_inputs[batch_size:]
