@@ -17,7 +17,7 @@ class DummyModelParams(BaseModelParams):
         self.test_ratio = 0.1
 
         self.num_epochs = 50
-        self.learning_rate = 5e-2
+        self.learning_rate = 1e-3
 
         self.nb_classes = 1
         self.nb_modalities = 3
