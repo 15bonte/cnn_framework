@@ -2,7 +2,7 @@ import datetime
 import json
 import os
 import time
-from typing import Type
+from typing import Optional, Type
 from pathlib import Path
 from matplotlib import pyplot as plt
 import numpy as np
@@ -15,6 +15,7 @@ from torch.cuda.amp import GradScaler, autocast
 from torch.optim.lr_scheduler import StepLR
 import torch.nn as nn
 
+from ..losses.loss_manager import LossManager
 from ..model_params.base_model_params import BaseModelParams
 from ..data_sets.dataset_output import DatasetOutput
 from ..metrics import AbstractMetric
@@ -97,6 +98,8 @@ class ModelManager:
         self.image_index = 0
         # Used in training
         self.epochs = int(self.params.num_epochs)
+        self.train_loss_manager = None
+        self.val_loss_manager = None
 
         # Useful information
         self.information = {"git_hash": sha}
@@ -150,7 +153,11 @@ class ModelManager:
                 )
 
     def compute_loss(
-        self, dl_element: DatasetOutput, dl_metric: AbstractMetric, loss_function=None, _=None
+        self,
+        dl_element: DatasetOutput,
+        dl_metric: AbstractMetric,
+        loss_manager: Optional[LossManager] = None,
+        _=None,
     ):
         inputs = dl_element.input.to(self.device)  # B, C, H, W
         targets = dl_element.target.to(self.device)
@@ -163,36 +170,40 @@ class ModelManager:
         dl_metric.update(predictions, targets, dl_element.additional)
 
         # No need to compute loss if used in test
-        if loss_function is None:
+        if loss_manager is None:
             return None
 
         # Calculate loss
-        loss = loss_function(predictions, targets.float())
+        loss = loss_manager(predictions, targets.float())
         return loss
 
-    def log_train_progress(self, train_loss, train_metric: AbstractMetric) -> None:
+    def log_train_progress(self, train_metric: AbstractMetric) -> None:
         current_batch = self.training_information.get_current_batch()
         # Graphs
         plot_step = int(self.params.plot_step)
         if current_batch % plot_step == plot_step - 1:  # every plot_step mini-batches...
             # ... log the running loss
-            for j, local_loss in enumerate(train_loss):
+            running_losses = self.train_loss_manager.get_running_losses()
+            for running_loss in running_losses:
                 self.writer.add_scalar(
-                    f"train/{j}/loss", local_loss.item() / plot_step, current_batch
+                    f"train/{running_loss[0]}/loss",
+                    running_loss[1].item() / plot_step,
+                    current_batch,
                 )
-                train_loss[j] = 0.0
 
             # ... log running accuracy
             score, _ = train_metric.get_score()
             self.writer.add_scalar(f"train/{j}/accuracy", score, current_batch)
             train_metric.reset()
 
-    def log_val_progress(self, val_loss, val_metric: AbstractMetric) -> None:
+    def log_val_progress(self, val_metric: AbstractMetric) -> None:
         current_batch = self.training_information.get_current_batch()
 
         # ...log the running loss
-        val_dl_length = len(self.dl["val"])
-        self.writer.add_scalar("val/0/loss", val_loss.item() / val_dl_length, current_batch)
+        running_losses = self.val_loss_manager.get_running_losses()
+        for name, loss in enumerate(running_losses):
+            val_dl_length = len(self.dl["val"])
+            self.writer.add_scalar(f"val/{name}/loss", loss.item() / val_dl_length, current_batch)
 
         # ...log the running accuracy
         score, _ = val_metric.get_score()
@@ -214,13 +225,7 @@ class ModelManager:
             # Plot last training batch of epoch
             self.write_images_to_tensorboard(current_batch, dl_element, name)
 
-    def fit_core(self, optimizer, lr_scheduler, loss_function, detailed_loss_function):
-        # Loss initializer
-        if detailed_loss_function is None:
-            running_loss = [0.0]
-        else:
-            running_loss = [0.0 for _ in range(len(detailed_loss_function) + 1)]
-
+    def fit_core(self, optimizer, lr_scheduler):
         # Batch information
         self.training_information.num_batches_train = len(self.dl["train"])
         best_val_loss, best_val_score = np.Infinity, -np.Infinity
@@ -246,7 +251,7 @@ class ModelManager:
                 # Perform training loop
                 with autocast(enabled=self.params.fp16_precision):
                     loss = self.compute_loss(
-                        dl_element, train_metric, loss_function, self.dl["train"]
+                        dl_element, train_metric, self.train_loss_manager, self.dl["train"]
                     )
 
                 # Clear the gradients
@@ -257,17 +262,8 @@ class ModelManager:
                 scaler.step(optimizer)
                 scaler.update()
 
-                # Compute each loss
-                running_loss[0] += loss
-
-                if detailed_loss_function is not None:
-                    losses = detailed_loss_function(
-                        dl_element.prediction, dl_element.target.float()
-                    )
-                    running_loss[1:] = [x + y for x, y in zip(running_loss[1:], losses)]
-
                 # Log progress
-                self.log_train_progress(running_loss, train_metric)
+                self.log_train_progress(train_metric)
                 self.log_images(dl_element, "train")
                 display_progress(
                     "Training in progress",
@@ -287,13 +283,13 @@ class ModelManager:
                         loss = self.compute_loss(
                             dl_element,
                             val_metric,
-                            loss_function,
+                            self.val_loss_manager,
                             self.dl["val"],
                         )
                         val_loss += loss
 
                     # Log progress
-                    val_score = self.log_val_progress(val_loss, val_metric)
+                    val_score = self.log_val_progress(val_metric)
                     self.log_images(dl_element, "val")
 
             # Save only if better than current best loss, or if no evaluation is possible
@@ -334,8 +330,7 @@ class ModelManager:
         train_dl,
         val_dl,
         optimizer,
-        loss_function=None,
-        detailed_loss_function=None,
+        loss_function,
         lr_scheduler=None,
     ):
         # Create folder to save model
@@ -368,8 +363,16 @@ class ModelManager:
         # Monitor training time
         start = time.time()
 
+        # Loss managers initializer
+        if isinstance(loss_function, list):
+            self.train_loss_manager = LossManager(*loss_function)
+            self.val_loss_manager = LossManager(*loss_function)
+        else:
+            self.train_loss_manager = LossManager(loss_function)
+            self.val_loss_manager = LossManager(loss_function)
+
         # Core fit function with training loop
-        self.fit_core(optimizer, lr_scheduler, loss_function, detailed_loss_function)
+        self.fit_core(optimizer, lr_scheduler)
 
         self.writer.close()
         end = time.time()
@@ -601,7 +604,9 @@ class ModelManager:
             f.write(f"{self.params.test_number};")
             f.write(f"{self.params.num_epochs};")
             f.write(f"{self.params.learning_rate};")
-            training_time = self.information["training_time"] if "training_time" in self.information else 0
+            training_time = (
+                self.information["training_time"] if "training_time" in self.information else 0
+            )
             f.write(f"{training_time};")
             score = self.information["score"]
             f.write(f"{score};\n")
