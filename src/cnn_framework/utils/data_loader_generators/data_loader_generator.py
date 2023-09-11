@@ -93,10 +93,12 @@ class DataLoaderGenerator:
         # By default, no oversampling is applied
         return [1 for _ in data_set_train.names]
 
-    def generate_data_loader(self, single_image_test_batch=False, shuffle_train=True):
+    def generate_data_loader(self, single_image_test_batch=False, train_as_test=False):
         """
         single_image_test_batch should be set to True to force batch_size=1 for test set.
         Useful to enable extraction of multi sub images for testing, for detection models.
+
+        If train_as_test is True, train is not shuffled and no augmentation is applied.
         """
         files = self.data_manager.get_distinct_files()
         files.sort()
@@ -111,7 +113,9 @@ class DataLoaderGenerator:
         self.params.names_test = names_test
 
         # Data sets
-        dataset_train = self.data_set_class(True, names_train, self.data_manager, self.params)
+        dataset_train = self.data_set_class(
+            (not train_as_test), names_train, self.data_manager, self.params
+        )
         dataset_val = self.data_set_class(False, names_val, self.data_manager, self.params)
         dataset_test = self.data_set_class(False, names_test, self.data_manager, self.params)
 
@@ -121,7 +125,7 @@ class DataLoaderGenerator:
         # Train
         sampler_train = (
             WeightedRandomSampler(torch.DoubleTensor(weights_train), len(names_train))
-            if len(names_train) and shuffle_train
+            if len(names_train) and not train_as_test
             else None
         )
         train_dl = DataLoader(
