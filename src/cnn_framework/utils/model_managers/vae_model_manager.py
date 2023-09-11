@@ -36,6 +36,10 @@ class VAEModelManager(ModelManager):
         # Update metric
         dl_metric.update(model_output["recon_x"], dl_element["data"])
 
+    def get_embedding(self, dl_element):
+        dl_element["data"] = dl_element["data"].to(self.device)
+        return self.model.encoder(dl_element["data"]).embedding
+
     def batch_predict(
         self, test_dl, images_to_save, num_batches_test, test_metric, do_not_save_images
     ):
