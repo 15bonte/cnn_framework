@@ -9,7 +9,7 @@ from ..utils.parsers.cnn_parser import CnnParser
 from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
 from ..utils.model_managers.model_manager import ModelManager
 from ..utils.data_managers.default_data_manager import DefaultDataManager
-from ..utils.metrics import PCC
+from ..utils.metrics.pcc import PCC
 
 
 def main(params):

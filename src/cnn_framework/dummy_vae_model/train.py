@@ -10,7 +10,7 @@ from .model_params import DummyVAEModelParams
 
 from ..utils.data_managers.default_data_manager import DefaultDataManager
 from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
-from ..utils.metrics import MeanSquaredErrorMetric
+from ..utils.metrics.mean_squared_error_metric import MeanSquaredErrorMetric
 from ..utils.model_managers.model_manager import ModelManager
 from ..utils.model_managers.vae_model_manager import VAEModelManager
 from ..utils.parsers.vae_parser import VAEParser

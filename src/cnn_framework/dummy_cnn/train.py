@@ -14,7 +14,7 @@ from ..utils.data_loader_generators.classifier_data_loader_generator import (
 )
 from ..utils.model_managers.cnn_model_manager import CnnModelManager
 from ..utils.data_managers.default_data_manager import DefaultDataManager
-from ..utils.metrics import ClassificationAccuracy
+from ..utils.metrics.classification_accuracy import ClassificationAccuracy
 from ..utils.parsers.cnn_parser import CnnParser
 
 MONITOR_FUNCTIONS = False

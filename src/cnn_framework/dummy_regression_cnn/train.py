@@ -12,7 +12,7 @@ from .model import DummyCnn
 from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
 from ..utils.model_managers.regression_model_manager import RegressionModelManager
 from ..utils.data_managers.default_data_manager import DefaultDataManager
-from ..utils.metrics import MeanSquaredErrorMetric
+from ..utils.metrics.mean_squared_error_metric import MeanSquaredErrorMetric
 from ..utils.parsers.cnn_parser import CnnParser
 
 MONITOR_FUNCTIONS = False

@@ -21,7 +21,7 @@ from ..enum import PredictMode
 from ..losses.loss_manager import LossManager
 from ..model_params.base_model_params import BaseModelParams
 from ..data_sets.dataset_output import DatasetOutput
-from ..metrics import AbstractMetric
+from ..metrics.abstract_metric import AbstractMetric
 from ..tools import random_sample
 from ..data_loader_generators.data_loader_generator import get_mean_and_std
 from ..display_tools import (

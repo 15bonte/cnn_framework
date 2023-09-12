@@ -4,7 +4,7 @@ from skimage import io
 import numpy as np
 import torch
 
-from ..metrics import AbstractMetric
+from ..metrics.abstract_metric import AbstractMetric
 from ..data_sets.dataset_output import DatasetOutput
 from .model_manager import ModelManager
 from ..display_tools import (

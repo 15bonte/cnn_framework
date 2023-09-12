@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from ..losses.loss_manager import LossManager
 from ..data_sets.dataset_output import DatasetOutput
 from ..display_tools import make_image_matplotlib_displayable
-from ..metrics import AbstractMetric
+from ..metrics.abstract_metric import AbstractMetric
 from .model_manager import ModelManager
 
 
