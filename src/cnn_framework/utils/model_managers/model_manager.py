@@ -2,7 +2,7 @@ import datetime
 import json
 import os
 import time
-from typing import Optional, Type
+from typing import Optional
 from pathlib import Path
 from matplotlib import pyplot as plt
 import numpy as np
@@ -14,6 +14,8 @@ from torch.utils.tensorboard import SummaryWriter
 from torch.cuda.amp import GradScaler, autocast
 from torch.optim.lr_scheduler import StepLR
 import torch.nn as nn
+from torch.utils.data import DataLoader
+from torch.optim.optimizer import Optimizer
 
 from ..enum import PredictMode
 from ..losses.loss_manager import LossManager
@@ -45,7 +47,11 @@ def adapt_mean_std(mean_std):
 
 
 class TrainingInformation:
-    def __init__(self, epochs):
+    """
+    Class to store training information.
+    """
+
+    def __init__(self, epochs: int) -> None:
         # Global parameters
         self.num_batches_train = None
         self.epochs = epochs
@@ -72,7 +78,7 @@ class ModelManager:
     """
 
     def __init__(
-        self, model: nn.Module, params: BaseModelParams, metric_class: Type[AbstractMetric]
+        self, model: nn.Module, params: BaseModelParams, metric_class: type[AbstractMetric]
     ):
         # Device to train model
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -212,7 +218,7 @@ class ModelManager:
         self.writer.add_scalar(f"val/{val_metric.get_name()}", score, current_batch)
         return score
 
-    def log_images(self, dl_element: DatasetOutput, name: str):
+    def log_images(self, dl_element: DatasetOutput, name: str) -> None:
         # Get needed training information
         current_batch = self.training_information.get_current_batch()
         num_batches_train = self.training_information.num_batches_train
@@ -227,7 +233,7 @@ class ModelManager:
             # Plot last training batch of epoch
             self.write_images_to_tensorboard(current_batch, dl_element, name)
 
-    def fit_core(self, optimizer):
+    def fit_core(self, optimizer: Optimizer) -> None:
         # Batch information
         self.training_information.num_batches_train = len(self.dl["train"])
         best_val_loss, best_val_score = np.Infinity, -np.Infinity
@@ -314,7 +320,7 @@ class ModelManager:
         self.information["best_model_epoch"] = model_epoch
         print(f"\nBest model saved at epoch {model_epoch}.")
 
-    def compute_and_save_mean_std(self, train_dl, val_dl):
+    def compute_and_save_mean_std(self, train_dl: DataLoader, val_dl: DataLoader) -> None:
         # Compute mean and std
         data_set_mean_std = get_mean_and_std([train_dl, val_dl])
 
@@ -329,12 +335,12 @@ class ModelManager:
 
     def fit(
         self,
-        train_dl,
-        val_dl,
-        optimizer,
+        train_dl: DataLoader,
+        val_dl: DataLoader,
+        optimizer: Optimizer,
         loss_function,
         lr_scheduler=None,
-    ):
+    ) -> None:
         # Create folder to save model
         os.makedirs(self.params.models_folder, exist_ok=True)
 
@@ -392,7 +398,7 @@ class ModelManager:
         self.model.load_state_dict(torch.load(self.model_save_path))
 
     def model_prediction(
-        self, dl_element: DatasetOutput, dl_metric: AbstractMetric, data_loader
+        self, dl_element: DatasetOutput, dl_metric: AbstractMetric, data_loader: DataLoader
     ) -> None:
         """
         Function to generate outputs from inputs for given model.
@@ -438,7 +444,12 @@ class ModelManager:
             )
 
     def batch_predict(
-        self, test_dl, images_to_save, num_batches_test, test_metric, predict_mode: PredictMode
+        self,
+        test_dl: DataLoader,
+        images_to_save: list[int],
+        num_batches_test: int,
+        test_metric: AbstractMetric,
+        predict_mode: PredictMode,
     ):
         all_predictions_np = []
         for batch_idx, dl_element in enumerate(test_dl):
@@ -488,7 +499,7 @@ class ModelManager:
 
         return all_predictions_np
 
-    def plot_confusion_matrix(self, _):
+    def plot_confusion_matrix(self, _) -> None:
         # Only used for classification models
         return
 
