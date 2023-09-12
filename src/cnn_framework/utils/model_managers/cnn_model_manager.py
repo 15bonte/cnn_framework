@@ -4,6 +4,7 @@ from skimage import io
 import numpy as np
 import torch
 
+from ..metrics import AbstractMetric
 from ..data_sets.dataset_output import DatasetOutput
 from .model_manager import ModelManager
 from ..display_tools import (
@@ -14,7 +15,7 @@ from ..display_tools import (
 
 
 class CnnModelManager(ModelManager):
-    def save_results(self, name, dl_element: DatasetOutput, mean_std):
+    def save_results(self, name: str, dl_element: DatasetOutput, mean_std):
         input_np = dl_element.input
         target_np = dl_element.target
         prediction_np = dl_element.prediction
@@ -49,9 +50,9 @@ class CnnModelManager(ModelManager):
 
     def write_images_to_tensorboard(
         self,
-        current_batch,
-        dl_element,
-        name,
+        current_batch: int,
+        dl_element: DatasetOutput,
+        name: str,
     ):
         # Get numpy arrays
         numpy_dl_element = dl_element.get_numpy_dataset_output()
@@ -90,7 +91,7 @@ class CnnModelManager(ModelManager):
                 current_batch,
             )
 
-    def model_prediction(self, dl_element: DatasetOutput, dl_metric, _):
+    def model_prediction(self, dl_element: DatasetOutput, dl_metric: AbstractMetric, _) -> None:
         """
         Function to generate outputs from inputs for given model
         Careful, softmax is applied here and not in the model.
@@ -103,5 +104,5 @@ class CnnModelManager(ModelManager):
         # Update metric
         dl_metric.update(predictions, dl_element.target, dl_element.additional)
 
-    def plot_confusion_matrix(self, results):
+    def plot_confusion_matrix(self, results) -> None:
         display_confusion_matrix(results, self.params.class_names, self.params.output_dir)

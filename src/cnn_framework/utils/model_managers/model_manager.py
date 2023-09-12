@@ -503,7 +503,7 @@ class ModelManager:
         # Only used for classification models
         return
 
-    def read_mean_std(self, test_dl):
+    def read_mean_std(self, test_dl: DataLoader) -> None:
         # Get mean and standard deviation from saved file
         # Either from model that have just been trained
         if os.path.exists(self.params.models_folder):
@@ -529,11 +529,11 @@ class ModelManager:
 
     def predict(
         self,
-        test_dl,
+        test_dl: DataLoader,
         predict_mode=PredictMode.Standard,
         nb_images_to_save=10,
         compute_own_mean_std=False,
-    ):
+    ) -> Optional[list]:
         """
         Parameters
         ----------
@@ -593,7 +593,7 @@ class ModelManager:
         print("\n" + accuracy_message)
         self.information["score"] = score
 
-    def write_useful_information(self):
+    def write_useful_information(self) -> None:
         # Update parameters file with all useful information
         os.makedirs(self.params.models_folder, exist_ok=True)
         with open(self.parameters_path, "a") as f:
