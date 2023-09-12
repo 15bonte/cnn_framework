@@ -1,6 +1,7 @@
 import os
 from matplotlib import pyplot as plt
 
+from ..enum import PredictMode
 from ..data_sets.dataset_output import DatasetOutput
 from ..display_tools import display_progress
 from .model_manager import ModelManager
@@ -41,29 +42,33 @@ class VAEModelManager(ModelManager):
         return self.model.encoder(dl_element["data"]).embedding
 
     def batch_predict(
-        self, test_dl, images_to_save, num_batches_test, test_metric, do_not_save_images
+        self, test_dl, images_to_save, num_batches_test, test_metric, predict_mode: PredictMode
     ):
-        # NB: do_not_save_images = return_predictions (by definition)
-        # Here, consider than do_not_save_images means return encoder output
-
         all_predictions_np = []
         for batch_idx, dl_element in enumerate(test_dl):
             # Run prediction
-            self.model_prediction(dl_element, test_metric, test_dl)
-            if not do_not_save_images:  # standard use
+            if predict_mode == PredictMode.Standard:  # standard use
+                self.model_prediction(dl_element, test_metric, test_dl)
                 predictions = dl_element.prediction["recon_x"]
             else:  # return embedding
-                predictions = dl_element.prediction.z
+                predictions = self.get_embedding(dl_element)
 
             predictions_np = predictions.cpu().numpy()
             all_predictions_np = all_predictions_np + [*predictions_np]
 
-            # Get numpy elements
-            inputs_np = dl_element["data"].cpu().numpy()
+            display_progress(
+                "Model evaluation in progress",
+                batch_idx + 1,
+                num_batches_test,
+                additional_message=f"Batch #{batch_idx}",
+            )
 
             # Save few images
-            if do_not_save_images:
+            if predict_mode != PredictMode.Standard:
                 continue
+
+            # Get numpy elements
+            inputs_np = dl_element["data"].cpu().numpy()
 
             for idx in range(dl_element["data"].shape[0]):
                 if self.image_index in images_to_save:
@@ -86,13 +91,6 @@ class VAEModelManager(ModelManager):
                     )
 
                 self.image_index += 1
-
-            display_progress(
-                "Model evaluation in progress",
-                batch_idx + 1,
-                num_batches_test,
-                additional_message=f"Batch #{batch_idx}",
-            )
 
         return all_predictions_np
 

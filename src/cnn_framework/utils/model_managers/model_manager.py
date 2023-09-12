@@ -15,6 +15,7 @@ from torch.cuda.amp import GradScaler, autocast
 from torch.optim.lr_scheduler import StepLR
 import torch.nn as nn
 
+from ..enum import PredictMode
 from ..losses.loss_manager import LossManager
 from ..model_params.base_model_params import BaseModelParams
 from ..data_sets.dataset_output import DatasetOutput
@@ -437,7 +438,7 @@ class ModelManager:
             )
 
     def batch_predict(
-        self, test_dl, images_to_save, num_batches_test, test_metric, do_not_save_images
+        self, test_dl, images_to_save, num_batches_test, test_metric, predict_mode: PredictMode
     ):
         all_predictions_np = []
         for batch_idx, dl_element in enumerate(test_dl):
@@ -462,7 +463,7 @@ class ModelManager:
             all_predictions_np = all_predictions_np + [*dl_element_numpy.prediction]
 
             # Save few images
-            if do_not_save_images:
+            if predict_mode != PredictMode.Standard:
                 continue
 
             for idx in range(dl_element.target.shape[0]):
@@ -516,17 +517,19 @@ class ModelManager:
                 test_dl.dataset.mean_std = mean_std
 
     def predict(
-        self, test_dl, return_predictions=False, nb_images_to_save=10, compute_own_mean_std=False
+        self,
+        test_dl,
+        predict_mode=PredictMode.Standard,
+        nb_images_to_save=10,
+        compute_own_mean_std=False,
     ):
         """
-        If return_predictions is True, returns predictions and do not save images
-
         Parameters
         ----------
         test_dl : DataLoader
             DataLoader for test set
-        return_predictions : bool, optional
-            If True, returns predictions, by default False
+        predict_mode : PredictMode, optional
+            By default, do not return predictions
         nb_images_to_save : int, optional
             Number of images to save, by default 10
             nb_images_to_save == -1 => save all images
@@ -563,10 +566,10 @@ class ModelManager:
         with torch.no_grad():
             # Use trained model to predict on test set
             predictions = self.batch_predict(
-                test_dl, images_to_save, num_batches_test, test_metric, return_predictions
+                test_dl, images_to_save, num_batches_test, test_metric, predict_mode
             )
 
-        if return_predictions:
+        if predict_mode != PredictMode.Standard:
             return predictions
 
         # Display box plot

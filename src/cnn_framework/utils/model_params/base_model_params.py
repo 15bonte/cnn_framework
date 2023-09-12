@@ -142,7 +142,7 @@ class BaseModelParams:
 
         # Training parameters
         self.num_epochs = 50
-        self.batch_size = 2
+        self.batch_size = 32
         self.learning_rate = 0.1
         self.fp16_precision = False
         self.nb_warmup_epochs = 10

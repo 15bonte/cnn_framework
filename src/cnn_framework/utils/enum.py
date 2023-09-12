@@ -14,3 +14,9 @@ class ProjectMethods(Enum):
     Focus = 3
     Channel = 4
     none = -1
+
+
+class PredictMode(Enum):
+    Standard = 1
+    GetPrediction = 2
+    GetEmbedding = 3
