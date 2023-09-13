@@ -5,18 +5,18 @@ from pythae.trainers import BaseTrainerConfig
 from pythae.trainers.training_callbacks import WandbCallback
 from pythae.models import AutoModel, BetaVAE, BetaVAEConfig
 
-from .data_set import DummyVAEDataSet
-from .model_params import DummyVAEModelParams
+from cnn_framework.dummy_vae_model.data_set import DummyVAEDataSet
+from cnn_framework.dummy_vae_model.model_params import DummyVAEModelParams
 
-from ..utils.data_managers.default_data_manager import DefaultDataManager
-from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
-from ..utils.metrics.mean_squared_error_metric import MeanSquaredErrorMetric
-from ..utils.model_managers.model_manager import ModelManager
-from ..utils.model_managers.vae_model_manager import VAEModelManager
-from ..utils.parsers.vae_parser import VAEParser
+from cnn_framework.utils.data_managers.default_data_manager import DefaultDataManager
+from cnn_framework.utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
+from cnn_framework.utils.metrics.mean_squared_error_metric import MeanSquaredErrorMetric
+from cnn_framework.utils.model_managers.model_manager import ModelManager
+from cnn_framework.utils.model_managers.vae_model_manager import VAEModelManager
+from cnn_framework.utils.parsers.vae_parser import VAEParser
 
-from .decoder import CustomDecoder
-from .encoder import CustomEncoder
+from cnn_framework.dummy_vae_model.decoder import CustomDecoder
+from cnn_framework.dummy_vae_model.encoder import CustomEncoder
 
 
 def main(params):

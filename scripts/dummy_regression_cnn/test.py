@@ -1,14 +1,14 @@
 import torch
 
-from .data_set import DummyRegressionCnnDataSet
-from .model_params import DummyModelParams
-from .model import DummyCnn
+from cnn_framework.dummy_regression_cnn.data_set import DummyRegressionCnnDataSet
+from cnn_framework.dummy_regression_cnn.model_params import DummyModelParams
+from cnn_framework.dummy_regression_cnn.model import DummyCnn
 
-from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
-from ..utils.model_managers.regression_model_manager import RegressionModelManager
-from ..utils.data_managers.default_data_manager import DefaultDataManager
-from ..utils.metrics.mean_squared_error_metric import MeanSquaredErrorMetric
-from ..utils.parsers.cnn_parser import CnnParser
+from cnn_framework.utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
+from cnn_framework.utils.model_managers.regression_model_manager import RegressionModelManager
+from cnn_framework.utils.data_managers.default_data_manager import DefaultDataManager
+from cnn_framework.utils.metrics.mean_squared_error_metric import MeanSquaredErrorMetric
+from cnn_framework.utils.parsers.cnn_parser import CnnParser
 
 
 def main(params):

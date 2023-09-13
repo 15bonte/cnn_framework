@@ -1,15 +1,15 @@
 from torch import optim
 from torch import nn
 
-from .data_set import DummyDataSet
-from .model_params import DummyModelParams
-from .model import UNet
+from cnn_framework.dummy_segmentation.data_set import DummyDataSet
+from cnn_framework.dummy_segmentation.model_params import DummyModelParams
+from cnn_framework.dummy_segmentation.model import UNet
 
-from ..utils.parsers.cnn_parser import CnnParser
-from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
-from ..utils.model_managers.model_manager import ModelManager
-from ..utils.data_managers.default_data_manager import DefaultDataManager
-from ..utils.metrics.pcc import PCC
+from cnn_framework.utils.parsers.cnn_parser import CnnParser
+from cnn_framework.utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
+from cnn_framework.utils.model_managers.model_manager import ModelManager
+from cnn_framework.utils.data_managers.default_data_manager import DefaultDataManager
+from cnn_framework.utils.metrics.pcc import PCC
 
 
 def main(params):

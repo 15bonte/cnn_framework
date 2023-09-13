@@ -1,16 +1,16 @@
 import torch
 
-from .data_set import DummyCnnDataSet
-from .model_params import DummyModelParams
-from .model import DummyCnn
+from cnn_framework.dummy_cnn.data_set import DummyCnnDataSet
+from cnn_framework.dummy_cnn.model_params import DummyModelParams
+from cnn_framework.dummy_cnn.model import DummyCnn
 
-from ..utils.data_loader_generators.classifier_data_loader_generator import (
+from cnn_framework.utils.data_loader_generators.classifier_data_loader_generator import (
     ClassifierDataLoaderGenerator,
 )
-from ..utils.model_managers.cnn_model_manager import CnnModelManager
-from ..utils.data_managers.default_data_manager import DefaultDataManager
-from ..utils.metrics.classification_accuracy import ClassificationAccuracy
-from ..utils.parsers.cnn_parser import CnnParser
+from cnn_framework.utils.model_managers.cnn_model_manager import CnnModelManager
+from cnn_framework.utils.data_managers.default_data_manager import DefaultDataManager
+from cnn_framework.utils.metrics.classification_accuracy import ClassificationAccuracy
+from cnn_framework.utils.parsers.cnn_parser import CnnParser
 
 
 def main(params):
