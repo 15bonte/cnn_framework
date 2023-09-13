@@ -98,8 +98,8 @@ class VAEModelManager(ModelManager):
         # Update parameters file with all useful information
         os.makedirs(self.params.models_folder, exist_ok=True)
         with open(self.parameters_path, "a") as f:
-            for key in self.information.keys():
-                f.write("%s;%s\n" % (key, self.information[key]))
+            for attribute, value in vars(self.training_information).items():
+                f.write("%s;%s\n" % (attribute, value))
         f.close()
 
         if self.params.global_results_path == "":
@@ -109,7 +109,7 @@ class VAEModelManager(ModelManager):
         if not os.path.exists(self.params.global_results_path):
             with open(self.params.global_results_path, "w") as f:
                 f.write(
-                    "data;id;latent dim;learning rate;beta;gamma;delta;git hash;score;weight_decay;batch size;drop out;encoder name\n"
+                    "data;id;latent dim;learning rate;beta;gamma;delta;git hash;score;weight_decay;batch size;drop out;encoder name;additional score\n"
                 )
             f.close()
 
@@ -122,14 +122,13 @@ class VAEModelManager(ModelManager):
             f.write(f"{self.params.beta};")
             f.write(f"{self.params.gamma};")
             f.write(f"{self.params.delta};")
-            git_hash = self.information["git_hash"]
-            f.write(f"{git_hash};")
-            score = self.information["score"]
-            f.write(f"{score};")
+            f.write(f"{self.training_information.git_hash};")
+            f.write(f"{self.training_information.score};")
             f.write(f"{self.params.weight_decay};")
             f.write(f"{self.params.batch_size};")
             f.write(f"{self.params.dropout};")
-            f.write(f"{self.params.encoder_name};\n")
+            f.write(f"{self.params.encoder_name};")
+            f.write(f"{self.training_information.additional_score};\n")
         f.close()
 
     def write_images_to_tensorboard(self, current_batch, dl_element, name):

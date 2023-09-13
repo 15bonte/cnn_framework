@@ -3,11 +3,9 @@ import json
 import os
 import time
 from typing import Optional
-from pathlib import Path
 from matplotlib import pyplot as plt
 import numpy as np
 from skimage import io
-import git
 
 import torch
 from torch.utils.tensorboard import SummaryWriter
@@ -17,6 +15,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.optim.optimizer import Optimizer
 
+from .utils.training_information import TrainingInformation
 from ..enum import PredictMode
 from ..losses.loss_manager import LossManager
 from ..model_params.base_model_params import BaseModelParams
@@ -46,32 +45,6 @@ def adapt_mean_std(mean_std):
     return {"mean": mean, "std": std}
 
 
-class TrainingInformation:
-    """
-    Class to store training information.
-    """
-
-    def __init__(self, epochs: int) -> None:
-        # Global parameters
-        self.num_batches_train = None
-        self.epochs = epochs
-        # Training follow-up
-        self.epoch = 1  # starts at 1
-        self.batch_index = 1  # starts at 1
-
-    def check_validity(self) -> None:
-        if self.num_batches_train is None:
-            raise ValueError("Number of batches is not defined yet")
-
-    def get_total_batches(self) -> int:
-        self.check_validity()
-        return self.num_batches_train * self.epochs
-
-    def get_current_batch(self) -> int:
-        self.check_validity()
-        return (self.epoch - 1) * self.num_batches_train + self.batch_index
-
-
 class ModelManager:
     """
     Class with all useful functions to train, test, ... a CNN-based model
@@ -93,26 +66,17 @@ class ModelManager:
         self.parameters_path = os.path.join(self.params.models_folder, "parameters.csv")
 
         # Display current git hash to follow up
-        try:
-            current_file_path = Path(__file__).parent.resolve()
-            repo = git.Repo(current_file_path, search_parent_directories=True)
-            sha = repo.head.object.hexsha
-            print(f"Current commit hash: {sha}")
-        except:  # if not a git repository
-            sha = "unknown"
 
         # Used in prediction
         self.image_index = 0
         # Used in training
-        self.epochs = int(self.params.num_epochs)
         self.train_loss_manager = None
         self.val_loss_manager = None
         self.lr_scheduler = None
 
         # Useful information
-        self.information = {"git_hash": sha}
-        self.dl = {}
-        self.training_information = TrainingInformation(self.epochs)
+        self.dl = {}  # data loaders dictionary
+        self.training_information = TrainingInformation(int(self.params.num_epochs))
 
         # Tensorboard writer
         os.makedirs(self.params.tensorboard_folder_path, exist_ok=True)
@@ -225,7 +189,9 @@ class ModelManager:
         batch_index = self.training_information.batch_index
         epoch = self.training_information.epoch
 
-        epochs_to_plot = np.linspace(1, self.epochs, self.params.nb_plot_images, dtype=int)
+        epochs_to_plot = np.linspace(
+            1, self.training_information.num_epochs, self.params.nb_plot_images, dtype=int
+        )
 
         # Condition to apply only for training
         batch_condition = True if name == "val" else batch_index == num_batches_train - 1
@@ -245,7 +211,7 @@ class ModelManager:
         # Define scaler
         scaler = GradScaler(enabled=self.params.fp16_precision)
 
-        for epoch in range(self.epochs):
+        for epoch in range(self.training_information.num_epochs):
             self.training_information.epoch = epoch + 1
             # Start by lr_scheduler as warmup starts by 0 otherwise
             self.lr_scheduler.step()
@@ -317,7 +283,7 @@ class ModelManager:
         torch.save(self.model.state_dict(), self.model_save_path)
 
         # Best model epoch
-        self.information["best_model_epoch"] = model_epoch
+        self.training_information.best_model_epoch = model_epoch
         print(f"\nBest model saved at epoch {model_epoch}.")
 
     def compute_and_save_mean_std(self, train_dl: DataLoader, val_dl: DataLoader) -> None:
@@ -389,7 +355,7 @@ class ModelManager:
 
         # Training time
         training_time = end - start
-        self.information["training_time"] = training_time
+        self.training_information.training_time = training_time
         print(
             f"\nTraining successfully finished in {datetime.timedelta(seconds = training_time)}."
         )
@@ -591,14 +557,14 @@ class ModelManager:
         # Compute accuracy
         accuracy_message = f"Average {test_metric.name}: {round(score, 2)}"
         print("\n" + accuracy_message)
-        self.information["score"] = score
+        self.training_information.score = score
 
     def write_useful_information(self) -> None:
         # Update parameters file with all useful information
         os.makedirs(self.params.models_folder, exist_ok=True)
         with open(self.parameters_path, "a") as f:
-            for key in self.information.keys():
-                f.write("%s;%s\n" % (key, self.information[key]))
+            for attribute, value in vars(self.training_information).items():
+                f.write("%s;%s\n" % (attribute, value))
         f.close()
 
         if self.params.global_results_path == "":
@@ -621,10 +587,6 @@ class ModelManager:
             f.write(f"{self.params.test_number};")
             f.write(f"{self.params.num_epochs};")
             f.write(f"{self.params.learning_rate};")
-            training_time = (
-                self.information["training_time"] if "training_time" in self.information else 0
-            )
-            f.write(f"{training_time};")
-            score = self.information["score"]
-            f.write(f"{score};\n")
+            f.write(f"{self.training_information.training_time};")
+            f.write(f"{self.training_information.score};\n")
         f.close()

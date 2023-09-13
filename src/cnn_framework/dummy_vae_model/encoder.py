@@ -4,7 +4,7 @@ import torch
 from pythae.models.nn import BaseEncoder
 from pythae.models.base.base_utils import ModelOutput
 
-from ..utils.model_managers.custom_get_encoder import get_encoder
+from ..utils.model_managers.utils.custom_get_encoder import get_encoder
 
 
 class CustomEncoder(BaseEncoder):
