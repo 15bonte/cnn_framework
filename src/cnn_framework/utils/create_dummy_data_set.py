@@ -1,4 +1,5 @@
 import os
+import warnings
 import numpy as np
 from skimage import io
 
@@ -69,9 +70,14 @@ def generate_data_set(
         square_image = generate_square(
             image_size, nb_channels, color=[255, 255, 0] if same_color else None
         )
-        io.imsave(f"{save_dir}/random_{idx}_c0.{extension}", square_image)
+        # Save image without warnings
+        with warnings.catch_warnings():
+            warnings.filterwarnings(action="ignore", category=UserWarning)
+            io.imsave(f"{save_dir}/random_{idx}_c0.{extension}", square_image)
 
         circle_image = generate_circle(
             image_size, nb_channels, color=[255, 0, 255] if same_color else None
         )
-        io.imsave(f"{save_dir}/random_{idx}_c1.{extension}", circle_image)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(action="ignore", category=UserWarning)
+            io.imsave(f"{save_dir}/random_{idx}_c1.{extension}", circle_image)

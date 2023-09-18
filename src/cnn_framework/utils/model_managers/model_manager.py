@@ -1,3 +1,5 @@
+from pathlib import Path
+import warnings
 import datetime
 import json
 import os
@@ -404,10 +406,12 @@ class ModelManager:
                 image_to_save = make_image_tiff_displayable(data_image, target_mean_std)
             else:
                 image_to_save = make_image_tiff_displayable(data_image, None)
-            io.imsave(
-                f"{self.params.output_dir}/{name}_{data_type}.tiff",
-                image_to_save,
-            )
+            with warnings.catch_warnings():
+                warnings.filterwarnings(action="ignore", category=UserWarning)
+                io.imsave(
+                    f"{self.params.output_dir}/{name}_{data_type}.tiff",
+                    image_to_save,
+                )
 
     def batch_predict(
         self,

@@ -1,4 +1,5 @@
 import os
+import warnings
 from matplotlib import pyplot as plt
 from skimage import io
 import numpy as np
@@ -43,10 +44,12 @@ class CnnModelManager(ModelManager):
             image_to_save = make_image_tiff_displayable(data_image, data_mean_std)
 
             # Save inputs with prediction and ground truth in name
-            io.imsave(
-                f"{folder_to_save}/{name}_{data_type}_g{ground_truth_class}_p{prediction_class}.tiff",
-                image_to_save,
-            )
+            with warnings.catch_warnings():
+                warnings.filterwarnings(action="ignore", category=UserWarning)
+                io.imsave(
+                    f"{folder_to_save}/{name}_{data_type}_g{ground_truth_class}_p{prediction_class}.tiff",
+                    image_to_save,
+                )
 
     def write_images_to_tensorboard(
         self,

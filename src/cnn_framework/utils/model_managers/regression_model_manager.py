@@ -1,3 +1,4 @@
+import warnings
 from matplotlib import pyplot as plt
 from skimage import io
 import numpy as np
@@ -33,10 +34,12 @@ class RegressionModelManager(ModelManager):
                 prediction_np = np.array([prediction_np])
             ground_truth = "_".join([str(local_target) for local_target in target_np])
             prediction = "_".join([str(local_prediction) for local_prediction in prediction_np])
-            io.imsave(
-                f"{self.params.output_dir}/{name}_{data_type}_g{ground_truth}_p{prediction}.tiff",
-                image_to_save,
-            )
+            with warnings.catch_warnings():
+                warnings.filterwarnings(action="ignore", category=UserWarning)
+                io.imsave(
+                    f"{self.params.output_dir}/{name}_{data_type}_g{ground_truth}_p{prediction}.tiff",
+                    image_to_save,
+                )
 
     def write_images_to_tensorboard(
         self,
