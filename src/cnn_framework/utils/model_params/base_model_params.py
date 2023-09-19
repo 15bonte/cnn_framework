@@ -171,6 +171,8 @@ class BaseModelParams:
         self.test_number = 0
         self.test_file = ""
 
+        self.cross_validation_dir = ""
+
         # Tensorboard parameters
         self.tensorboard_folder_path = os.path.join(str(Path.home()), "tensorboard/local")
         self.plot_step = 10
@@ -263,6 +265,8 @@ class BaseModelParams:
                 self.nb_modalities = int(args.nb_modalities)
             if args.nb_stacks_per_modality:
                 self.nb_stacks_per_modality = int(args.nb_stacks_per_modality)
+            if args.cross_validation_dir:
+                self.cross_validation_dir = args.cross_validation_dir
 
         # Create folders dedicated to current run
         now = datetime.now()

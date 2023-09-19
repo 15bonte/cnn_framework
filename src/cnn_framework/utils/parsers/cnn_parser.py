@@ -37,6 +37,9 @@ class CnnParser:
         self.arguments_parser.add_argument("--train_file", help="File containing training set")
         self.arguments_parser.add_argument("--val_file", help="File containing validation set")
         self.arguments_parser.add_argument("--test_file", help="File containing test set")
+        self.arguments_parser.add_argument(
+            "--cross_validation_dir", help="Folder containing cross validation splits"
+        )
         self.arguments_parser.add_argument("--batch_size", help="Batch size")
         self.arguments_parser.add_argument("--model_load_path", help="Model load path to predict")
         self.arguments_parser.add_argument("--global_results_path", help="Path with all results")
