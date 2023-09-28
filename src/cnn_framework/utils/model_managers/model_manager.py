@@ -147,7 +147,7 @@ class ModelManager:
         if loss_manager is None:
             return None
 
-        # Calculate loss
+        # Compute loss
         loss = loss_manager(predictions, targets.float())
         return loss
 
@@ -215,8 +215,6 @@ class ModelManager:
 
         for epoch in range(self.training_information.num_epochs):
             self.training_information.epoch = epoch + 1
-            # Start by lr_scheduler as warmup starts by 0 otherwise
-            self.lr_scheduler.step()
             # Enumerate mini batches
             self.model.train()  # set model to train mode
             for batch_index, dl_element in enumerate(
@@ -247,6 +245,9 @@ class ModelManager:
                     self.training_information.get_total_batches(),
                     additional_message=f"Local step {self.training_information.batch_index} | Epoch {self.training_information.epoch}",
                 )
+
+            # Start by lr_scheduler as warmup starts by 0 otherwise
+            self.lr_scheduler.step()
 
             evaluate = len(self.dl["val"]) > 0
             val_loss, val_score = 0, 0
@@ -443,22 +444,19 @@ class ModelManager:
             dl_element_numpy = dl_element.get_numpy_dataset_output()
             all_predictions_np = all_predictions_np + [*dl_element_numpy.prediction]
 
-            # Save few images
-            if predict_mode != PredictMode.Standard:
-                continue
+            if predict_mode == PredictMode.Standard and dl_element.target is not None:
+                # Save few images
+                for idx in range(dl_element.target.shape[0]):
+                    if self.image_index in images_to_save:
+                        image_id = (batch_idx * test_dl.batch_size) + idx
+                        image_name = test_dl.dataset.names[image_id].split(".")[0]
 
-            for idx in range(dl_element.target.shape[0]):
-                if self.image_index in images_to_save:
-                    image_id = (batch_idx * test_dl.batch_size) + idx
-                    image_name = test_dl.dataset.names[image_id].split(".")[0]
-
-                    self.save_results(
-                        f"{image_name}_{self.image_index}",
-                        dl_element_numpy[idx],
-                        test_dl.dataset.mean_std,
-                    )
-
-                self.image_index += 1
+                        self.save_results(
+                            f"{image_name}_{self.image_index}",
+                            dl_element_numpy[idx],
+                            test_dl.dataset.mean_std,
+                        )
+                    self.image_index += 1
 
             display_progress(
                 "Model evaluation in progress",

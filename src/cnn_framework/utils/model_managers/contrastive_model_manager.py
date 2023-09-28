@@ -25,11 +25,11 @@ class ContrastiveModelManager(ModelManager):
         # Construct all_inputs: [input[0], input[1], input[2], ..., input_bis[0], input_bis[1], input_bis[2], ...]
         all_inputs = torch.zeros((inputs.shape[0] * self.params.n_views, *inputs.shape[1:]))
         for input_index, image_index in enumerate(dl_element.index):
-            image_index_bis, input_bis, _, _ = data_loader.dataset[image_index.item()]
-            assert image_index_bis == image_index
+            dl_element_bis = data_loader.dataset[image_index.item()]
+            assert dl_element_bis.index == image_index
             # Fill input
             all_inputs[input_index] = inputs[input_index]
-            all_inputs[input_index + batch_size] = input_bis
+            all_inputs[input_index + batch_size] = dl_element_bis.input
 
         all_inputs = all_inputs.to(self.device).float()
         features = self.model(all_inputs)
@@ -60,14 +60,13 @@ class ContrastiveModelManager(ModelManager):
         # Update metric
         dl_metric.update(logits, labels)
 
-        if loss_manager is None:
-            return None, all_inputs[batch_size:]
-
-        # Compute loss
-        loss, _ = loss_manager(logits, labels)
-
         # Use other inputs as fake predictions
         dl_element.prediction = all_inputs[batch_size:]
+
+        # Compute loss if possible
+        if loss_manager is None:
+            return None
+        loss = loss_manager(logits, labels)
 
         return loss
 

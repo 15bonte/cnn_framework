@@ -1,18 +1,18 @@
+from typing import Iterable
 import torch
 from torch.optim.optimizer import Optimizer
 from torch import nn
 
-# from https://github.com/NUS-HPC-AI-Lab/LARS-ImageNet-PyTorch
 
-"""
-    We recommend using create_optimizer_lars and setting bn_bias_separately=True 
+def create_optimizer_lars(model, lr, momentum, weight_decay, bn_bias_separately, epsilon):
+    """
+    from https://github.com/NUS-HPC-AI-Lab/LARS-ImageNet-PyTorch
+
+    We recommend using create_optimizer_lars and setting bn_bias_separately=True
     instead of using class Lars directly, which helps LARS skip parameters
     in BatchNormalization and bias, and has better performance in general.
     Polynomial Warmup learning rate decay is also helpful for better performance in general.
-"""
-
-
-def create_optimizer_lars(model, lr, momentum, weight_decay, bn_bias_separately, epsilon):
+    """
     if bn_bias_separately:
         optimizer = Lars(
             [
