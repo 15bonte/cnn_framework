@@ -24,3 +24,9 @@ git clone https://github.com/15bonte/cnn_framework.git
 cd cnn_framework
 pip install -e .
 ```
+
+If you want to work with VAE, you must also install [Pythae](https://github.com/clementchadebec/benchmark_VAE/tree/main), which is not the case by default.
+
+```bash
+pip install pythae
+```
