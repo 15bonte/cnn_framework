@@ -25,6 +25,12 @@ cd cnn_framework
 pip install -e .
 ```
 
+If you want to run jupyter tutorials, you also need to install ipykernel
+
+```bash
+pip install ipykernel
+```
+
 If you want to work with VAE, you must also install [Pythae](https://github.com/clementchadebec/benchmark_VAE/tree/main) and [WandB](https://wandb.ai/home), which is not the case by default.
 
 ```bash
