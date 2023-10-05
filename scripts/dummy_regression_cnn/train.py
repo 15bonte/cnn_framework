@@ -1,6 +1,3 @@
-from cProfile import Profile
-from pstats import Stats
-
 import torch
 import torch.nn as nn
 from torch import optim
@@ -36,17 +33,7 @@ def main(params):
     )  # define the optimization
     loss_function = nn.L1Loss()  # define the loss function
 
-    if MONITOR_FUNCTIONS:
-        profiler = Profile()
-        training_test_function = lambda: manager.fit(train_dl, val_dl, optimizer, loss_function)
-        profiler.runcall(training_test_function)
-
-        stats = Stats(profiler)
-        stats.strip_dirs()
-        stats.sort_stats("cumulative")
-        stats.print_stats(20)
-    else:
-        manager.fit(train_dl, val_dl, optimizer, loss_function)
+    manager.fit(train_dl, val_dl, optimizer, loss_function)
 
     for model_path, name in zip(
         [manager.model_save_path_early_stopping, manager.model_save_path],

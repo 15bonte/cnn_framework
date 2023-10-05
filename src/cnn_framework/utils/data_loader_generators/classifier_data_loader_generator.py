@@ -1,6 +1,6 @@
 import random
-import numpy as np
 from collections import Counter
+import numpy as np
 
 from .data_loader_generator import DataLoaderGenerator
 
