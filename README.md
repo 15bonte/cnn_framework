@@ -25,8 +25,12 @@ cd cnn_framework
 pip install -e .
 ```
 
-If you want to work with VAE, you must also install [Pythae](https://github.com/clementchadebec/benchmark_VAE/tree/main), which is not the case by default.
+If you want to work with VAE, you must also install [Pythae](https://github.com/clementchadebec/benchmark_VAE/tree/main) and [WandB](https://wandb.ai/home), which is not the case by default.
 
 ```bash
 pip install pythae
+```
+
+```bash
+pip install wandb
 ```
