@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="cnn_framework",
-    version="0.0.6",
+    version="0.0.7",
     author="Thomas Bonte",
     author_email="thomas.bonte@mines-paristech.fr",
     description="CNN framework",
