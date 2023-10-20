@@ -21,4 +21,4 @@ class DummyModelParams(BaseModelParams):
 
         self.nb_classes = 2
         self.class_names = ["Square", "Circle"]
-        self.nb_modalities = 3
+        self.c_indexes = [0, 1, 2]

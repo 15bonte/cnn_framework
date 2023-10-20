@@ -11,7 +11,7 @@ class CustomEncoder(BaseEncoder):
     def __init__(self, params, args):
         BaseEncoder.__init__(self)
 
-        in_channels = params.nb_modalities * params.nb_stacks_per_modality
+        in_channels = len(params.c_indexes) * len(params.z_indexes)
         self.conv_layers = get_encoder(
             params.encoder_name,
             in_channels=in_channels,

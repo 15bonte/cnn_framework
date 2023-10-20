@@ -48,7 +48,7 @@ def main(params):
     my_vae_config = BetaVAEConfig(
         reconstruction_loss=params.reconstruction_loss,
         input_dim=(
-            params.nb_modalities * params.nb_stacks_per_modality,
+            len(params.c_indexes) * len(params.z_indexes),
             params.input_dimensions.height,
             params.input_dimensions.width,
         ),

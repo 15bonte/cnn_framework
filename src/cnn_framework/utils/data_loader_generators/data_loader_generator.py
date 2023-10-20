@@ -10,7 +10,7 @@ from ..tools import handle_image_type
 
 
 def check_dimensions_order(params, dataset_output):
-    assert dataset_output.input.shape[-1] == params.nb_modalities * params.nb_stacks_per_modality
+    assert dataset_output.input.shape[-1] == len(params.c_indexes) * len(params.z_indexes)
     if dataset_output.target_is_image():
         assert dataset_output.target.shape[-1] == params.out_channels
 
@@ -26,7 +26,7 @@ def get_mean_and_std(data_loaders):
 
     # Initialize mean and std
     params = data_loaders[0].dataset.params
-    in_channels = params.nb_modalities * params.nb_stacks_per_modality
+    in_channels = len(params.c_indexes) * len(params.z_indexes)
     channels = in_channels + params.out_channels
     channels_sum, channels_squared_sum = np.zeros(channels), np.zeros(channels)
     num_imgs = 0

@@ -12,8 +12,8 @@ class VAEModelParams(BaseModelParams):
 
         self.input_dimensions = Dimensions(height=160, width=160)
 
-        self.nb_modalities = 2
-        self.nb_stacks_per_modality = 1
+        self.c_indexes = [0, 1]
+        self.z_indexes = [0]
 
         self.nb_classes = 3  # G1, S, G2
         self.depth = 5

@@ -151,8 +151,8 @@ class BaseModelParams:
         self.nb_classes = None
         self.class_names = []
         self.model_index = 0
-        self.nb_modalities = 1  # input
-        self.nb_stacks_per_modality = 1  # input
+        self.c_indexes = [0]  # channels selected as input
+        self.z_indexes = [0]  # heights selected as input
         self.out_channels = 0  # output
 
         # Input data set
@@ -261,10 +261,10 @@ class BaseModelParams:
                 self.num_workers = int(args.num_workers)
             if args.dropout:
                 self.dropout = float(args.dropout)
-            if args.nb_modalities:
-                self.nb_modalities = int(args.nb_modalities)
-            if args.nb_stacks_per_modality:
-                self.nb_stacks_per_modality = int(args.nb_stacks_per_modality)
+            if args.c_indexes:
+                self.c_indexes = args.c_indexes
+            if args.z_indexes:
+                self.z_indexes = args.z_indexes
             if args.cross_validation_dir:
                 self.cross_validation_dir = args.cross_validation_dir
 

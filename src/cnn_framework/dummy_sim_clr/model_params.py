@@ -21,7 +21,7 @@ class SimCLRModelParams(BaseModelParams):
         self.val_ratio = 0.1
         self.test_ratio = 0.1
 
-        self.nb_modalities = 3
+        self.c_indexes = [0, 1, 2]
 
         self.n_views = 2
         self.temperature = 0.07

@@ -15,8 +15,8 @@ class DummyVAEModelParams(VAEModelParams):
 
         self.num_epochs = 30
 
-        self.nb_modalities = 3  # RGB
-        self.nb_stacks_per_modality = 1
+        self.c_indexes = [0, 1, 2]  # RGB
+        self.z_indexes = [0]
 
         self.nb_classes = 2  # square, circle
         self.depth = 5

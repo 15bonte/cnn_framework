@@ -16,7 +16,7 @@ def main(params):
     _, _, test_dl = loader_generator.generate_data_loader()
 
     model = ResNetSimCLR(
-        nb_input_channels=params.nb_modalities * params.nb_stacks_per_modality,
+        nb_input_channels=len(params.c_indexes) * len(params.z_indexes),
     )
     manager = ContrastiveModelManager(model, params, PositivePairMatchingMetric)
 

@@ -18,4 +18,4 @@ class DummyModelParams(BaseModelParams):
         self.test_ratio = 0.1
 
         self.out_channels = 1
-        self.nb_modalities = 3
+        self.c_indexes = [0, 1, 2]

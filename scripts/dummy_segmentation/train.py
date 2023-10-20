@@ -19,7 +19,7 @@ def main(params):
     # Load pretrained model
     model = UNet(
         nb_classes=params.out_channels,
-        nb_input_channels=params.nb_modalities * params.nb_stacks_per_modality,
+        nb_input_channels=len(params.c_indexes) * len(params.z_indexes),
     )
     manager = ModelManager(model, params, PCC)
 

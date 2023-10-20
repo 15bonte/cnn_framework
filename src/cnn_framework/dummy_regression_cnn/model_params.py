@@ -20,4 +20,4 @@ class DummyModelParams(BaseModelParams):
         self.learning_rate = 1e-3
 
         self.nb_classes = 1
-        self.nb_modalities = 3
+        self.c_indexes = [0, 1, 2]

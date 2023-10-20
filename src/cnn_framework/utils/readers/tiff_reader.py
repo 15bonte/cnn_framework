@@ -1,3 +1,5 @@
+from typing import Optional, Union
+
 import math
 import matplotlib.pyplot as plt
 import numpy as np
