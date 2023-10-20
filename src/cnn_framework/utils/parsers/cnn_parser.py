@@ -55,8 +55,8 @@ class CnnParser:
             "--num_workers", help="Number of workers in train/val data loaders"
         )
         self.arguments_parser.add_argument(
-            "--c_indexes", nargs="*", type=int, help="Number of image modalities"
+            "--c_indexes", nargs="*", type=int, help="Channel indexes to select as input"
         )
         self.arguments_parser.add_argument(
-            "--z_indexes", nargs="*", type=int, help="Number of stacks per modality"
+            "--z_indexes", nargs="*", type=int, help="Height indexes to select as input"
         )
