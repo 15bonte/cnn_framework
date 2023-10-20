@@ -205,7 +205,7 @@ class BaseModelParams:
         self.wandb_entity = "cbio-bis"
 
     def get_useful_training_parameters(self):
-        return f"epochs {self.num_epochs} | batch {self.batch_size} | lr {self.learning_rate} | weight decay {self.weight_decay} | dropout {self.dropout}"
+        return f"epochs {self.num_epochs} | batch {self.batch_size} | lr {self.learning_rate} | weight decay {self.weight_decay} | dropout {self.dropout} | c {self.c_indexes} | z {self.z_indexes}"
 
     def update(self, args=None):
         if args is not None:
