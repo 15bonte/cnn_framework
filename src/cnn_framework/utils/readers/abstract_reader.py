@@ -93,11 +93,11 @@ class AbstractReader:
             elif projection.method == ProjectMethods.Focus:
                 self.image = stack.focus_projection(self.image, proportion=projection.proportion)
             elif projection.method == ProjectMethods.Channel:
-                self.image = np.take(
-                    self.image, projection.channels, axis=projection.axis
-                ).squeeze()
+                self.image = np.take(self.image, projection.channels, axis=projection.axis)
             else:
                 raise ValueError("Unknown projection method")
+        # Squeeze as before, but after projection
+        self.image = np.squeeze(self.image)
 
     @abstractmethod
     def display_info(
