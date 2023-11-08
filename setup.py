@@ -30,7 +30,6 @@ setup(
         "big-fish>=0.6.2",
         "pillow>=9.2.0",
         "segmentation-models-pytorch>=0.3.0",
-        "GitPython==3.1.27",
         "protobuf==3.20.*",
         "tensorboard==2.8.0",
     ],

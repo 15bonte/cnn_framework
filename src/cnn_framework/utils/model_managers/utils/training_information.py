@@ -1,5 +1,4 @@
 from pathlib import Path
-import git
 
 
 class TrainingInformation:
@@ -22,6 +21,8 @@ class TrainingInformation:
 
         # Get git hash
         try:
+            import git
+
             current_file_path = Path(__file__).parent.resolve()
             repo = git.Repo(current_file_path, search_parent_directories=True)
             self.git_hash = repo.head.object.hexsha
