@@ -390,7 +390,7 @@ class ModelManager:
                 # Case where both input and target have been normalized
                 if data_image.shape[0] != len(mean_std["mean"]):
                     nb_input_channels = (
-                        len(params.c_indexes) * len(params.z_indexes)
+                        len(self.params.c_indexes) * len(self.params.z_indexes)
                     )
                     input_mean_std = {
                         "mean": mean_std["mean"][:nb_input_channels],
