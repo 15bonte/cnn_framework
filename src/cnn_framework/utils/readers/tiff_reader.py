@@ -1,10 +1,11 @@
-from typing import Optional, Union
-
+from typing import Optional
+from abc import abstractmethod
 import math
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 from PIL.TiffTags import TAGS
+from aicsimageio import AICSImage
 
 from .utils.projection import Projection
 
@@ -19,6 +20,30 @@ class TiffReader(AbstractReader):
     Handles 2D or 3D images, coded on 8 or 16bit.
     """
 
+    def _read_image(self, file_path: str) -> np.ndarray:
+        aics_img = AICSImage(file_path)
+        image = self._reorganize_channels(aics_img.data, "TCZYX", aics_img.dims.order)
+        return image
+
+    @abstractmethod
+    def _reorganize_channels(
+        self,
+        image: np.ndarray,
+        target_order: Optional[str],
+        original_order: Optional[str],
+    ):
+        """
+        Make sure image dimensions order matches dim_order.
+        """
+        # Add missing dimensions if necessary
+        for dim in target_order:
+            if dim not in original_order:
+                original_order = dim + original_order
+                image = np.expand_dims(image, axis=0)
+
+        indexes = [original_order.index(dim) for dim in target_order]
+        return np.moveaxis(image, indexes, list(range(len(target_order))))
+
     def display_info(
         self,
         unit=None,
@@ -28,6 +53,7 @@ class TiffReader(AbstractReader):
         show=True,
         verbose=True,
     ):
+        print("Deprecated.")
         if verbose:
             with Image.open(self.file_path) as img:
                 meta_dict = {TAGS[key]: img.tag[key] for key in img.tag_v2}
@@ -73,7 +99,9 @@ class TiffReader(AbstractReader):
         figManager.window.showMaximized()
 
         if save_path:
-            plt.savefig(save_path, bbox_inches="tight", pad_inches=0.0, transparent=True)
+            plt.savefig(
+                save_path, bbox_inches="tight", pad_inches=0.0, transparent=True
+            )
 
         if show:
             plt.show()
@@ -96,7 +124,12 @@ if __name__ == "__main__":
         "µm",
         0.225,
     )  # MC "µm", 6.4504 / 63  # "µm", 0.1  # ("µm", 0.1) => 1px = 0.1µm
-    DIMENSIONS = {"min_x": 806 - 200, "max_x": 806 + 200, "min_y": 764 - 120, "max_y": 764 + 200}
+    DIMENSIONS = {
+        "min_x": 806 - 200,
+        "max_x": 806 + 200,
+        "min_y": 764 - 120,
+        "max_y": 764 + 200,
+    }
     SAVE_PATH = None  # only for basic for now
 
     reader = TiffReader(
