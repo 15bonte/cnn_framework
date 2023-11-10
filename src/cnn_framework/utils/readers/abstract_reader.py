@@ -40,7 +40,7 @@ class AbstractReader:
         respect_initial_type=False,
     ):
         # Read image from file
-        self.image = io.imread(file_path)
+        self.image = self._read_image(file_path)
         # Type management
         if not respect_initial_type:
             self.image = handle_image_type(self.image)
@@ -51,6 +51,9 @@ class AbstractReader:
 
         self.normalize = normalize
         self.project = project
+
+    def _read_image(self, file_path: str) -> np.ndarray:
+        return io.imread(file_path)
 
     def get_processed_image(self):
         if not self.preprocessing_done:
@@ -89,15 +92,19 @@ class AbstractReader:
             elif projection.method == ProjectMethods.Maximum:
                 self.image = self.image.max(axis=projection.axis)
             elif projection.method == ProjectMethods.Mean:
-                self.image = self.image.mean(axis=projection.axis).astype(self.image.dtype)
+                self.image = self.image.mean(axis=projection.axis).astype(
+                    self.image.dtype
+                )
             elif projection.method == ProjectMethods.Focus:
-                self.image = stack.focus_projection(self.image, proportion=projection.proportion)
+                self.image = stack.focus_projection(
+                    self.image, proportion=projection.proportion
+                )
             elif projection.method == ProjectMethods.Channel:
-                self.image = np.take(self.image, projection.channels, axis=projection.axis)
+                self.image = np.take(
+                    self.image, projection.channels, axis=projection.axis
+                )
             else:
                 raise ValueError("Unknown projection method")
-        # Squeeze as before, but after projection
-        self.image = np.squeeze(self.image)
 
     @abstractmethod
     def display_info(
