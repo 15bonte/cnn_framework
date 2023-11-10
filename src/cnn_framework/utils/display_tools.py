@@ -32,7 +32,9 @@ def display_confusion_matrix(
         y_true = np.array([int(label) for label in y_true])
         y_pred = np.array([int(label) for label in y_pred])
 
-    m = confusion_matrix(y_true, y_pred, labels=list(range(len(class_names))), normalize=normalize)
+    m = confusion_matrix(
+        y_true, y_pred, labels=list(range(len(class_names))), normalize=normalize
+    )
 
     # Rotate only if names are long
     max_name_length = max([len(name) for name in class_names])
@@ -51,7 +53,9 @@ def display_confusion_matrix(
     # Save plot
     if save_path is not None:
         plt.savefig(
-            f"{save_path}/confusion_matrix.{extension}", transparent=True, bbox_inches="tight"
+            f"{save_path}/confusion_matrix.{extension}",
+            transparent=True,
+            bbox_inches="tight",
         )
 
     if show:
@@ -96,7 +100,9 @@ def make_image_matplotlib_displayable(image, mean_std=None):
     # Else, add dummy channels as copy of last
     for _ in range(3 - normalized_image.shape[-1]):
         copy_channel = np.copy(normalized_image[:, :, -1])
-        normalized_image = np.concatenate([normalized_image, copy_channel[..., None]], axis=-1)
+        normalized_image = np.concatenate(
+            [normalized_image, copy_channel[..., None]], axis=-1
+        )
 
     return normalized_image
 
@@ -115,7 +121,7 @@ def make_image_tiff_displayable(image, mean_std):
     image = np.moveaxis(image, channels_axis, 0)
 
     # If mean and std are provided, normalize back to initial values
-    if mean_std is not None:
+    if mean_std is not None and len(mean_std["mean"]) > 0:
         normalized_image = normalize_array(image, mean_std=mean_std, reverse=True)
     # Else, just let it like that
     else:

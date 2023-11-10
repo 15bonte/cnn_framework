@@ -45,46 +45,53 @@ class ImagesReader:
         """
         if self.is_empty():
             return None
-        images = []
-        for function, projection, normalization in zip(
-            self.functions, self.projections, self.normalizations
-        ):
-            image_path = function(filename)
-            image_reader = TiffReader(
-                image_path,
-                project=projection,
-                normalize=normalization,
-                respect_initial_type=respect_initial_type,
-            )
-            raw_image = image_reader.get_processed_image()
 
-            if raw_image.ndim != 5:
-                print("Old behavior. Should be investigated.")
+        try:
+            images = []
+            for function, projection, normalization in zip(
+                self.functions, self.projections, self.normalizations
+            ):
+                image_path = function(filename)
+                image_reader = TiffReader(
+                    image_path,
+                    project=projection,
+                    normalize=normalization,
+                    respect_initial_type=respect_initial_type,
+                )
+                raw_image = image_reader.get_processed_image()
 
-                # Add channel dimension if needed
-                while raw_image.ndim < axis_to_merge + 1:
-                    raw_image = np.expand_dims(raw_image, axis=-1)
+                if raw_image.ndim != 5:
+                    print("Old behavior. Should be investigated.")
 
-                # For global consistency, even projected image should have one channel
-                if raw_image.ndim == 2:
-                    raw_image = np.expand_dims(raw_image, axis_to_merge)
+                    # Add channel dimension if needed
+                    while raw_image.ndim < axis_to_merge + 1:
+                        raw_image = np.expand_dims(raw_image, axis=-1)
 
-            images.append(raw_image)
+                    # For global consistency, even projected image should have one channel
+                    if raw_image.ndim == 2:
+                        raw_image = np.expand_dims(raw_image, axis_to_merge)
 
-        concatenated_image = np.concatenate(images, axis=axis_to_merge)
+                images.append(raw_image)
 
-        # For global consistency, axis_to_merge (=channels) should be last
-        # raw_img = np.moveaxis(raw_img, axis_to_merge, -1)  # H, W, C
+            concatenated_image = np.concatenate(images, axis=axis_to_merge)
 
-        if for_training:  # need to match YXC
-            concatenated_image = (
-                concatenated_image.squeeze()
-            )  # squeeze unnecessary dimensions
-            if concatenated_image.ndim == 2:  # YX
-                concatenated_image = np.expand_dims(concatenated_image, axis=-1)  # YXC
-            else:
-                concatenated_image = np.moveaxis(
-                    concatenated_image, np.argmin(concatenated_image.shape), -1
-                )  # YXC
+            # For global consistency, axis_to_merge (=channels) should be last
+            # raw_img = np.moveaxis(raw_img, axis_to_merge, -1)  # H, W, C
 
-        return concatenated_image
+            if for_training:  # need to match YXC
+                concatenated_image = (
+                    concatenated_image.squeeze()
+                )  # squeeze unnecessary dimensions
+                if concatenated_image.ndim == 2:  # YX
+                    concatenated_image = np.expand_dims(
+                        concatenated_image, axis=-1
+                    )  # YXC
+                else:
+                    concatenated_image = np.moveaxis(
+                        concatenated_image, np.argmin(concatenated_image.shape), -1
+                    )  # YXC
+
+            return concatenated_image
+
+        except IndexError:  # handle indexes out of bound
+            return None

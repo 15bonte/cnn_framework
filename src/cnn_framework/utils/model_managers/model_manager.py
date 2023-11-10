@@ -53,7 +53,10 @@ class ModelManager:
     """
 
     def __init__(
-        self, model: nn.Module, params: BaseModelParams, metric_class: type[AbstractMetric]
+        self,
+        model: nn.Module,
+        params: BaseModelParams,
+        metric_class: type[AbstractMetric],
     ):
         # Device to train model
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -83,7 +86,9 @@ class ModelManager:
         # Tensorboard writer
         os.makedirs(self.params.tensorboard_folder_path, exist_ok=True)
         self.writer = SummaryWriter(self.params.tensorboard_folder_path)
-        self.model_save_path = f"{self.params.models_folder}/{self.params.model_save_name}"
+        self.model_save_path = (
+            f"{self.params.models_folder}/{self.params.model_save_name}"
+        )
         self.model_save_path_early_stopping = (
             f"{self.params.models_folder}/early_stopping_{self.params.model_save_name}"
         )
@@ -155,7 +160,9 @@ class ModelManager:
         current_batch = self.training_information.get_current_batch()
         # Graphs
         plot_step = int(self.params.plot_step)
-        if current_batch % plot_step == plot_step - 1:  # every plot_step mini-batches...
+        if (
+            current_batch % plot_step == plot_step - 1
+        ):  # every plot_step mini-batches...
             # ... log the running loss
             running_losses = self.train_loss_manager.get_running_losses()
             for name, loss in running_losses:
@@ -167,7 +174,9 @@ class ModelManager:
 
             # ... log running metric
             score, _ = train_metric.get_score()
-            self.writer.add_scalar(f"train/{train_metric.get_name()}", score, current_batch)
+            self.writer.add_scalar(
+                f"train/{train_metric.get_name()}", score, current_batch
+            )
             train_metric.reset()
 
     def log_val_progress(self, val_metric: AbstractMetric) -> None:
@@ -177,7 +186,9 @@ class ModelManager:
         running_losses = self.val_loss_manager.get_running_losses()
         for name, loss in running_losses:
             val_dl_length = len(self.dl["val"])
-            self.writer.add_scalar(f"val/{name}", loss.item() / val_dl_length, current_batch)
+            self.writer.add_scalar(
+                f"val/{name}", loss.item() / val_dl_length, current_batch
+            )
 
         # ...log the running metric
         score, _ = val_metric.get_score()
@@ -192,11 +203,16 @@ class ModelManager:
         epoch = self.training_information.epoch
 
         epochs_to_plot = np.linspace(
-            1, self.training_information.num_epochs, self.params.nb_plot_images, dtype=int
+            1,
+            self.training_information.num_epochs,
+            self.params.nb_plot_images,
+            dtype=int,
         )
 
         # Condition to apply only for training
-        batch_condition = True if name == "val" else batch_index == num_batches_train - 1
+        batch_condition = (
+            True if name == "val" else batch_index == num_batches_train - 1
+        )
         if epoch in epochs_to_plot and batch_condition:
             # Plot last training batch of epoch
             self.write_images_to_tensorboard(current_batch, dl_element, name)
@@ -225,7 +241,10 @@ class ModelManager:
                 # Perform training loop
                 with autocast(enabled=self.params.fp16_precision):
                     loss = self.compute_loss(
-                        dl_element, train_metric, self.train_loss_manager, self.dl["train"]
+                        dl_element,
+                        train_metric,
+                        self.train_loss_manager,
+                        self.dl["train"],
                     )
 
                 # Clear the gradients
@@ -272,7 +291,9 @@ class ModelManager:
             # Save only if better than current best loss, or if no evaluation is possible
             if (
                 (not evaluate)
-                or (val_score >= best_val_score)  # best model is model with highest val score
+                or (
+                    val_score >= best_val_score
+                )  # best model is model with highest val score
                 or (
                     val_score == best_val_score and val_loss < best_val_loss
                 )  # or lowest val loss if val score is constant
@@ -289,7 +310,9 @@ class ModelManager:
         self.training_information.best_model_epoch = model_epoch
         print(f"\nBest model saved at epoch {model_epoch}.")
 
-    def compute_and_save_mean_std(self, train_dl: DataLoader, val_dl: DataLoader) -> None:
+    def compute_and_save_mean_std(
+        self, train_dl: DataLoader, val_dl: DataLoader
+    ) -> None:
         # Compute mean and std
         data_set_mean_std = get_mean_and_std([train_dl, val_dl])
 
@@ -367,7 +390,10 @@ class ModelManager:
         self.model.load_state_dict(torch.load(self.model_save_path))
 
     def model_prediction(
-        self, dl_element: DatasetOutput, dl_metric: AbstractMetric, data_loader: DataLoader
+        self,
+        dl_element: DatasetOutput,
+        dl_metric: AbstractMetric,
+        data_loader: DataLoader,
     ) -> None:
         """
         Function to generate outputs from inputs for given model.
@@ -380,17 +406,24 @@ class ModelManager:
         target_mean_std = None
         # Save inputs, targets & predictions as tiff images
         for data_image, data_type in zip(
-            [dl_element.input, dl_element.target, dl_element.prediction, dl_element.additional],
+            [
+                dl_element.input,
+                dl_element.target,
+                dl_element.prediction,
+                dl_element.additional,
+            ],
             ["input", "groundtruth", "predicted", "additional"],
         ):
             # C, H, W for data_image
             if data_image is None:  # case when additional data is None
                 continue
-            if data_type == "input" and mean_std is not None:  # input has been normalized
+            if (
+                data_type == "input" and mean_std is not None
+            ):  # input has been normalized
                 # Case where both input and target have been normalized
                 if data_image.shape[0] != len(mean_std["mean"]):
-                    nb_input_channels = (
-                        len(self.params.c_indexes) * len(self.params.z_indexes)
+                    nb_input_channels = len(self.params.c_indexes) * len(
+                        self.params.z_indexes
                     )
                     input_mean_std = {
                         "mean": mean_std["mean"][:nb_input_channels],
@@ -403,10 +436,15 @@ class ModelManager:
                 else:
                     input_mean_std = mean_std
                 image_to_save = make_image_tiff_displayable(data_image, input_mean_std)
-            elif data_type in ["groundtruth", "predicted"] and target_mean_std is not None:
+            elif (
+                data_type in ["groundtruth", "predicted"]
+                and target_mean_std is not None
+            ):
                 image_to_save = make_image_tiff_displayable(data_image, target_mean_std)
             else:
                 image_to_save = make_image_tiff_displayable(data_image, None)
+            if len(image_to_save) == 0:  # protect against empty image
+                continue
             with warnings.catch_warnings():
                 warnings.filterwarnings(action="ignore", category=UserWarning)
                 io.imsave(
@@ -434,7 +472,9 @@ class ModelManager:
                     *dl_element.target.shape[:0], -1, *dl_element.target.shape[2:]
                 )
                 dl_element.additional = dl_element.additional.view(
-                    *dl_element.additional.shape[:0], -1, *dl_element.additional.shape[2:]
+                    *dl_element.additional.shape[:0],
+                    -1,
+                    *dl_element.additional.shape[2:],
                 )
 
             # Run prediction
