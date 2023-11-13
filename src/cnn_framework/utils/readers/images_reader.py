@@ -60,7 +60,7 @@ class ImagesReader:
                 )
                 raw_image = image_reader.get_processed_image()
 
-                if raw_image.ndim != 5:
+                if raw_image.ndim < 5:
                     print("Old behavior. Should be investigated.")
 
                     # Add channel dimension if needed

@@ -15,7 +15,15 @@ class SimCLRDataSet(AbstractDataSet):
         # Data sources
         self.input_data_source = ImagesReader(
             [self.data_manager.get_microscopy_image_path],
-            [[Projection(method=ProjectMethods.Channel, channels=self.params.c_indexes, axis=2)]],
+            [
+                [
+                    Projection(
+                        method=ProjectMethods.Channel,
+                        channels=self.params.c_indexes,
+                        axis=-1,
+                    )
+                ]
+            ],
         )
 
     def set_transforms(self):
@@ -27,14 +35,16 @@ class SimCLRDataSet(AbstractDataSet):
                 A.HorizontalFlip(),
                 A.VerticalFlip(),
                 # A.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2, p=0.5),
-                A.Normalize(self.mean_std["mean"], std=self.mean_std["std"], max_pixel_value=1),
+                A.Normalize(
+                    self.mean_std["mean"], std=self.mean_std["std"], max_pixel_value=1
+                ),
                 A.GaussianBlur(),
             ]
         )
 
     def generate_raw_images(self, filename):
         return DatasetOutput(
-            input=self.input_data_source.get_image(filename, axis_to_merge=2),
+            input=self.input_data_source.get_image(filename, axis_to_merge=-1),
         )
 
 
@@ -43,7 +53,9 @@ class SimCLRDataSetWithoutTransforms(SimCLRDataSet):
         height, width = self.params.input_dimensions.to_tuple(False)
         self.transforms = A.Compose(
             [
-                A.Normalize(self.mean_std["mean"], std=self.mean_std["std"], max_pixel_value=1),
+                A.Normalize(
+                    self.mean_std["mean"], std=self.mean_std["std"], max_pixel_value=1
+                ),
                 A.CenterCrop(height=height, width=width, p=1),
             ]
         )

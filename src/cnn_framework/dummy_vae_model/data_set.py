@@ -17,7 +17,15 @@ class DummyVAEDataSet(AbstractDataSet):
         # Data sources
         self.input_data_source = ImagesReader(
             [self.data_manager.get_microscopy_image_path],
-            [[Projection(method=ProjectMethods.Channel, channels=[0, 1, 2], axis=2)]],
+            [
+                [
+                    Projection(
+                        method=ProjectMethods.Channel,
+                        channels=self.params.c_indexes,
+                        axis=-1,
+                    )
+                ]
+            ],
         )
 
     def set_transforms(self):
@@ -26,9 +34,13 @@ class DummyVAEDataSet(AbstractDataSet):
             self.transforms = A.Compose(
                 [
                     A.Normalize(
-                        self.mean_std["mean"], std=self.mean_std["std"], max_pixel_value=1
+                        self.mean_std["mean"],
+                        std=self.mean_std["std"],
+                        max_pixel_value=1,
                     ),
-                    A.PadIfNeeded(min_height=height, min_width=width, border_mode=0, value=0, p=1),
+                    A.PadIfNeeded(
+                        min_height=height, min_width=width, border_mode=0, value=0, p=1
+                    ),
                     A.CenterCrop(height=height, width=width, p=1),
                     A.Rotate(border_mode=0),
                     A.HorizontalFlip(),
@@ -39,16 +51,20 @@ class DummyVAEDataSet(AbstractDataSet):
             self.transforms = A.Compose(
                 [
                     A.Normalize(
-                        self.mean_std["mean"], std=self.mean_std["std"], max_pixel_value=1
+                        self.mean_std["mean"],
+                        std=self.mean_std["std"],
+                        max_pixel_value=1,
                     ),
-                    A.PadIfNeeded(min_height=height, min_width=width, border_mode=0, value=0, p=1),
+                    A.PadIfNeeded(
+                        min_height=height, min_width=width, border_mode=0, value=0, p=1
+                    ),
                     A.CenterCrop(height=height, width=width, p=1),
                 ]
             )
 
     def generate_raw_images(self, filename):
         return DatasetOutput(
-            input=self.input_data_source.get_image(filename, axis_to_merge=2),
+            input=self.input_data_source.get_image(filename, axis_to_merge=-1),
         )
 
     def __getitem__(self, idx):

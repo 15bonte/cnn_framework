@@ -14,7 +14,15 @@ class DummyCnnDataSet(AbstractDataSet):
         # Data sources
         self.input_data_source = ImagesReader(
             [self.data_manager.get_microscopy_image_path],
-            [[Projection(method=ProjectMethods.Channel, channels=self.params.c_indexes, axis=2)]],
+            [
+                [
+                    Projection(
+                        method=ProjectMethods.Channel,
+                        channels=self.params.c_indexes,
+                        axis=-1,
+                    )
+                ]
+            ],
         )
 
     def set_transforms(self):
@@ -23,9 +31,13 @@ class DummyCnnDataSet(AbstractDataSet):
             self.transforms = A.Compose(
                 [
                     A.Normalize(
-                        self.mean_std["mean"], std=self.mean_std["std"], max_pixel_value=1
+                        self.mean_std["mean"],
+                        std=self.mean_std["std"],
+                        max_pixel_value=1,
                     ),
-                    A.PadIfNeeded(min_height=height, min_width=width, border_mode=0, value=0, p=1),
+                    A.PadIfNeeded(
+                        min_height=height, min_width=width, border_mode=0, value=0, p=1
+                    ),
                     A.CenterCrop(height=height, width=width, p=1),
                     A.Rotate(border_mode=0, p=1, value=1),
                     A.HorizontalFlip(p=0.5),
@@ -37,9 +49,13 @@ class DummyCnnDataSet(AbstractDataSet):
             self.transforms = A.Compose(
                 [
                     A.Normalize(
-                        mean=self.mean_std["mean"], std=self.mean_std["std"], max_pixel_value=1
+                        mean=self.mean_std["mean"],
+                        std=self.mean_std["std"],
+                        max_pixel_value=1,
                     ),
-                    A.PadIfNeeded(min_height=height, min_width=width, border_mode=0, value=0, p=1),
+                    A.PadIfNeeded(
+                        min_height=height, min_width=width, border_mode=0, value=0, p=1
+                    ),
                     A.CenterCrop(height=height, width=width, p=1),
                 ]
             )
@@ -49,6 +65,6 @@ class DummyCnnDataSet(AbstractDataSet):
         probabilities = self.read_output(filename)
 
         return DatasetOutput(
-            input=self.input_data_source.get_image(filename, axis_to_merge=2),
+            input=self.input_data_source.get_image(filename, axis_to_merge=-1),
             target_array=probabilities,
         )

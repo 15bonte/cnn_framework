@@ -15,7 +15,15 @@ class DummyRegressionCnnDataSet(AbstractDataSet):
         # Data sources
         self.input_data_source = ImagesReader(
             [self.data_manager.get_microscopy_image_path],
-            [[Projection(method=ProjectMethods.Channel, channels=self.params.c_indexes, axis=2)]],
+            [
+                [
+                    Projection(
+                        method=ProjectMethods.Channel,
+                        channels=self.params.c_indexes,
+                        axis=-1,
+                    )
+                ]
+            ],
         )
 
     def set_transforms(self):
@@ -24,9 +32,13 @@ class DummyRegressionCnnDataSet(AbstractDataSet):
             self.transforms = A.Compose(
                 [
                     A.Normalize(
-                        self.mean_std["mean"], std=self.mean_std["std"], max_pixel_value=1
+                        self.mean_std["mean"],
+                        std=self.mean_std["std"],
+                        max_pixel_value=1,
                     ),
-                    A.PadIfNeeded(min_height=height, min_width=width, border_mode=0, value=0, p=1),
+                    A.PadIfNeeded(
+                        min_height=height, min_width=width, border_mode=0, value=0, p=1
+                    ),
                     A.CenterCrop(height=height, width=width, p=1),
                     # A.Rotate(border_mode=0, p=1, value=1),
                     A.HorizontalFlip(p=0.5),
@@ -38,20 +50,26 @@ class DummyRegressionCnnDataSet(AbstractDataSet):
             self.transforms = A.Compose(
                 [
                     A.Normalize(
-                        mean=self.mean_std["mean"], std=self.mean_std["std"], max_pixel_value=1
+                        mean=self.mean_std["mean"],
+                        std=self.mean_std["std"],
+                        max_pixel_value=1,
                     ),
-                    A.PadIfNeeded(min_height=height, min_width=width, border_mode=0, value=0, p=1),
+                    A.PadIfNeeded(
+                        min_height=height, min_width=width, border_mode=0, value=0, p=1
+                    ),
                     A.CenterCrop(height=height, width=width, p=1),
                 ]
             )
 
     def generate_raw_images(self, filename):
         # Output
-        input_image = self.input_data_source.get_image(filename, axis_to_merge=2)
+        input_image = self.input_data_source.get_image(filename, axis_to_merge=-1)
         non_zero_area = np.count_nonzero(input_image) / 3
 
         return DatasetOutput(
             input=input_image,
             target_array=np.array([non_zero_area]),
-            additional=self.additional_data_source.get_image(filename, axis_to_merge=2),
+            additional=self.additional_data_source.get_image(
+                filename, axis_to_merge=-1
+            ),
         )
