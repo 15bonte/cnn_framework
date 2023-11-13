@@ -85,7 +85,9 @@ class DataSplit:
                 data_set["possible_files"] = files[:]
             # Replace ratio by number to only consider number in the following
             if data_set["ratio"] > 0:
-                data_set["number"] = int(data_set["ratio"] * len(data_set["possible_files"]))
+                data_set["number"] = int(
+                    data_set["ratio"] * len(data_set["possible_files"])
+                )
         print("###################")
 
         # Return data set names, sorted by priority
@@ -174,7 +176,9 @@ class BaseModelParams:
         self.cross_validation_dir = ""
 
         # Tensorboard parameters
-        self.tensorboard_folder_path = os.path.join(str(Path.home()), "tensorboard/local")
+        self.tensorboard_folder_path = os.path.join(
+            str(Path.home()), "tensorboard/local"
+        )
         self.plot_step = 10
         # Number of different epochs where to plot images
         self.nb_plot_images = 2
@@ -267,6 +271,8 @@ class BaseModelParams:
                 self.z_indexes = args.z_indexes
             if args.cross_validation_dir:
                 self.cross_validation_dir = args.cross_validation_dir
+            if args.out_channels:
+                self.out_channels = args.out_channels
 
         # Create folders dedicated to current run
         now = datetime.now()
