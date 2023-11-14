@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
 
-def normalize_array(input_array, mean_std=None, reverse=False):
+def normalize_array(input_array, mean_std=None, reverse=False, channel_axis=None):
     """
     Works for both 2D and 3D arrays.
     If reverse, then the normalization is reversed.
@@ -13,8 +13,10 @@ def normalize_array(input_array, mean_std=None, reverse=False):
     # Get number of channels
     nb_channels = np.min(input_array.shape)
 
-    # Find channel axis
-    channel_axis = np.argmin(input_array.shape)
+    # Find channel axis if not already given
+    if channel_axis is None:
+        channel_axis = np.argmin(input_array.shape)
+
     # Put channel axis in front
     input_array = np.moveaxis(input_array, channel_axis, 0)
 
@@ -62,7 +64,9 @@ def zero_one_scaler(input_array, feature_range=(0, 1)):
     # Reshape to 2D
     as_columns = new_input_array.reshape(-1, nb_channels)
     # Apply min max scaler
-    transformed_columns = MinMaxScaler(feature_range=feature_range).fit_transform(as_columns)
+    transformed_columns = MinMaxScaler(feature_range=feature_range).fit_transform(
+        as_columns
+    )
     # Reshape to original shape
     transformed = transformed_columns.reshape(new_input_array.shape)
     # Put channel axis back to original position
