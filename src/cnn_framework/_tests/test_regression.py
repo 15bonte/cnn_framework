@@ -10,4 +10,4 @@ def test_training():
     params.update()
 
     score = training(params)
-    assert abs(score) < 500
+    assert abs(score) < 20
