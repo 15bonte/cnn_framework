@@ -2,25 +2,26 @@ import torch
 import torch.nn as nn
 from torch import optim
 
-from .data_set import DummyCnnDataSet
+from ..utils.data_loader_generators.data_loader_generator import (
+    DataLoaderGenerator,
+)
+from ..utils.model_managers.regression_model_manager import (
+    RegressionModelManager,
+)
+from ..utils.data_managers.default_data_manager import DefaultDataManager
+from ..utils.metrics.mean_error_metric import MeanErrorMetric
 
 from .model import DummyCnn
-
-from ..utils.data_loader_generators.classifier_data_loader_generator import (
-    ClassifierDataLoaderGenerator,
-)
-from ..utils.model_managers.cnn_model_manager import CnnModelManager
-from ..utils.data_managers.default_data_manager import DefaultDataManager
-from ..utils.metrics.classification_accuracy import ClassificationAccuracy
+from .data_set import DummyRegressionCnnDataSet
 
 
 def training(params):
     """
-    Training function for dummy classification.
+    Training function for dummy regression.
     """
 
-    loader_generator = ClassifierDataLoaderGenerator(
-        params, DummyCnnDataSet, DefaultDataManager
+    loader_generator = DataLoaderGenerator(
+        params, DummyRegressionCnnDataSet, DefaultDataManager
     )
     train_dl, val_dl, test_dl = loader_generator.generate_data_loader()
 
@@ -29,14 +30,14 @@ def training(params):
         nb_classes=params.nb_classes,
         nb_input_channels=len(params.c_indexes) * len(params.z_indexes),
     )
-    manager = CnnModelManager(model, params, ClassificationAccuracy)
+    manager = RegressionModelManager(model, params, MeanErrorMetric)
 
     optimizer = optim.Adam(
         model.parameters(),
         lr=float(params.learning_rate),
         betas=(params.beta1, params.beta2),
     )  # define the optimization
-    loss_function = nn.CrossEntropyLoss()  # define the loss function
+    loss_function = nn.L1Loss()  # define the loss function
 
     manager.fit(train_dl, val_dl, optimizer, loss_function)
 

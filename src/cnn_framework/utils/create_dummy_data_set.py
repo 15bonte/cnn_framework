@@ -58,7 +58,7 @@ def generate_data_set(
     save_dir,
     image_size=128,
     nb_channels=3,
-    nb_elements_per_class=100,
+    nb_elements_per_class=1000,
     extension="tiff",
     same_color=False,  # if True, square are all yellow and circle are all purple, if False, random colors
 ):

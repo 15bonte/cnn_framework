@@ -1,4 +1,5 @@
 from cnn_framework.dummy_cnn.model_params import DummyModelParams
+from cnn_framework.dummy_cnn.test import testing
 from cnn_framework.utils.parsers.cnn_parser import CnnParser
 
 
