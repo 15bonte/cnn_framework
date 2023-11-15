@@ -3,8 +3,10 @@ import random
 from datetime import datetime
 import os
 
+
 from ..dimensions import Dimensions
 from ..tools import extract_patterns
+from ...data.tools import get_folder_path
 
 
 class DataSplit:
@@ -158,7 +160,7 @@ class BaseModelParams:
         self.out_channels = 0  # output
 
         # Input data set
-        self.data_dir = os.path.join(str(Path.home()), "data", "dummy")
+        self.data_dir = get_folder_path("images")
 
         # Data split
         self.train_ratio = 0
@@ -176,18 +178,16 @@ class BaseModelParams:
         self.cross_validation_dir = ""
 
         # Tensorboard parameters
-        self.tensorboard_folder_path = os.path.join(
-            str(Path.home()), "tensorboard/local"
-        )
+        self.tensorboard_folder_path = get_folder_path("tensorboard")
         self.plot_step = 10
         # Number of different epochs where to plot images
         self.nb_plot_images = 2
         self.nb_tensorboard_images_max = 8
 
         # Output folders - models & predictions
-        self.models_folder = os.path.join(str(Path.home()), "models/local")
+        self.models_folder = get_folder_path("models")
         self.model_save_name = f"{self.name}.pt"
-        self.output_dir = os.path.join(str(Path.home()), "predictions/local")
+        self.output_dir = get_folder_path("predictions")
 
         # Path to load model to predict
         self.model_load_path = ""

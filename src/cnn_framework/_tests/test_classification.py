@@ -17,6 +17,7 @@ from cnn_framework.utils.metrics.classification_accuracy import ClassificationAc
 
 def training():
     params = DummyModelParams()
+    params.update()
 
     loader_generator = ClassifierDataLoaderGenerator(
         params, DummyCnnDataSet, DefaultDataManager
