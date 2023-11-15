@@ -15,7 +15,7 @@ from cnn_framework.utils.data_managers.default_data_manager import DefaultDataMa
 from cnn_framework.utils.metrics.classification_accuracy import ClassificationAccuracy
 
 
-def training():
+def test_training():
     params = DummyModelParams()
     params.update()
 
