@@ -1,5 +1,7 @@
 # CNN framework
 
+[![codecov](https://codecov.io/gh/15bonte/cnn_framework/branch/main/graph/badge.svg)](https://codecov.io/gh/15bonte/cnn_framework)
+
 Run CNN models for classification, regression, segmentation, VAE, contrastive learning with any data set.
 
 ## Installation
