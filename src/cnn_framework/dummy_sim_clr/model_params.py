@@ -10,8 +10,6 @@ class SimCLRModelParams(BaseModelParams):
     def __init__(self):
         super().__init__("sim_clr")
 
-        self.input_dimensions = Dimensions(height=128, width=128)
-
         self.batch_size = 32  # the greater the better
         self.learning_rate = 0.3 * self.batch_size / 256
         self.weight_decay = 1e-6

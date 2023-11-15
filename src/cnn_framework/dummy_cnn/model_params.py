@@ -1,5 +1,4 @@
 from ..utils.model_params.base_model_params import BaseModelParams
-from ..utils.dimensions import Dimensions
 
 
 class DummyModelParams(BaseModelParams):
@@ -10,9 +9,7 @@ class DummyModelParams(BaseModelParams):
     def __init__(self):
         super().__init__("dummy_cnn")
 
-        self.input_dimensions = Dimensions(height=128, width=128)
-
-        self.num_epochs = 5
+        self.num_epochs = 25
         self.learning_rate = 1e-4
 
         self.train_ratio = 0.8

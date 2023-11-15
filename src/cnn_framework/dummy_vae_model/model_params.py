@@ -1,7 +1,5 @@
 from ..utils.model_params.vae_model_params import VAEModelParams
 
-from ..utils.dimensions import Dimensions
-
 
 class DummyVAEModelParams(VAEModelParams):
     """
@@ -10,8 +8,6 @@ class DummyVAEModelParams(VAEModelParams):
 
     def __init__(self):
         super().__init__("dummy_vae")
-
-        self.input_dimensions = Dimensions(height=128, width=128)
 
         self.num_epochs = 30
 

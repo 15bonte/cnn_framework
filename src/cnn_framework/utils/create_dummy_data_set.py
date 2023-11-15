@@ -56,7 +56,7 @@ def generate_circle(image_size, nb_channels, color):
 
 def generate_data_set(
     save_dir,
-    image_size=128,
+    image_size=32,
     nb_channels=3,
     nb_elements_per_class=1000,
     extension="tiff",

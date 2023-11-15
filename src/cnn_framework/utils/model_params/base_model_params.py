@@ -136,7 +136,7 @@ class BaseModelParams:
         self.name = name
 
         # Input dimensions to the model
-        self.input_dimensions = Dimensions(height=None, width=None, depth=None)
+        self.input_dimensions = Dimensions(height=32, width=32)
 
         # Optimizer
         self.beta1 = 0.9  # exponential decay rate for the first moment estimates

@@ -10,8 +10,6 @@ class VAEModelParams(BaseModelParams):
     def __init__(self, name="vae"):
         super().__init__(name)
 
-        self.input_dimensions = Dimensions(height=160, width=160)
-
         self.c_indexes = [0, 1]
         self.z_indexes = [0]
 
