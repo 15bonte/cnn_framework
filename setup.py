@@ -12,7 +12,9 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://https://github.com/15bonte/cnn_framework",
-    project_urls={"Bug Tracker": "https://https://github.com/15bonte/cnn_framework/issues"},
+    project_urls={
+        "Bug Tracker": "https://https://github.com/15bonte/cnn_framework/issues"
+    },
     classifiers=[
         "Programming Language :: Python :: 3.9",
     ],
@@ -32,6 +34,7 @@ setup(
         "segmentation-models-pytorch>=0.3.0",
         "protobuf==3.20.*",
         "tensorboard==2.8.0",
+        "aicsimageio>=4.12.1",
     ],
     python_requires=">=3.9",
 )
