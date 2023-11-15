@@ -1,5 +1,4 @@
 from ..utils.model_params.base_model_params import BaseModelParams
-from ..utils.dimensions import Dimensions
 
 
 class DummyModelParams(BaseModelParams):
