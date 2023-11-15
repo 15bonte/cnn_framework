@@ -12,7 +12,7 @@ class DummyModelParams(BaseModelParams):
 
         self.input_dimensions = Dimensions(height=128, width=128)
 
-        self.num_epochs = 20
+        self.num_epochs = 5
         self.learning_rate = 1e-4
 
         self.train_ratio = 0.8
