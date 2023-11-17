@@ -35,6 +35,7 @@ setup(
         "protobuf==3.20.*",
         "tensorboard==2.8.0",
         "aicsimageio>=4.12.1",
+        "tensorflow==2.8.0",
     ],
     python_requires=">=3.9",
 )
