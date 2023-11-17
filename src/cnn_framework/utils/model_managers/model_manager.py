@@ -8,6 +8,8 @@ from typing import Optional
 from matplotlib import pyplot as plt
 import numpy as np
 from skimage import io
+from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
+import math
 
 import torch
 from torch.utils.tensorboard import SummaryWriter
@@ -632,3 +634,24 @@ class ModelManager:
             f.write(f"{self.training_information.training_time};")
             f.write(f"{self.training_information.score};\n")
         f.close()
+
+    def display_training_curves(self):
+        """
+        Show tensorboard curves in a matplotlib figure.
+        """
+        event_acc = EventAccumulator(self.params.tensorboard_folder_path)
+        event_acc.Reload()
+        scalar_tags = event_acc.Tags()["scalars"]
+
+        fig = plt.figure(figsize=(12, 12))
+
+        nb_columns = 2
+        nb_lines = math.ceil(len(scalar_tags) / nb_columns)
+        for idx, scalar_tag in enumerate(scalar_tags):
+            _, step_nums, vals = zip(*event_acc.Scalars(scalar_tag))
+            ax = fig.add_subplot(nb_lines, nb_columns, idx + 1)
+            ax.plot(step_nums, vals)
+            ax.set_title(scalar_tag)
+            ax.set_xlabel("Steps")
+
+        plt.show()
