@@ -1,3 +1,4 @@
+import math
 from pathlib import Path
 import warnings
 import datetime
@@ -9,7 +10,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from skimage import io
 from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
-import math
+import tensorflow as tf
 
 import torch
 from torch.utils.tensorboard import SummaryWriter
@@ -25,7 +26,7 @@ from ..losses.loss_manager import LossManager
 from ..model_params.base_model_params import BaseModelParams
 from ..data_sets.dataset_output import DatasetOutput
 from ..metrics.abstract_metric import AbstractMetric
-from ..tools import random_sample
+from ..tools import extract_patterns, random_sample
 from ..data_loader_generators.data_loader_generator import get_mean_and_std
 from ..display_tools import (
     display_progress,
@@ -653,5 +654,34 @@ class ModelManager:
             ax.plot(step_nums, vals)
             ax.set_title(scalar_tag)
             ax.set_xlabel("Steps")
+
+        plt.show()
+
+    def display_training_images(self, patterns: Optional[list[str]] = None):
+        """
+        Show tensorboard images in a matplotlib figure.
+        Plot first 8 images, last printed to tensorboard.
+        """
+        if patterns is None:
+            patterns = ["val*"]
+
+        event_acc = EventAccumulator(self.params.tensorboard_folder_path)
+        event_acc.Reload()
+        image_tags = event_acc.Tags()["images"]
+        filtered_images_tags = extract_patterns(image_tags, patterns)
+
+        fig = plt.figure(figsize=(4, 6))
+
+        for idx, image_tag in enumerate(filtered_images_tags):
+            if idx == 6:
+                break
+            is_ground_truth = idx % 2 == 0
+            _, _, encoded_string, _, _ = zip(*event_acc.Images(image_tag))
+            # -1 for last image (most recent)
+            image = tf.image.decode_image(encoded_string[-1], channels=1).numpy()
+            ax = fig.add_subplot(3, 2, idx + 1)
+            ax.imshow(image, cmap="gray")
+            ax.axis("off")
+            ax.set_title("Ground truth mask" if is_ground_truth else "Predicted mask")
 
         plt.show()
