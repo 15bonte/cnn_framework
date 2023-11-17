@@ -163,15 +163,15 @@ class BaseModelParams:
         self.data_dir = get_folder_path("images")
 
         # Data split
-        self.train_ratio = 0
+        self.train_ratio = 0.8
         self.train_number = 0
         self.train_file = ""
 
-        self.val_ratio = 0
+        self.val_ratio = 0.1
         self.val_number = 0
         self.val_file = ""
 
-        self.test_ratio = 0
+        self.test_ratio = 0.1
         self.test_number = 0
         self.test_file = ""
 
