@@ -315,8 +315,10 @@ class ModelManager:
 
     def compute_and_save_mean_std(
         self, train_dl: DataLoader, val_dl: DataLoader
-    ) -> None:
-        # Compute mean and std
+    ) -> dict[str, list[float]]:
+        """
+        Compute mean and std.
+        """
         data_set_mean_std = get_mean_and_std([train_dl, val_dl])
 
         # Save in model folder
@@ -327,6 +329,8 @@ class ModelManager:
         # Update train and val accordingly
         train_dl.dataset.mean_std = data_set_mean_std
         val_dl.dataset.mean_std = data_set_mean_std
+
+        return data_set_mean_std
 
     def fit(
         self,
