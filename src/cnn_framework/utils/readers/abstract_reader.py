@@ -91,10 +91,12 @@ class AbstractReader:
                 pass
             elif projection.method == ProjectMethods.Maximum:
                 self.image = self.image.max(axis=projection.axis)
+                self.image = np.expand_dims(self.image, projection.axis)
             elif projection.method == ProjectMethods.Mean:
                 self.image = self.image.mean(axis=projection.axis).astype(
                     self.image.dtype
                 )
+                self.image = np.expand_dims(self.image, projection.axis)
             elif projection.method == ProjectMethods.Focus:
                 self.image = stack.focus_projection(
                     self.image, proportion=projection.proportion
