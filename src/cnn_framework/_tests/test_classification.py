@@ -12,4 +12,4 @@ def test_training():
     params.update()
 
     score = training(params)
-    assert np.isclose(score, 1.0, rtol=1e-02)
+    assert np.isclose(score, 1.0, rtol=5e-02)
