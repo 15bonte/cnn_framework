@@ -1,6 +1,7 @@
 import random
 import numpy as np
 from albumentations.augmentations.utils import MAX_VALUES_BY_DTYPE
+from albumentations.core.transforms_interface import ImageOnlyTransform
 import fnmatch
 import torch
 
@@ -14,7 +15,11 @@ def random_sample(range_sample, nb_sample):
     global BUFFER_RANGE
     global BUFFER_RANDOM
 
-    if BUFFER_RANDOM is None or nb_sample != len(BUFFER_RANDOM) or range_sample != BUFFER_RANGE:
+    if (
+        BUFFER_RANDOM is None
+        or nb_sample != len(BUFFER_RANDOM)
+        or range_sample != BUFFER_RANGE
+    ):
         BUFFER_RANGE = range_sample
         BUFFER_RANDOM = CONSTANT_SEEDED_RD.sample(range_sample, nb_sample)
     return BUFFER_RANDOM
@@ -36,7 +41,10 @@ def read_categories_probability_from_name(filename):
     probabilities = []
     for i in range(len(categories_and_probabilities) - 1):
         current_category_and_probability = categories_and_probabilities[i + 1]
-        current_category, current_probability = current_category_and_probability.split("_")[:2]
+        (
+            current_category,
+            current_probability,
+        ) = current_category_and_probability.split("_")[:2]
         # Probabilities have to be given in order
         assert int(current_category) == i
         probabilities.append(int(current_probability) / 100)
@@ -91,13 +99,51 @@ def get_image_type_max(image):
         if image_max_value > np.iinfo(image_type).max:
             continue
         return float(np.iinfo(image_type).max)
-    raise ValueError("Image max value is too high to be encoded in uint8 or uint16")
+    raise ValueError(
+        "Image max value is too high to be encoded in uint8 or uint16"
+    )
 
 
 def torch_from_numpy(np_array):
+    """
+    Converts a numpy array to a torch tensor.
+    """
     if np_array is None:
         return None
     # uint16 not supported by torch.from_numpy
     if np_array.dtype == np.uint16:
         np_array = np_array.astype(np.int32)
     return torch.from_numpy(np_array)
+
+
+class UnNormalize(ImageOnlyTransform):
+    """
+    Unnormalize a tensor image with mean and standard deviation.
+    Tken from https://discuss.pytorch.org/t/simple-way-to-inverse-transform-normalization/4821/3
+    """
+
+    def __init__(
+        self,
+        mean,
+        std,
+        always_apply=False,
+        p=1.0,
+    ):
+        super(UnNormalize, self).__init__(always_apply, p)
+        self.mean = mean
+        self.std = std
+
+    def apply(self, img, **params):
+        """
+        Args:
+            img (Tensor): Tensor image of size (C, H, W) to be normalized.
+        Returns:
+            Tensor: Normalized image.
+        """
+        for t, m, s in zip(img, self.mean, self.std):
+            t.mul_(s).add_(m)
+            # The normalize code -> t.sub_(m).div_(s)
+        return img
+
+    def get_transform_init_args_names(self):
+        return ("mean", "std")
