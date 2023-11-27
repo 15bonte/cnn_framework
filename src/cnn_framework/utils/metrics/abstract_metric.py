@@ -14,7 +14,7 @@ class AbstractMetric:
         return self.__class__.__name__
 
     @abstractmethod
-    def update(self, predictions, targets, adds=None):
+    def update(self, predictions, targets, adds=None, mean_std=None):
         pass
 
     @abstractmethod

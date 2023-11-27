@@ -9,7 +9,9 @@ from typing import Optional
 from matplotlib import pyplot as plt
 import numpy as np
 from skimage import io
-from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
+from tensorboard.backend.event_processing.event_accumulator import (
+    EventAccumulator,
+)
 import tensorflow as tf
 
 import torch
@@ -62,7 +64,9 @@ class ModelManager:
         metric_class: type[AbstractMetric],
     ):
         # Device to train model
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu"
+        )
 
         self.model = model.float()
         self.model.to(self.device)
@@ -71,7 +75,9 @@ class ModelManager:
 
         self.metric_class = metric_class
 
-        self.parameters_path = os.path.join(self.params.models_folder, "parameters.csv")
+        self.parameters_path = os.path.join(
+            self.params.models_folder, "parameters.csv"
+        )
 
         # Display current git hash to follow up
 
@@ -84,7 +90,9 @@ class ModelManager:
 
         # Useful information
         self.dl = {}  # data loaders dictionary
-        self.training_information = TrainingInformation(int(self.params.num_epochs))
+        self.training_information = TrainingInformation(
+            int(self.params.num_epochs)
+        )
 
         # Tensorboard writer
         os.makedirs(self.params.tensorboard_folder_path, exist_ok=True)
@@ -92,9 +100,7 @@ class ModelManager:
         self.model_save_path = (
             f"{self.params.models_folder}/{self.params.model_save_name}"
         )
-        self.model_save_path_early_stopping = (
-            f"{self.params.models_folder}/early_stopping_{self.params.model_save_name}"
-        )
+        self.model_save_path_early_stopping = f"{self.params.models_folder}/early_stopping_{self.params.model_save_name}"
 
     def write_images_to_tensorboard(
         self, current_batch: int, dl_element: DatasetOutput, name: str
@@ -104,15 +110,21 @@ class ModelManager:
 
         # Get images name
         current_dl_file_names = [
-            file_name.split(".")[0] for file_name in self.dl[name].dataset.names
+            file_name.split(".")[0]
+            for file_name in self.dl[name].dataset.names
         ]
         image_names = [
-            current_dl_file_names[image_index] for image_index in numpy_dl_element.index
+            current_dl_file_names[image_index]
+            for image_index in numpy_dl_element.index
         ]
 
         # Log the results images
         for i, (prediction_np, target_np, image_name) in enumerate(
-            zip(numpy_dl_element.prediction, numpy_dl_element.target, image_names)
+            zip(
+                numpy_dl_element.prediction,
+                numpy_dl_element.target,
+                image_names,
+            )
         ):
             # Do not save too many images
             if i == self.params.nb_tensorboard_images_max:
@@ -138,8 +150,8 @@ class ModelManager:
         self,
         dl_element: DatasetOutput,
         dl_metric: AbstractMetric,
+        data_loader: DataLoader,
         loss_manager: Optional[LossManager] = None,
-        _=None,
     ):
         inputs = dl_element.input.to(self.device)  # B, C, H, W
         targets = dl_element.target.to(self.device)
@@ -149,7 +161,12 @@ class ModelManager:
         dl_element.prediction = predictions
 
         # Update metric
-        dl_metric.update(predictions, targets, dl_element.additional)
+        dl_metric.update(
+            predictions,
+            targets,
+            adds=dl_element.additional,
+            mean_std=data_loader.dataset.mean_std,
+        )
 
         # No need to compute loss if used in test
         if loss_manager is None:
@@ -195,7 +212,9 @@ class ModelManager:
 
         # ...log the running metric
         score, _ = val_metric.get_score()
-        self.writer.add_scalar(f"val/{val_metric.get_name()}", score, current_batch)
+        self.writer.add_scalar(
+            f"val/{val_metric.get_name()}", score, current_batch
+        )
         return score
 
     def log_images(self, dl_element: DatasetOutput, name: str) -> None:
@@ -246,8 +265,8 @@ class ModelManager:
                     loss = self.compute_loss(
                         dl_element,
                         train_metric,
-                        self.train_loss_manager,
                         self.dl["train"],
+                        self.train_loss_manager,
                     )
 
                 # Clear the gradients
@@ -275,15 +294,17 @@ class ModelManager:
             val_loss, val_score = 0, 0
             # If val_dl is not empty then perform evaluation and compute loss
             if evaluate:
-                val_metric = self.metric_class(self.device, self.params.nb_classes)
+                val_metric = self.metric_class(
+                    self.device, self.params.nb_classes
+                )
                 self.model.eval()  # set model to evaluation mode
                 with torch.no_grad():
                     for dl_element in self.dl["val"]:
                         loss = self.compute_loss(
                             dl_element,
                             val_metric,
-                            self.val_loss_manager,
                             self.dl["val"],
+                            self.val_loss_manager,
                         )
                         val_loss += loss
 
@@ -301,7 +322,10 @@ class ModelManager:
                     val_score == best_val_score and val_loss < best_val_loss
                 )  # or lowest val loss if val score is constant
             ):
-                torch.save(self.model.state_dict(), self.model_save_path_early_stopping)
+                torch.save(
+                    self.model.state_dict(),
+                    self.model_save_path_early_stopping,
+                )
                 best_val_loss = val_loss
                 best_val_score = val_score
                 model_epoch = self.training_information.epoch
@@ -322,7 +346,9 @@ class ModelManager:
         data_set_mean_std = get_mean_and_std([train_dl, val_dl])
 
         # Save in model folder
-        mean_std_file = os.path.join(self.params.models_folder, "mean_std.json")
+        mean_std_file = os.path.join(
+            self.params.models_folder, "mean_std.json"
+        )
         with open(mean_std_file, "w") as write_file:
             json.dump(data_set_mean_std, write_file, indent=4)
 
@@ -365,7 +391,9 @@ class ModelManager:
 
         # Define lr_scheduler
         if lr_scheduler is None:
-            self.lr_scheduler = StepLR(optimizer, step_size=1, gamma=1)  # Constant lr
+            self.lr_scheduler = StepLR(
+                optimizer, step_size=1, gamma=1
+            )  # Constant lr
         else:
             self.lr_scheduler = lr_scheduler
 
@@ -406,9 +434,11 @@ class ModelManager:
         Function to generate outputs from inputs for given model.
         By default, does the same thing as compute_loss.
         """
-        self.compute_loss(dl_element, dl_metric, None, data_loader)
+        self.compute_loss(dl_element, dl_metric, data_loader)
 
-    def save_results(self, name: str, dl_element: DatasetOutput, mean_std) -> None:
+    def save_results(
+        self, name: str, dl_element: DatasetOutput, mean_std
+    ) -> None:
         # Possible target normalization
         target_mean_std = None
         # Save inputs, targets & predictions as tiff images
@@ -442,12 +472,16 @@ class ModelManager:
                     }
                 else:
                     input_mean_std = mean_std
-                image_to_save = make_image_tiff_displayable(data_image, input_mean_std)
+                image_to_save = make_image_tiff_displayable(
+                    data_image, input_mean_std
+                )
             elif (
                 data_type in ["groundtruth", "predicted"]
                 and target_mean_std is not None
             ):
-                image_to_save = make_image_tiff_displayable(data_image, target_mean_std)
+                image_to_save = make_image_tiff_displayable(
+                    data_image, target_mean_std
+                )
             else:
                 image_to_save = make_image_tiff_displayable(data_image, None)
             if len(image_to_save) == 0:  # protect against empty image
@@ -471,12 +505,18 @@ class ModelManager:
         for batch_idx, dl_element in enumerate(test_dl):
             # Reshape in case of multiple images stacked together
             # Transform shape to (S, C, H, W) to mimic (B, C, H, W)
-            if len(dl_element.input.shape) == 5:  # (B, S, C, H, W) = (1, S, C, H, W)
+            if (
+                len(dl_element.input.shape) == 5
+            ):  # (B, S, C, H, W) = (1, S, C, H, W)
                 dl_element.input = dl_element.input.view(
-                    *dl_element.input.shape[:0], -1, *dl_element.input.shape[2:]
+                    *dl_element.input.shape[:0],
+                    -1,
+                    *dl_element.input.shape[2:],
                 )  # (S, C, H, W)
                 dl_element.target = dl_element.target.view(
-                    *dl_element.target.shape[:0], -1, *dl_element.target.shape[2:]
+                    *dl_element.target.shape[:0],
+                    -1,
+                    *dl_element.target.shape[2:],
                 )
                 dl_element.additional = dl_element.additional.view(
                     *dl_element.additional.shape[:0],
@@ -489,14 +529,21 @@ class ModelManager:
 
             # Get numpy elements
             dl_element_numpy = dl_element.get_numpy_dataset_output()
-            all_predictions_np = all_predictions_np + [*dl_element_numpy.prediction]
+            all_predictions_np = all_predictions_np + [
+                *dl_element_numpy.prediction
+            ]
 
-            if predict_mode == PredictMode.Standard and dl_element.target is not None:
+            if (
+                predict_mode == PredictMode.Standard
+                and dl_element.target is not None
+            ):
                 # Save few images
                 for idx in range(dl_element.target.shape[0]):
                     if self.image_index in images_to_save:
                         image_id = (batch_idx * test_dl.batch_size) + idx
-                        image_name = test_dl.dataset.names[image_id].split(".")[0]
+                        image_name = test_dl.dataset.names[image_id].split(
+                            "."
+                        )[0]
 
                         self.save_results(
                             f"{image_name}_{self.image_index}",
@@ -592,7 +639,11 @@ class ModelManager:
         with torch.no_grad():
             # Use trained model to predict on test set
             predictions = self.batch_predict(
-                test_dl, images_to_save, num_batches_test, test_metric, predict_mode
+                test_dl,
+                images_to_save,
+                num_batches_test,
+                test_metric,
+                predict_mode,
             )
 
         if predict_mode != PredictMode.Standard:
@@ -604,7 +655,9 @@ class ModelManager:
         self.plot_confusion_matrix(additional_results)
 
         # Compute accuracy
-        accuracy_message = f"Average {test_metric.name}: {round(score, 2)}"
+        accuracy_message = (
+            f"Average {test_metric.get_name()}: {round(score, 2)}"
+        )
         print("\n" + accuracy_message)
         self.training_information.score = score
 
@@ -682,10 +735,14 @@ class ModelManager:
             is_ground_truth = idx % 2 == 0
             _, _, encoded_string, _, _ = zip(*event_acc.Images(image_tag))
             # -1 for last image (most recent)
-            image = tf.image.decode_image(encoded_string[-1], channels=1).numpy()
+            image = tf.image.decode_image(
+                encoded_string[-1], channels=1
+            ).numpy()
             ax = fig.add_subplot(3, 2, idx + 1)
             ax.imshow(image, cmap="gray")
             ax.axis("off")
-            ax.set_title("Ground truth mask" if is_ground_truth else "Predicted mask")
+            ax.set_title(
+                "Ground truth mask" if is_ground_truth else "Predicted mask"
+            )
 
         plt.show()

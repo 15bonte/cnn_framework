@@ -12,12 +12,14 @@ class ClassificationAccuracy(AbstractMetric):
     def __init__(self, *args):
         super().__init__(*args)
         self.name = "ClassificationAccuracy"
-        self.true, self.pred = torch.empty(0).to(self.device), torch.empty(0).to(self.device)
+        self.true, self.pred = torch.empty(0).to(self.device), torch.empty(
+            0
+        ).to(self.device)
         self.metric = Accuracy(
             task="multiclass", num_classes=self.num_classes, average="macro"
         ).to(self.device)
 
-    def update(self, predictions, targets, _=None):
+    def update(self, predictions, targets, _=None, __=None):
         # From vector to classification
         predictions_argmax = torch.argmax(predictions, dim=1)
         targets_argmax = torch.argmax(targets, dim=1)
@@ -37,4 +39,6 @@ class ClassificationAccuracy(AbstractMetric):
         self.metric = Accuracy(
             task="multiclass", num_classes=self.num_classes, average="macro"
         ).to(self.device)
-        self.true, self.pred = torch.empty(0).to(self.device), torch.empty(0).to(self.device)
+        self.true, self.pred = torch.empty(0).to(self.device), torch.empty(
+            0
+        ).to(self.device)

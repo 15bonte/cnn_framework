@@ -1,5 +1,6 @@
 import os
 from matplotlib import pyplot as plt
+from torch.utils.data import DataLoader
 
 from ..enum import PredictMode
 from ..data_sets.dataset_output import DatasetOutput
@@ -8,7 +9,9 @@ from .model_manager import ModelManager
 
 
 class VAEModelManager(ModelManager):
-    def compute_loss(self, dl_element, dl_metric, _=None, __=None):
+    def compute_loss(
+        self, dl_element, dl_metric, data_loader: DataLoader, _=None
+    ):
         # Read data loader element
         dl_element["data"] = dl_element["data"].to(self.device)
         dl_element["category"] = dl_element["category"].to(self.device)
@@ -18,11 +21,15 @@ class VAEModelManager(ModelManager):
         dl_element.prediction = model_output["recon_x"]
 
         # Update metric
-        dl_metric.update(model_output["recon_x"], dl_element["data"])
+        dl_metric.update(
+            model_output["recon_x"],
+            dl_element["data"],
+            mean_std=data_loader.dataset.mean_std,
+        )
 
         return model_output["loss"]
 
-    def model_prediction(self, dl_element, dl_metric, _):
+    def model_prediction(self, dl_element, dl_metric, data_loader: DataLoader):
         """
         Function to generate outputs from inputs for given model.
         """
@@ -35,14 +42,23 @@ class VAEModelManager(ModelManager):
         dl_element.prediction = model_output
 
         # Update metric
-        dl_metric.update(model_output["recon_x"], dl_element["data"])
+        dl_metric.update(
+            model_output["recon_x"],
+            dl_element["data"],
+            mean_std=data_loader.dataset.mean_std,
+        )
 
     def get_embedding(self, dl_element):
         dl_element["data"] = dl_element["data"].to(self.device)
         return self.model.encoder(dl_element["data"]).embedding
 
     def batch_predict(
-        self, test_dl, images_to_save, num_batches_test, test_metric, predict_mode: PredictMode
+        self,
+        test_dl,
+        images_to_save,
+        num_batches_test,
+        test_metric,
+        predict_mode: PredictMode,
     ):
         all_predictions_np = []
         for batch_idx, dl_element in enumerate(test_dl):
@@ -138,12 +154,18 @@ class VAEModelManager(ModelManager):
 
         # Get images name
         current_dl_file_names = [
-            file_name.split(".")[0] for file_name in self.dl[name].dataset.names
+            file_name.split(".")[0]
+            for file_name in self.dl[name].dataset.names
         ]
-        image_names = [current_dl_file_names[image_index] for image_index in image_indexes_np]
+        image_names = [
+            current_dl_file_names[image_index]
+            for image_index in image_indexes_np
+        ]
 
         # Log the results images
-        for i, (input_np, image_name) in enumerate(zip(inputs_np, image_names)):
+        for i, (input_np, image_name) in enumerate(
+            zip(inputs_np, image_names)
+        ):
             # Do not save too many images
             if i == self.params.nb_tensorboard_images_max:
                 break

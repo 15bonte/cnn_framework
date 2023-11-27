@@ -13,7 +13,7 @@ class MeanSquaredErrorMetric(AbstractMetric):
         self.name = "MeanSquaredError"
         self.metric = MeanSquaredError(squared=True).to(self.device)
 
-    def update(self, predictions, targets, _=None):
+    def update(self, predictions, targets, _=None, __=None):
         # Update metric
         self.metric.update(
             predictions,

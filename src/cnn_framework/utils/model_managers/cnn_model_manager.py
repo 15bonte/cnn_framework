@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 from skimage import io
 import numpy as np
 import torch
+from torch.utils.data import DataLoader
 
 from ..metrics.abstract_metric import AbstractMetric
 from ..data_sets.dataset_output import DatasetOutput
@@ -16,6 +17,10 @@ from ..display_tools import (
 
 
 class CnnModelManager(ModelManager):
+    """
+    Model manager for CNN classification models.
+    """
+
     def save_results(self, name: str, dl_element: DatasetOutput, mean_std):
         input_np = dl_element.input
         target_np = dl_element.target
@@ -41,7 +46,9 @@ class CnnModelManager(ModelManager):
         ):
             if data_image is None:  # case when additional data is None
                 continue
-            image_to_save = make_image_tiff_displayable(data_image, data_mean_std)
+            image_to_save = make_image_tiff_displayable(
+                data_image, data_mean_std
+            )
 
             # Save inputs with prediction and ground truth in name
             with warnings.catch_warnings():
@@ -56,16 +63,18 @@ class CnnModelManager(ModelManager):
         current_batch: int,
         dl_element: DatasetOutput,
         name: str,
-    ):
+    ) -> None:
         # Get numpy arrays
         numpy_dl_element = dl_element.get_numpy_dataset_output()
 
         # Get images name
         current_dl_file_names = [
-            file_name.split(".")[0] for file_name in self.dl[name].dataset.names
+            file_name.split(".")[0]
+            for file_name in self.dl[name].dataset.names
         ]
         image_names = [
-            current_dl_file_names[image_index] for image_index in numpy_dl_element.index
+            current_dl_file_names[image_index]
+            for image_index in numpy_dl_element.index
         ]
 
         # Log the results images
@@ -86,7 +95,9 @@ class CnnModelManager(ModelManager):
 
             # Log input image
             plt.title(f"Ground truth {ground_truth} - Predicted {prediction}")
-            input_mat = make_image_matplotlib_displayable(input_np, self.dl[name].dataset.mean_std)
+            input_mat = make_image_matplotlib_displayable(
+                input_np, self.dl[name].dataset.mean_std
+            )
             plt.imshow(input_mat)
             self.writer.add_figure(
                 f"{name}/{image_name}",
@@ -94,18 +105,32 @@ class CnnModelManager(ModelManager):
                 current_batch,
             )
 
-    def model_prediction(self, dl_element: DatasetOutput, dl_metric: AbstractMetric, _) -> None:
+    def model_prediction(
+        self,
+        dl_element: DatasetOutput,
+        dl_metric: AbstractMetric,
+        data_loader: DataLoader,
+    ) -> None:
         """
-        Function to generate outputs from inputs for given model
+        Function to generate outputs from inputs for given model.
         Careful, softmax is applied here and not in the model.
         """
         dl_element.to_device(self.device)
 
-        predictions = torch.softmax(self.model(dl_element.input.float()), dim=-1)
+        predictions = torch.softmax(
+            self.model(dl_element.input.float()), dim=-1
+        )
         dl_element.prediction = predictions
 
         # Update metric
-        dl_metric.update(predictions, dl_element.target, dl_element.additional)
+        dl_metric.update(
+            predictions,
+            dl_element.target,
+            adds=dl_element.additional,
+            mean_std=data_loader.dataset.mean_std,
+        )
 
     def plot_confusion_matrix(self, results) -> None:
-        display_confusion_matrix(results, self.params.class_names, self.params.output_dir)
+        display_confusion_matrix(
+            results, self.params.class_names, self.params.output_dir
+        )

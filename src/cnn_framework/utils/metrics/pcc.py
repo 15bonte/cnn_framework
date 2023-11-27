@@ -14,8 +14,10 @@ class PCC(AbstractMetric):
         self.metric = PearsonCorrCoef().to(self.device)
         self.name = "PCC"
 
-    def update(self, predictions, targets, _=None):
-        self.metric.update(torch.flatten(predictions), torch.flatten(targets).float())
+    def update(self, predictions, targets, _=None, __=None):
+        self.metric.update(
+            torch.flatten(predictions), torch.flatten(targets).float()
+        )
 
     def get_score(self):
         return self.metric.compute().item(), None
