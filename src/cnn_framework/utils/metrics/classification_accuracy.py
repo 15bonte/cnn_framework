@@ -11,7 +11,6 @@ class ClassificationAccuracy(AbstractMetric):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.name = "ClassificationAccuracy"
         self.true, self.pred = torch.empty(0).to(self.device), torch.empty(
             0
         ).to(self.device)

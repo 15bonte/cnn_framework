@@ -11,7 +11,6 @@ class PositivePairMatchingMetric(AbstractMetric):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.name = "PositivePairMatchingMetric"
         self.local_matchings = []
 
     def update(self, predictions, targets, _=None, __=None):

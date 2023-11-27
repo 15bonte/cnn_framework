@@ -12,7 +12,6 @@ class PCC(AbstractMetric):
     def __init__(self, *args):
         super().__init__(*args)
         self.metric = PearsonCorrCoef().to(self.device)
-        self.name = "PCC"
 
     def update(self, predictions, targets, _=None, __=None):
         self.metric.update(

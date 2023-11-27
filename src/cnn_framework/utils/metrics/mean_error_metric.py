@@ -10,7 +10,6 @@ class MeanErrorMetric(AbstractMetric):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.name = "MeanError"
         self.metric = MeanSquaredError(squared=False).to(self.device)
 
     def update(self, predictions, targets, _=None, __=None):
