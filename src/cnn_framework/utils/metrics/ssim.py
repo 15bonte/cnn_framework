@@ -1,7 +1,8 @@
+import torch
 from matplotlib import pyplot as plt
 from torchmetrics.image import StructuralSimilarityIndexMeasure
 
-from ..tools import UnNormalize
+from ..tools import UnNormalize, get_padding_coordinates
 from .abstract_metric import AbstractMetric
 
 
@@ -36,9 +37,16 @@ class SSIM(AbstractMetric):
                 targets_copy[idx] = un_normalize(image=targets_copy[idx])[
                     "image"
                 ]
-            self.metric.update(predictions_copy, targets_copy)
         else:
-            self.metric.update(predictions, targets)
+            predictions_copy, targets_copy = predictions, targets
+        # Remove padding
+        y_min, y_max, x_min, x_max = get_padding_coordinates(
+            targets_copy[0, 0]
+        )
+        self.metric.update(
+            predictions[..., y_min:y_max, x_min:x_max],
+            targets[..., y_min:y_max, x_min:x_max],
+        )
 
     def get_score(self):
         return self.metric.compute().item(), None
