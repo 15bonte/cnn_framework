@@ -147,3 +147,22 @@ class UnNormalize(ImageOnlyTransform):
 
     def get_transform_init_args_names(self):
         return ("mean", "std")
+
+
+def get_padding_coordinates(image) -> list[int]:
+    """
+    Automatically detect the padding of a torch image and return the coordinates.
+    """
+    same_cols = torch.all(image == image[0, :], axis=1)
+    same_cols_index = torch.where(same_cols == False)[0]
+    x_min, x_max = same_cols_index[0], same_cols_index[-1] + 1
+    if x_min == 1:  # if only one column is different, no padding
+        x_min = 0
+
+    same_rows = torch.all(torch.transpose(image, 0, 1) == image[:, 0], axis=1)
+    same_rows_index = torch.where(same_rows == False)[0]
+    y_min, y_max = same_rows_index[0], same_rows_index[-1] + 1
+    if y_min == 1:  # if only one row is different, no padding
+        y_min = 0
+
+    return x_min, x_max, y_min, y_max
