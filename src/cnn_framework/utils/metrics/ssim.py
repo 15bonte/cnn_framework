@@ -17,7 +17,7 @@ class SSIM(AbstractMetric):
             self.device
         )
 
-    def update(self, predictions, targets, _=None, mean_std=None):
+    def update(self, predictions, targets, adds=None, mean_std=None):
         if mean_std is not None:
             # Expect reconstruction images to be first channels
             # Unormalize images to use SSIM

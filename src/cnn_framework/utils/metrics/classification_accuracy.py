@@ -18,7 +18,7 @@ class ClassificationAccuracy(AbstractMetric):
             task="multiclass", num_classes=self.num_classes, average="macro"
         ).to(self.device)
 
-    def update(self, predictions, targets, _=None, __=None):
+    def update(self, predictions, targets, adds=None, mean_std=None):
         # From vector to classification
         predictions_argmax = torch.argmax(predictions, dim=1)
         targets_argmax = torch.argmax(targets, dim=1)

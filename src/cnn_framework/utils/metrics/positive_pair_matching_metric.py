@@ -13,7 +13,7 @@ class PositivePairMatchingMetric(AbstractMetric):
         super().__init__(*args)
         self.local_matchings = []
 
-    def update(self, predictions, targets, _=None, __=None):
+    def update(self, predictions, targets, adds=None, mean_std=None):
         topk = (1,)
 
         with torch.no_grad():

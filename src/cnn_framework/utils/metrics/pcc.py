@@ -13,7 +13,7 @@ class PCC(AbstractMetric):
         super().__init__(*args)
         self.metric = PearsonCorrCoef().to(self.device)
 
-    def update(self, predictions, targets, _=None, __=None):
+    def update(self, predictions, targets, adds=None, mean_std=None):
         self.metric.update(
             torch.flatten(predictions), torch.flatten(targets).float()
         )
