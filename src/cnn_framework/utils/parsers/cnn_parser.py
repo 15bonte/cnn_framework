@@ -78,5 +78,5 @@ class CnnParser:
             "--z_indexes", nargs="*", type=int, help="Height indexes to select as input"
         )
         self.arguments_parser.add_argument(
-            "--out_channels", nargs="*", type=int, help="Number of channels as output"
+            "--out_channels", help="Number of channels as output"
         )

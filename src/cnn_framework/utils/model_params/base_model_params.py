@@ -272,7 +272,7 @@ class BaseModelParams:
             if args.cross_validation_dir:
                 self.cross_validation_dir = args.cross_validation_dir
             if args.out_channels:
-                self.out_channels = args.out_channels
+                self.out_channels = int(args.out_channels)
 
         # Create folders dedicated to current run
         now = datetime.now()
