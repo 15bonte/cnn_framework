@@ -1,7 +1,6 @@
 import random
 import numpy as np
 from albumentations.augmentations.utils import MAX_VALUES_BY_DTYPE
-from albumentations.core.transforms_interface import ImageOnlyTransform
 import fnmatch
 import torch
 
@@ -114,39 +113,6 @@ def torch_from_numpy(np_array):
     if np_array.dtype == np.uint16:
         np_array = np_array.astype(np.int32)
     return torch.from_numpy(np_array)
-
-
-class UnNormalize(ImageOnlyTransform):
-    """
-    Unnormalize a tensor image with mean and standard deviation.
-    Tken from https://discuss.pytorch.org/t/simple-way-to-inverse-transform-normalization/4821/3
-    """
-
-    def __init__(
-        self,
-        mean,
-        std,
-        always_apply=False,
-        p=1.0,
-    ):
-        super(UnNormalize, self).__init__(always_apply, p)
-        self.mean = mean
-        self.std = std
-
-    def apply(self, img, **params):
-        """
-        Args:
-            img (Tensor): Tensor image of size (C, H, W) to be normalized.
-        Returns:
-            Tensor: Normalized image.
-        """
-        for t, m, s in zip(img, self.mean, self.std):
-            t.mul_(s).add_(m)
-            # The normalize code -> t.sub_(m).div_(s)
-        return img
-
-    def get_transform_init_args_names(self):
-        return ("mean", "std")
 
 
 def get_padding_coordinates(image) -> list[int]:

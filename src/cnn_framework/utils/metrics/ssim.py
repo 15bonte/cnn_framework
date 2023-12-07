@@ -1,8 +1,7 @@
-import torch
-from matplotlib import pyplot as plt
 from torchmetrics.image import StructuralSimilarityIndexMeasure
 
-from ..tools import UnNormalize, get_padding_coordinates
+from ..augmentations.unnormalize import UnNormalize
+from ..tools import get_padding_coordinates
 from .abstract_metric import AbstractMetric
 
 
