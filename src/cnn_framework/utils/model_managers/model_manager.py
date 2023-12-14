@@ -565,19 +565,20 @@ class ModelManager:
         # Only used for classification models
         return
 
-    def read_mean_std(self, test_dl: DataLoader) -> None:
+    @staticmethod
+    def read_mean_std(test_dl: DataLoader, params) -> None:
         # Get mean and standard deviation from saved file
         # Either from model that have just been trained
-        if os.path.exists(self.params.models_folder):
-            mean_std_path = f"{self.params.models_folder}/mean_std.json"
+        if os.path.exists(params.models_folder):
+            mean_std_path = f"{params.models_folder}/mean_std.json"
         # Or from model that have been loaded from model_load_path
         else:
             # mean_std may be saved in parent folders
             # Iterate over parent folders to find mean_std.json
             mean_std_path = None
             potential_paths = [
-                self.params.model_load_path,
-            ] + list(Path(self.params.model_load_path).parents)
+                params.model_load_path,
+            ] + list(Path(params.model_load_path).parents)
             for parent_folder in potential_paths:
                 mean_std_path = f"{parent_folder}/mean_std.json"
                 if os.path.isfile(mean_std_path):
@@ -617,7 +618,7 @@ class ModelManager:
             mean_std = get_mean_and_std([test_dl])
             test_dl.dataset.mean_std = mean_std
         else:
-            self.read_mean_std(test_dl)
+            self.read_mean_std(test_dl, self.params)
 
         # Initialise transforms before prediction
         test_dl.dataset.initialize_transforms()

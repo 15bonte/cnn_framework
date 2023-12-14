@@ -22,12 +22,13 @@ class TiffReader(AbstractReader):
 
     def _read_image(self, file_path: str) -> np.ndarray:
         aics_img = AICSImage(file_path)
-        image = self._reorganize_channels(aics_img.data, "TCZYX", aics_img.dims.order)
+        image = self.reorganize_channels(
+            aics_img.data, "TCZYX", aics_img.dims.order
+        )
         return image
 
-    @abstractmethod
-    def _reorganize_channels(
-        self,
+    @staticmethod
+    def reorganize_channels(
         image: np.ndarray,
         target_order: Optional[str],
         original_order: Optional[str],
@@ -90,7 +91,9 @@ class TiffReader(AbstractReader):
 
                 # Add scale bar
                 if scale is not None and unit is not None:
-                    generate_size_bar(image_to_plot.shape[2], local_ax, scale, unit)
+                    generate_size_bar(
+                        image_to_plot.shape[2], local_ax, scale, unit
+                    )
 
         plt.tight_layout()
 
@@ -100,7 +103,10 @@ class TiffReader(AbstractReader):
 
         if save_path:
             plt.savefig(
-                save_path, bbox_inches="tight", pad_inches=0.0, transparent=True
+                save_path,
+                bbox_inches="tight",
+                pad_inches=0.0,
+                transparent=True,
             )
 
         if show:
@@ -108,9 +114,7 @@ class TiffReader(AbstractReader):
 
 
 if __name__ == "__main__":
-    TIFF_FILE_TO_DISPLAY = (
-        r"C:\Users\thoma\data\Data Pasteur\main_data\train\t1_NG-MKLP1-clone-1-1.tif"
-    )
+    TIFF_FILE_TO_DISPLAY = r"C:\Users\thoma\data\Data Pasteur\main_data\train\t1_NG-MKLP1-clone-1-1.tif"
 
     # NB: display is ugly with several images...
     CHANNEL_PROJECTION = Projection(
