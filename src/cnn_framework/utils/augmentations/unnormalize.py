@@ -1,10 +1,24 @@
 from albumentations.core.transforms_interface import ImageOnlyTransform
+import numpy as np
+
+
+def un_normalize_numpy(img, mean, std):
+    img = img.astype(np.float32)
+    img *= std
+    img += mean
+    return img
+
+
+def un_normalize(img, mean, std):
+    mean = np.array(mean, dtype=np.float32)
+    std = np.array(std, dtype=np.float32)
+    return un_normalize_numpy(img, mean, std)
 
 
 class UnNormalize(ImageOnlyTransform):
     """
     Unnormalize a tensor image with mean and standard deviation.
-    Taken from https://discuss.pytorch.org/t/simple-way-to-inverse-transform-normalization/4821/3
+    Inspired by https://discuss.pytorch.org/t/simple-way-to-inverse-transform-normalization/4821/3
     """
 
     def __init__(
@@ -25,10 +39,7 @@ class UnNormalize(ImageOnlyTransform):
         Returns:
             Tensor: Normalized image.
         """
-        for t, m, s in zip(img, self.mean, self.std):
-            t.mul_(s).add_(m)
-            # The normalize code -> t.sub_(m).div_(s)
-        return img
+        return un_normalize(img, self.mean, self.std)
 
     def get_transform_init_args_names(self):
         return ("mean", "std")
