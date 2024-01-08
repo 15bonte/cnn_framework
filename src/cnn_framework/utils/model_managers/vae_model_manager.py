@@ -40,10 +40,9 @@ class VAEModelManager(ModelManager):
         """
         # Read data loader element
         dl_element["data"] = dl_element["data"].to(self.device)
-        dl_element["category"] = dl_element["category"].to(self.device)
 
         # Compute the model output
-        model_output = self.model(dl_element)
+        model_output = self.model.predict(dl_element["data"])
         dl_element.prediction = model_output
 
         # Update metric
