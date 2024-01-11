@@ -7,6 +7,7 @@ from ..data_managers.default_data_manager import DefaultDataManager
 from ..model_params.base_model_params import DataSplit
 from ..data_sets.dataset_output import DatasetOutput
 from ..tools import handle_image_type
+from ..display_tools import display_progress
 
 
 def check_dimensions_order(params, dataset_output):
@@ -33,6 +34,9 @@ def get_mean_and_std(data_loaders: list[DataLoader]) -> dict[str, list[float]]:
     channels_sum, channels_squared_sum = np.zeros(channels), np.zeros(channels)
     num_imgs = 0
 
+    total_files = sum(
+        [len(data_loader.dataset.names) for data_loader in data_loaders]
+    )
     for data_loader in data_loaders:
         for filename in data_loader.dataset.names:
             dataset_output = data_loader.dataset.generate_raw_images(
@@ -50,6 +54,12 @@ def get_mean_and_std(data_loaders: list[DataLoader]) -> dict[str, list[float]]:
             channels_sum += np.mean(img, axis=(0, 1))
             channels_squared_sum += np.mean(np.square(img), axis=(0, 1))
             num_imgs += 1
+            display_progress(
+                "Mean/std computation in progress",
+                num_imgs,
+                total_files,
+                additional_message=f"Image {num_imgs}/{total_files}",
+            )
 
     mean = channels_sum / num_imgs
     std = np.sqrt((channels_squared_sum / num_imgs - np.square(mean)))
