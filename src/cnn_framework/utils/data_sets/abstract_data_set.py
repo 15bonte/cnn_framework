@@ -34,6 +34,9 @@ class AbstractDataSet(Dataset):
         pass
 
     def check_order(self):
+        if self.transforms is None:
+            return
+
         # Check if order of transforms makes sense
         transform_names = [transform.__class__.__name__ for transform in self.transforms]
         # Transform that have to be BEFORE and AFTER Normalize
