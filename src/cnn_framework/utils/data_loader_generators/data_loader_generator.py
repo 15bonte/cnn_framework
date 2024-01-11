@@ -18,7 +18,9 @@ def check_dimensions_order(params, dataset_output):
         assert dataset_output.target.shape[-1] == params.out_channels
 
 
-def get_mean_and_std(data_loaders: list[DataLoader]) -> dict[str, list[float]]:
+def get_mean_and_std(
+    data_loaders: list[DataLoader], max_percentile=80
+) -> dict[str, list[float]]:
     """
     Args:
         dataloader: DataLoader with a mil dataset
@@ -31,8 +33,12 @@ def get_mean_and_std(data_loaders: list[DataLoader]) -> dict[str, list[float]]:
     params = data_loaders[0].dataset.params
     in_channels = len(params.c_indexes) * len(params.z_indexes)
     channels = in_channels + params.out_channels
-    channels_sum, channels_squared_sum = np.zeros(channels), np.zeros(channels)
-    num_imgs = 0
+    channels_sum, channels_squared_sum, channels_max = (
+        np.zeros(channels),
+        np.zeros(channels),
+        np.zeros(channels),
+    )
+    num_imgs, nb_pixels = 0, 0
 
     total_files = sum(
         [len(data_loader.dataset.names) for data_loader in data_loaders]
@@ -51,9 +57,15 @@ def get_mean_and_std(data_loaders: list[DataLoader]) -> dict[str, list[float]]:
             img = handle_image_type(img)
             # Cast img to float32 to avoid overflow
             img = img.astype("float32")
-            channels_sum += np.mean(img, axis=(0, 1))
-            channels_squared_sum += np.mean(np.square(img), axis=(0, 1))
+            # Compute sum, squared sum, max
+            channels_sum += np.sum(img, axis=(0, 1))
+            channels_squared_sum += np.sum(np.square(img), axis=(0, 1))
+            channels_max = np.maximum(
+                channels_max, np.percentile(img, max_percentile, axis=(0, 1))
+            )
+            # Update number of images and pixels
             num_imgs += 1
+            nb_pixels += img.shape[0] * img.shape[1]
             display_progress(
                 "Mean/std computation in progress",
                 num_imgs,
@@ -61,10 +73,10 @@ def get_mean_and_std(data_loaders: list[DataLoader]) -> dict[str, list[float]]:
                 additional_message=f"Image {num_imgs}/{total_files}",
             )
 
-    mean = channels_sum / num_imgs
-    std = np.sqrt((channels_squared_sum / num_imgs - np.square(mean)))
+    mean = channels_sum / nb_pixels
+    std = np.sqrt((channels_squared_sum / nb_pixels - np.square(mean)))
 
-    return {"mean": list(mean), "std": list(std)}
+    return {"mean": list(mean), "std": list(std), "max": list(channels_max)}
 
 
 def collate_dataset_output(batch):
