@@ -19,7 +19,7 @@ def check_dimensions_order(params, dataset_output):
 
 
 def get_mean_and_std(
-    data_loaders: list[DataLoader], max_percentile=80
+    data_loaders: list[DataLoader], max_percentile=90
 ) -> dict[str, list[float]]:
     """
     Args:
@@ -36,7 +36,7 @@ def get_mean_and_std(
     channels_sum, channels_squared_sum, channels_max = (
         np.zeros(channels),
         np.zeros(channels),
-        np.zeros(channels),
+        [],
     )
     num_imgs, nb_pixels = 0, 0
 
@@ -60,8 +60,8 @@ def get_mean_and_std(
             # Compute sum, squared sum, max
             channels_sum += np.sum(img, axis=(0, 1))
             channels_squared_sum += np.sum(np.square(img), axis=(0, 1))
-            channels_max = np.maximum(
-                channels_max, np.percentile(img, max_percentile, axis=(0, 1))
+            channels_max.append(
+                np.percentile(img, max_percentile, axis=(0, 1))
             )
             # Update number of images and pixels
             num_imgs += 1
@@ -75,8 +75,15 @@ def get_mean_and_std(
 
     mean = channels_sum / nb_pixels
     std = np.sqrt((channels_squared_sum / nb_pixels - np.square(mean)))
+    channels_percent_max = np.percentile(
+        np.array(channels_max), max_percentile, axis=0
+    )
 
-    return {"mean": list(mean), "std": list(std), "max": list(channels_max)}
+    return {
+        "mean": list(mean),
+        "std": list(std),
+        "max": list(channels_percent_max),
+    }
 
 
 def collate_dataset_output(batch):
