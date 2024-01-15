@@ -1,7 +1,9 @@
+import json
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, WeightedRandomSampler
 from torch.utils.data._utils.collate import default_collate
+from typing import Optional
 
 from ..data_managers.default_data_manager import DefaultDataManager
 from ..model_params.base_model_params import DataSplit
@@ -19,7 +21,9 @@ def check_dimensions_order(params, dataset_output):
 
 
 def get_mean_and_std(
-    data_loaders: list[DataLoader], max_percentile=90
+    data_loaders: list[DataLoader],
+    max_percentile=90,
+    mean_std_path: Optional[str] = None,
 ) -> dict[str, list[float]]:
     """
     Args:
@@ -28,6 +32,12 @@ def get_mean_and_std(
     Returns:
         Mean and std of images in dataloader.
     """
+
+    # If provided, read mean and std from file directly
+    if mean_std_path is not None:
+        with open(mean_std_path, "r") as mean_std_file:
+            mean_std = json.load(mean_std_file)
+        return mean_std
 
     # Initialize mean and std
     params = data_loaders[0].dataset.params

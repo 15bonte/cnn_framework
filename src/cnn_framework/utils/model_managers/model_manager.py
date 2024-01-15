@@ -338,12 +338,17 @@ class ModelManager:
         print(f"\nBest model saved at epoch {model_epoch}.")
 
     def compute_and_save_mean_std(
-        self, train_dl: DataLoader, val_dl: DataLoader
+        self,
+        train_dl: DataLoader,
+        val_dl: DataLoader,
+        mean_std_path: Optional[str] = None,
     ) -> dict[str, list[float]]:
         """
         Compute mean and std.
         """
-        data_set_mean_std = get_mean_and_std([train_dl, val_dl])
+        data_set_mean_std = get_mean_and_std(
+            [train_dl, val_dl], mean_std_path=mean_std_path
+        )
 
         # Save in model folder
         mean_std_file = os.path.join(
@@ -365,6 +370,7 @@ class ModelManager:
         optimizer: Optimizer,
         loss_function,
         lr_scheduler=None,
+        mean_std_path: Optional[str] = None,
     ) -> None:
         # Create folder to save model
         os.makedirs(self.params.models_folder, exist_ok=True)
@@ -376,7 +382,7 @@ class ModelManager:
         f.close()
 
         # Compute mean and std of dataset
-        self.compute_and_save_mean_std(train_dl, val_dl)
+        self.compute_and_save_mean_std(train_dl, val_dl, mean_std_path)
 
         if len(train_dl) == 0:
             raise ValueError("No data to train.")
