@@ -677,13 +677,15 @@ class ModelManager:
         if not os.path.exists(self.params.global_results_path):
             with open(self.params.global_results_path, "w") as f:
                 f.write(
-                    "model;model id;train set size;val set size;test set size;epochs;learning rate;training_time;score;\n"
+                    "model;git hash;data;model id;train number;val number;test number;epochs;learning rate;batch size;training_time;score;additional score\n"
                 )
             f.close()
 
         # Store useful results in global results file
         with open(self.params.global_results_path, "a") as f:
             f.write(f"{self.params.name};")
+            f.write(f"{self.training_information.git_hash};")
+            f.write(f"{self.params.data_dir};")
             f.write(f"{self.params.format_now};")
             f.write(f"{self.params.train_number};")
             f.write(f"{self.params.val_number};")
@@ -691,7 +693,8 @@ class ModelManager:
             f.write(f"{self.params.num_epochs};")
             f.write(f"{self.params.learning_rate};")
             f.write(f"{self.training_information.training_time};")
-            f.write(f"{self.training_information.score};\n")
+            f.write(f"{self.training_information.score};")
+            f.write(f"{self.training_information.additional_score};\n")
         f.close()
 
     def display_training_curves(self):

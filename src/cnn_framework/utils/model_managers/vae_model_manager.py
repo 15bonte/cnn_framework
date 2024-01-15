@@ -129,26 +129,35 @@ class VAEModelManager(ModelManager):
         if not os.path.exists(self.params.global_results_path):
             with open(self.params.global_results_path, "w") as f:
                 f.write(
-                    "data;id;latent dim;learning rate;beta;gamma;delta;git hash;score;weight_decay;batch size;drop out;encoder name;additional score\n"
+                    "model;git hash;data;model id;train number;val number;test number;epochs;learning rate;batch size;training_time;score;additional score;weight decay;batch size;dropout;latent dim;beta;gamma;delta;encoder name\n"
                 )
             f.close()
 
         # Store useful results in global results file
         with open(self.params.global_results_path, "a") as f:
+            # Base information
+            f.write(f"{self.params.name};")
+            f.write(f"{self.training_information.git_hash};")
             f.write(f"{self.params.data_dir};")
             f.write(f"{self.params.format_now};")
-            f.write(f"{self.params.latent_dim};")
+            f.write(f"{self.params.train_number};")
+            f.write(f"{self.params.val_number};")
+            f.write(f"{self.params.test_number};")
+            f.write(f"{self.params.num_epochs};")
             f.write(f"{self.params.learning_rate};")
+            f.write(f"{self.params.batch_size};")
+            f.write(f"{self.training_information.training_time};")
+            f.write(f"{self.training_information.score};")
+            f.write(f"{self.training_information.additional_score};")
+
+            # VAE information
+            f.write(f"{self.params.weight_decay};")
+            f.write(f"{self.params.dropout};")
+            f.write(f"{self.params.latent_dim};")
             f.write(f"{self.params.beta};")
             f.write(f"{self.params.gamma};")
             f.write(f"{self.params.delta};")
-            f.write(f"{self.training_information.git_hash};")
-            f.write(f"{self.training_information.score};")
-            f.write(f"{self.params.weight_decay};")
-            f.write(f"{self.params.batch_size};")
-            f.write(f"{self.params.dropout};")
-            f.write(f"{self.params.encoder_name};")
-            f.write(f"{self.training_information.additional_score};\n")
+            f.write(f"{self.params.encoder_name};\n")
         f.close()
 
     def write_images_to_tensorboard(self, current_batch, dl_element, name):
