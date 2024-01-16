@@ -698,6 +698,7 @@ class ModelManager:
             f.write(f"{self.params.test_number};")
             f.write(f"{self.params.num_epochs};")
             f.write(f"{self.params.learning_rate};")
+            f.write(f"{self.params.batch_size};")
             f.write(f"{self.training_information.training_time};")
             f.write(f"{self.training_information.score};")
             f.write(f"{self.training_information.additional_score};\n")

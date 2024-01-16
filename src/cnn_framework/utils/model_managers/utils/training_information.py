@@ -17,7 +17,7 @@ class TrainingInformation:
         self.best_model_epoch = None
         self.training_time = 0
         self.score = None
-        self.additional_score = None
+        self.additional_score = 0
 
         # Get git hash
         try:
