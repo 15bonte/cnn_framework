@@ -18,7 +18,12 @@ from .tools import get_image_type_max
 
 
 def display_confusion_matrix(
-    results, class_names, save_path=None, show=False, extension="pdf", normalize=None
+    results,
+    class_names,
+    save_path=None,
+    show=False,
+    extension="pdf",
+    normalize=None,
 ):
     (y_true, y_pred) = results
 
@@ -29,11 +34,14 @@ def display_confusion_matrix(
 
     # Change labels to int if necessary
     if isinstance(y_true[0], str):
-        y_true = np.array([int(label) for label in y_true])
-        y_pred = np.array([int(label) for label in y_pred])
+        y_true = np.array([class_names.index(label) for label in y_true])
+        y_pred = np.array([class_names.index(label) for label in y_pred])
 
     m = confusion_matrix(
-        y_true, y_pred, labels=list(range(len(class_names))), normalize=normalize
+        y_true,
+        y_pred,
+        labels=list(range(len(class_names))),
+        normalize=normalize,
     )
 
     # Rotate only if names are long
@@ -75,7 +83,9 @@ def make_image_matplotlib_displayable(image, mean_std=None):
 
     # If mean and std are provided, normalize back to initial values
     if mean_std is not None:
-        normalized_image = normalize_array(image, mean_std=mean_std, reverse=True)
+        normalized_image = normalize_array(
+            image, mean_std=mean_std, reverse=True
+        )
         # Round to 6 decimals to avoid floating point errors
         # 6 is chosen arbitrary as enough to see uint16 precision (65535 ~ 1e6)
         # but not too much too avoid floating errors
@@ -88,7 +98,7 @@ def make_image_matplotlib_displayable(image, mean_std=None):
 
     # Enhance contrast
     normalized_image = zero_one_scaler(normalized_image)
-    # normalized_image = equalize_adapthist(normalized_image)
+    normalized_image = equalize_adapthist(normalized_image)
 
     # Switch it back to the end for matpltolib
     normalized_image = np.moveaxis(normalized_image, 0, -1)
@@ -122,7 +132,9 @@ def make_image_tiff_displayable(image, mean_std):
 
     # If mean and std are provided, normalize back to initial values
     if mean_std is not None and len(mean_std["mean"]) > 0:
-        normalized_image = normalize_array(image, mean_std=mean_std, reverse=True)
+        normalized_image = normalize_array(
+            image, mean_std=mean_std, reverse=True
+        )
     # Else, just let it like that
     else:
         normalized_image = image
@@ -131,7 +143,12 @@ def make_image_tiff_displayable(image, mean_std):
 
 
 def display_progress(
-    message, current, total, precision=1, additional_message="", cpu_memory=False
+    message,
+    current,
+    total,
+    precision=1,
+    additional_message="",
+    cpu_memory=False,
 ):
     percentage = round(current / total * 100, precision)
     padded_percentage = str(percentage).ljust(precision + 3, "0")
@@ -142,7 +159,9 @@ def display_progress(
     # Display CPU memory usage
     if cpu_memory:
         cpu_available = round(
-            psutil.virtual_memory().available * 100 / psutil.virtual_memory().total
+            psutil.virtual_memory().available
+            * 100
+            / psutil.virtual_memory().total
         )
         cpu_message = f"CPU available: {cpu_available}%"
         display_message += " | " + cpu_message
