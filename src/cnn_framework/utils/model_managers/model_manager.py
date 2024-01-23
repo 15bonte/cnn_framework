@@ -350,6 +350,17 @@ class ModelManager:
             [train_dl, val_dl], mean_std_path=mean_std_path
         )
 
+        # If necessary, use only first channels
+        current_nb_channels = len(self.params.c_indexes) * len(
+            self.params.z_indexes
+        )
+        data_set_mean_std["mean"] = data_set_mean_std["mean"][
+            :current_nb_channels
+        ]
+        data_set_mean_std["std"] = data_set_mean_std["std"][
+            :current_nb_channels
+        ]
+
         # Save in model folder
         mean_std_file = os.path.join(
             self.params.models_folder, "mean_std.json"
