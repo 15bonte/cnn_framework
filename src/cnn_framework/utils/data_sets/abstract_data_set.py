@@ -38,9 +38,14 @@ class AbstractDataSet(Dataset):
             return
 
         # Check if order of transforms makes sense
-        transform_names = [transform.__class__.__name__ for transform in self.transforms]
+        transform_names = [
+            transform.__class__.__name__ for transform in self.transforms
+        ]
         # Transform that have to be BEFORE and AFTER Normalize
-        before_normalize = ["ColorJitter", "GaussNoise"]  # because they clip to 0-MAX_TYPE_VALUE
+        before_normalize = [
+            "ColorJitter",
+            "GaussNoise",
+        ]  # because they clip to 0-MAX_TYPE_VALUE
         after_normalize = ["GaussianBlur", "Rotate", "PadIfNeeded"]
         # Ignore if Normalize is not in transforms
         if "Normalize" not in transform_names:
@@ -70,13 +75,22 @@ class AbstractDataSet(Dataset):
         """
         # Read category from name
         categories_and_probabilities = filename.split(".")[0].split("_c")[1:]
-        category = int(categories_and_probabilities[0])
-        # Are there probabilities for classes?
-        if len(categories_and_probabilities) > 1 and not one_hot:
-            _, probabilities = read_categories_probability_from_name(filename)
+        if len(categories_and_probabilities) == 0:
+            probabilities = None  # case where name is not adapted
         else:
-            # Case where class is set to -1
-            probabilities = to_one_hot(category, self.params.nb_classes) if category > -1 else None
+            category = int(categories_and_probabilities[0])
+            # Are there probabilities for classes?
+            if len(categories_and_probabilities) > 1 and not one_hot:
+                _, probabilities = read_categories_probability_from_name(
+                    filename
+                )
+            else:
+                # Case where class is set to -1
+                probabilities = (
+                    to_one_hot(category, self.params.nb_classes)
+                    if category > -1
+                    else None
+                )
 
         if probabilities is None:
             return np.zeros(self.params.nb_classes)
@@ -103,32 +117,58 @@ class AbstractDataSet(Dataset):
             return data_set_output
 
         # No target or additional images
-        if not data_set_output.target_is_image() and not data_set_output.additional_is_image():
+        if (
+            not data_set_output.target_is_image()
+            and not data_set_output.additional_is_image()
+        ):
             transformed = self.transforms(image=data_set_output.input)
             data_set_output.input = np.moveaxis(transformed["image"], 2, 0)
         # Target and no additional images
-        elif data_set_output.target_is_image() and not data_set_output.additional_is_image():
-            fake_input = np.concatenate((data_set_output.input, data_set_output.target), axis=-1)
+        elif (
+            data_set_output.target_is_image()
+            and not data_set_output.additional_is_image()
+        ):
+            fake_input = np.concatenate(
+                (data_set_output.input, data_set_output.target), axis=-1
+            )
             transformed = self.transforms(image=fake_input)
             # Split image and target
-            transformed_input = transformed["image"][:, :, : data_set_output.input.shape[-1]]
-            transformed_target = transformed["image"][:, :, data_set_output.input.shape[-1] :]
+            transformed_input = transformed["image"][
+                :, :, : data_set_output.input.shape[-1]
+            ]
+            transformed_target = transformed["image"][
+                :, :, data_set_output.input.shape[-1] :
+            ]
             data_set_output.input = np.moveaxis(transformed_input, 2, 0)
             data_set_output.target = np.moveaxis(transformed_target, 2, 0)
         # No target and additional images
-        elif not data_set_output.target_is_image() and data_set_output.additional_is_image():
+        elif (
+            not data_set_output.target_is_image()
+            and data_set_output.additional_is_image()
+        ):
             transformed = self.transforms(
                 image=data_set_output.input, mask=data_set_output.additional
             )
             data_set_output.input = np.moveaxis(transformed["image"], 2, 0)
             data_set_output.additional = np.moveaxis(transformed["mask"], 2, 0)
         # Target and additional images
-        elif data_set_output.target_is_image() and data_set_output.additional_is_image():
-            fake_input = np.concatenate((data_set_output.input, data_set_output.target), axis=-1)
-            transformed = self.transforms(image=fake_input, mask=data_set_output.additional)
+        elif (
+            data_set_output.target_is_image()
+            and data_set_output.additional_is_image()
+        ):
+            fake_input = np.concatenate(
+                (data_set_output.input, data_set_output.target), axis=-1
+            )
+            transformed = self.transforms(
+                image=fake_input, mask=data_set_output.additional
+            )
             # Split image and target
-            transformed_input = transformed["image"][:, :, : data_set_output.input.shape[-1]]
-            transformed_target = transformed["image"][:, :, data_set_output.input.shape[-1] :]
+            transformed_input = transformed["image"][
+                :, :, : data_set_output.input.shape[-1]
+            ]
+            transformed_target = transformed["image"][
+                :, :, data_set_output.input.shape[-1] :
+            ]
             data_set_output.input = np.moveaxis(transformed_input, 2, 0)
             data_set_output.target = np.moveaxis(transformed_target, 2, 0)
             data_set_output.additional = np.moveaxis(transformed["mask"], 2, 0)
