@@ -55,7 +55,9 @@ class DataSplit:
             if os.path.isfile(current_filename):
                 with open(current_filename, "r") as f:
                     patterns = f.read().splitlines()
-                data_set["possible_files"] = extract_patterns(distinct_files, patterns)
+                data_set["possible_files"] = extract_patterns(
+                    distinct_files, patterns
+                )
                 # In this case, if neither ratio nor number is provided, then ratio is 100%
                 if data_set["ratio"] == 0 and data_set["number"] == 0:
                     data_set["ratio"] = 1
@@ -64,7 +66,9 @@ class DataSplit:
 
     @staticmethod
     def display_loading_source(name, data_set, dir_src):
-        source_path = data_set["file_name"] if data_set["file_name"] != "" else dir_src
+        source_path = (
+            data_set["file_name"] if data_set["file_name"] != "" else dir_src
+        )
         number_ratio_message = "All elements"
         if data_set["ratio"] > 1:
             raise ValueError(f"{name} ratio is greater than 1.")
@@ -72,10 +76,14 @@ class DataSplit:
             print(f"No data is loaded for {name}")
         else:
             if data_set["ratio"] > 0:
-                number_ratio_message = f"{int(data_set['ratio'] * 100)}% elements"
+                number_ratio_message = (
+                    f"{int(data_set['ratio'] * 100)}% elements"
+                )
             elif data_set["number"] > 0:
                 number_ratio_message = f"{data_set['number']} elements"
-            print(f"{name} data is loaded from {source_path} - {number_ratio_message}")
+            print(
+                f"{name} data is loaded from {source_path} - {number_ratio_message}"
+            )
 
     def generate_train_val_test_list(self, files, dir_src):
         print("### Data source ###")
@@ -96,12 +104,15 @@ class DataSplit:
         def sort_data_sets():
             # Train is always last as it uses random with no seed
             # Between test and val, first select the one having a file name
-            if self.data_sets["test"]["file_name"] > self.data_sets["val"]["file_name"]:
+            if (
+                self.data_sets["test"]["file_name"]
+                > self.data_sets["val"]["file_name"]
+            ):
                 return ["test", "val", "train"]
             return ["val", "test", "train"]
 
         sorted_data_sets = sort_data_sets()
-        for name in sorted_data_sets:
+        for data_set_idx, name in enumerate(sorted_data_sets):
             data_set = self.data_sets[name]
             # Raise error if too many elements are required
             if data_set["number"] > len(data_set["possible_files"]):
@@ -112,12 +123,21 @@ class DataSplit:
             indices = rd_generator.sample(
                 range(len(data_set["possible_files"])), data_set["number"]
             )
-            data_set["files"] = [data_set["possible_files"][i] for i in indices]
+            data_set["files"] = [
+                data_set["possible_files"][i] for i in indices
+            ]
             # Remove the files from the possible files for other data sets
-            for file in data_set["files"]:
-                for other_data_set in self.data_sets.values():
-                    if file in other_data_set["possible_files"]:
-                        other_data_set["possible_files"].remove(file)
+            current_files_set = set(data_set["files"])
+            for data_set_jdx in range(data_set_idx + 1, len(sorted_data_sets)):
+                self.data_sets[sorted_data_sets[data_set_jdx]][
+                    "possible_files"
+                ] = [
+                    f
+                    for f in self.data_sets[sorted_data_sets[data_set_jdx]][
+                        "possible_files"
+                    ]
+                    if f not in current_files_set
+                ]
 
         # Sort files before returning
         return (
@@ -139,8 +159,12 @@ class BaseModelParams:
         self.input_dimensions = Dimensions(height=32, width=32)
 
         # Optimizer
-        self.beta1 = 0.9  # exponential decay rate for the first moment estimates
-        self.beta2 = 0.999  # exponential decay rate for the second moment estimates
+        self.beta1 = (
+            0.9  # exponential decay rate for the first moment estimates
+        )
+        self.beta2 = (
+            0.999  # exponential decay rate for the second moment estimates
+        )
         self.weight_decay = 0.0  # weight decay (L2 penalty)
         self.dropout = 0.0  # dropout rate
 
@@ -285,6 +309,8 @@ class BaseModelParams:
             f"{self.tensorboard_folder_path}/{self.format_now}_{self.name}"
         )
 
-        self.models_folder = f"{self.models_folder}/{self.name}/{self.format_now}"
+        self.models_folder = (
+            f"{self.models_folder}/{self.name}/{self.format_now}"
+        )
 
         self.output_dir = f"{self.output_dir}/{self.name}/{self.format_now}"
