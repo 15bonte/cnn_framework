@@ -24,11 +24,12 @@ def get_mean_and_std(
     data_loaders: list[DataLoader],
     max_percentile=90,
     mean_std_path: Optional[str] = None,
+    max_nb_imgs: Optional[int] = None,
 ) -> dict[str, list[float]]:
     """
     Args:
         dataloader: DataLoader with a mil dataset
-
+        max_nb_images: in case of huge data sets, consider using only first images to compute mean and std
     Returns:
         Mean and std of images in dataloader.
     """
@@ -39,6 +40,12 @@ def get_mean_and_std(
             mean_std = json.load(mean_std_file)
         return mean_std
 
+    # If max_nb_imgs is provided, compute mean and std on first images
+    if max_nb_imgs is not None:
+        print(f"Mean and std are computed on only {max_nb_imgs} images max.")
+    else:
+        max_nb_imgs = np.inf
+
     # Initialize mean and std
     params = data_loaders[0].dataset.params
     in_channels = len(params.c_indexes) * len(params.z_indexes)
@@ -48,13 +55,16 @@ def get_mean_and_std(
         np.zeros(channels),
         [],
     )
-    num_imgs, nb_pixels = 0, 0
+    nb_imgs, nb_pixels = 0, 0
 
     total_files = sum(
         [len(data_loader.dataset.names) for data_loader in data_loaders]
     )
     for data_loader in data_loaders:
         for filename in data_loader.dataset.names:
+            # Break if max_nb_images is reached
+            if nb_imgs >= max_nb_imgs:
+                break
             dataset_output = data_loader.dataset.generate_raw_images(
                 filename
             )  # H, W, C
@@ -74,13 +84,13 @@ def get_mean_and_std(
                 np.percentile(img, max_percentile, axis=(0, 1))
             )
             # Update number of images and pixels
-            num_imgs += 1
+            nb_imgs += 1
             nb_pixels += img.shape[0] * img.shape[1]
             display_progress(
                 "Mean/std computation in progress",
-                num_imgs,
-                total_files,
-                additional_message=f"Image {num_imgs}/{total_files}",
+                nb_imgs,
+                min(total_files, max_nb_imgs),
+                additional_message=f"Image {nb_imgs}/{min(total_files, max_nb_imgs)}",
             )
 
     mean = channels_sum / nb_pixels
