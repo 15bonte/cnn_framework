@@ -634,7 +634,7 @@ class ModelManager:
         if compute_own_mean_std:
             mean_std = get_mean_and_std([test_dl])
             test_dl.dataset.mean_std = mean_std
-        else:
+        elif test_dl.dataset.mean_std is None:
             self.read_mean_std(test_dl, self.params)
 
         # Initialise transforms before prediction
