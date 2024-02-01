@@ -3,6 +3,7 @@ import warnings
 from matplotlib import pyplot as plt
 from torch.utils.data import DataLoader
 from skimage import io
+import numpy as np
 
 from ..enum import PredictMode
 from ..data_sets.dataset_output import DatasetOutput
@@ -207,7 +208,7 @@ class VAEModelManager(ModelManager):
             ["input", "groundtruth", "predicted", "additional"],
         ):
             # C, H, W for data_image
-            if data_image is None:  # case when additional data is None
+            if data_image is None or np.any(np.array(data_image.shape) == 0):
                 continue
             if (
                 data_type == "input" and mean_std is not None
