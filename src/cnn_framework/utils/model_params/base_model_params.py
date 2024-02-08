@@ -182,6 +182,7 @@ class BaseModelParams:
         self.c_indexes = [0]  # channels selected as input
         self.z_indexes = [0]  # heights selected as input
         self.out_channels = 0  # output
+        self.data_set_size = None  # standard image size in data set
 
         # Input data set
         self.data_dir = get_folder_path("images")
@@ -233,7 +234,7 @@ class BaseModelParams:
         self.wandb_entity = "cbio-bis"
 
     def get_useful_training_parameters(self):
-        return f"epochs {self.num_epochs} | batch {self.batch_size} | lr {self.learning_rate} | weight decay {self.weight_decay} | dropout {self.dropout} | c {self.c_indexes} | z {self.z_indexes}"
+        return f"epochs {self.num_epochs} | batch {self.batch_size} | lr {self.learning_rate} | weight decay {self.weight_decay} | dropout {self.dropout} | c {self.c_indexes} | z {self.z_indexes} | data set size {self.data_set_size}"
 
     def update(self, args=None):
         if args is not None:
@@ -297,6 +298,8 @@ class BaseModelParams:
                 self.cross_validation_dir = args.cross_validation_dir
             if args.out_channels:
                 self.out_channels = int(args.out_channels)
+            if args.data_set_size:
+                self.data_set_size = int(args.data_set_size)
 
         # Create folders dedicated to current run
         now = datetime.now()

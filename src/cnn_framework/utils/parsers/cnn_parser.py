@@ -12,31 +12,43 @@ class CnnParser:
         self.arguments_parser.add_argument(
             "--data_dir", help="Folder containing .ciz pictures"
         )
-        self.arguments_parser.add_argument("--tb_dir", help="Tensorboard folder path")
-        self.arguments_parser.add_argument("--model_path", help="Model save path")
+        self.arguments_parser.add_argument(
+            "--tb_dir", help="Tensorboard folder path"
+        )
+        self.arguments_parser.add_argument(
+            "--model_path", help="Model save path"
+        )
         self.arguments_parser.add_argument("--lr", help="Learning rate")
         self.arguments_parser.add_argument("--epochs", help="Number of epochs")
-        self.arguments_parser.add_argument("--plot_step", help="Plot every n steps")
+        self.arguments_parser.add_argument(
+            "--plot_step", help="Plot every n steps"
+        )
         self.arguments_parser.add_argument(
             "--output_dir", help="Folder to save output pictures"
         )
         self.arguments_parser.add_argument(
-            "--train_ratio", help="Ratio of input pictures to include in training set"
+            "--train_ratio",
+            help="Ratio of input pictures to include in training set",
         )
         self.arguments_parser.add_argument(
-            "--val_ratio", help="Ratio of input pictures to include in validation set"
+            "--val_ratio",
+            help="Ratio of input pictures to include in validation set",
         )
         self.arguments_parser.add_argument(
-            "--test_ratio", help="Ratio of input pictures to include in test set"
+            "--test_ratio",
+            help="Ratio of input pictures to include in test set",
         )
         self.arguments_parser.add_argument(
-            "--train_number", help="Number of input pictures to include in training set"
+            "--train_number",
+            help="Number of input pictures to include in training set",
         )
         self.arguments_parser.add_argument(
-            "--val_number", help="Number of input pictures to include in validation set"
+            "--val_number",
+            help="Number of input pictures to include in validation set",
         )
         self.arguments_parser.add_argument(
-            "--test_number", help="Number of input pictures to include in test set"
+            "--test_number",
+            help="Number of input pictures to include in test set",
         )
         self.arguments_parser.add_argument(
             "--train_file", help="File containing training set"
@@ -48,7 +60,8 @@ class CnnParser:
             "--test_file", help="File containing test set"
         )
         self.arguments_parser.add_argument(
-            "--cross_validation_dir", help="Folder containing cross validation splits"
+            "--cross_validation_dir",
+            help="Folder containing cross validation splits",
         )
         self.arguments_parser.add_argument("--batch_size", help="Batch size")
         self.arguments_parser.add_argument(
@@ -61,9 +74,13 @@ class CnnParser:
         self.arguments_parser.add_argument(
             "--model_index", help="Potential index to choose model to be used"
         )
-        self.arguments_parser.add_argument("--image_height", help="Image height")
+        self.arguments_parser.add_argument(
+            "--image_height", help="Image height"
+        )
         self.arguments_parser.add_argument("--image_width", help="Image width")
-        self.arguments_parser.add_argument("--weight_decay", help="Weight decay")
+        self.arguments_parser.add_argument(
+            "--weight_decay", help="Weight decay"
+        )
         self.arguments_parser.add_argument("--dropout", help="Dropout rate")
         self.arguments_parser.add_argument(
             "--num_workers", help="Number of workers in train/val data loaders"
@@ -75,8 +92,14 @@ class CnnParser:
             help="Channel indexes to select as input",
         )
         self.arguments_parser.add_argument(
-            "--z_indexes", nargs="*", type=int, help="Height indexes to select as input"
+            "--z_indexes",
+            nargs="*",
+            type=int,
+            help="Height indexes to select as input",
         )
         self.arguments_parser.add_argument(
             "--out_channels", help="Number of channels as output"
+        )
+        self.arguments_parser.add_argument(
+            "--data_set_size", help="Standard image size in the dataset"
         )
