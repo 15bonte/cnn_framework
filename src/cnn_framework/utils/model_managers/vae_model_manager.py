@@ -130,7 +130,7 @@ class VAEModelManager(ModelManager):
         if not os.path.exists(self.params.global_results_path):
             with open(self.params.global_results_path, "w") as f:
                 f.write(
-                    "model;git hash;data;model id;train number;val number;test number;epochs;learning rate;batch size;training_time;score;additional score;weight decay;dropout;latent dim;beta;gamma;delta;encoder name\n"
+                    "model;git hash;data;model id;train number;val number;test number;epochs;learning rate;batch size;training_time;score;additional score;weight decay;dropout;latent dim;beta;gamma;delta;encoder name;C\n"
                 )
             f.close()
 
@@ -158,7 +158,8 @@ class VAEModelManager(ModelManager):
             f.write(f"{self.params.beta};")
             f.write(f"{self.params.gamma};")
             f.write(f"{self.params.delta};")
-            f.write(f"{self.params.encoder_name};\n")
+            f.write(f"{self.params.encoder_name};")
+            f.write(f"{self.params.C};\n")
         f.close()
 
     def write_images_to_tensorboard(self, current_batch, dl_element, name):
