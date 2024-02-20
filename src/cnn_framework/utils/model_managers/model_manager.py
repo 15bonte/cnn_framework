@@ -347,7 +347,7 @@ class ModelManager:
         Compute mean and std.
         """
         data_set_mean_std = get_mean_and_std(
-            [train_dl, val_dl], mean_std_path=mean_std_path
+            [train_dl], mean_std_path=mean_std_path
         )
 
         # If necessary, use only first channels
