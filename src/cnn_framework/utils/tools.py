@@ -1,9 +1,19 @@
 import random
+from typing import Optional
 import numpy as np
 from albumentations.augmentations.utils import MAX_VALUES_BY_DTYPE
 import fnmatch
 import torch
 
+from aicsimageio.writers import OmeTiffWriter
+from aicsimageio.types import PhysicalPixelSizes
+from aicsimageio.utils.io_utils import pathlike_to_fs
+
+from ome_types.model import OME
+from ome_types import to_xml
+
+import tifffile
+from tifffile import TIFF
 
 CONSTANT_SEEDED_RD = random.Random(10)
 BUFFER_RANDOM = None
@@ -132,3 +142,92 @@ def get_padding_coordinates(image) -> list[int]:
         x_min = 0
 
     return y_min, y_max, x_min, x_max
+
+
+def reorganize_channels(
+    image: np.array,
+    target_order: Optional[str],
+    original_order: Optional[str],
+) -> np.array:
+    """
+    Make sure image dimensions order matches dim_order.
+    """
+    # Add missing dimensions if necessary
+    for dim in target_order:
+        if dim not in original_order:
+            original_order = dim + original_order
+            image = np.expand_dims(image, axis=0)
+
+    indexes = [original_order.index(dim) for dim in target_order]
+    return np.moveaxis(image, indexes, list(range(len(target_order))))
+
+
+def save_tiff(
+    data: np.array,
+    uri: str,
+    original_order: Optional[str] = None,
+) -> None:
+    """
+    Inspired from OmeTiffWriter save method.
+    Useless options are removed, and bigtiff is always chosen.
+    """
+
+    # Reorganize channels if necessary
+    if original_order is not None:
+        data = reorganize_channels(data, "TCZYX", original_order)
+
+    # Make sure data is ready to be saved as TCZYX
+    assert len(data.shape) == 5
+
+    # Resolve final destination
+    fs, path = pathlike_to_fs(uri)
+
+    xml = b""
+    # try to construct OME from params
+    ome_xml = OmeTiffWriter.build_ome(
+        [data.shape],
+        [data.dtype],
+        channel_names=[None],  # type: ignore
+        image_name=[None],
+        physical_pixel_sizes=[PhysicalPixelSizes(None, None, None)],
+        channel_colors=[None],  # type: ignore
+        dimension_order=["TCZYX"],
+    )
+
+    # if we do not have an OME object now, something is wrong
+    if not isinstance(ome_xml, OME):
+        raise TypeError(
+            "Unknown OME-XML metadata passed in. Use OME object, or xml string or \
+                None"
+        )
+
+    # vaidate ome
+    OmeTiffWriter._check_ome_dims(ome_xml, 0, data.shape, data.dtype)
+
+    # convert to string for writing
+    xml = to_xml(ome_xml).encode()
+
+    with fs.open(path, "wb") as open_resource:
+        tif = tifffile.TiffWriter(
+            open_resource,
+            bigtiff=True,
+        )
+
+        # now the heavy lifting. assemble the raw data and write it
+        # assume if first channel is rgb then all of it is
+        spp = ome_xml.images[0].pixels.channels[0].samples_per_pixel
+        is_rgb = spp is not None and spp > 1
+        photometric = (
+            TIFF.PHOTOMETRIC.RGB if is_rgb else TIFF.PHOTOMETRIC.MINISBLACK
+        )
+        planarconfig = TIFF.PLANARCONFIG.CONTIG if is_rgb else None
+        tif.write(
+            data,
+            description=xml,
+            photometric=photometric,
+            metadata=None,
+            planarconfig=planarconfig,
+            compression=TIFF.COMPRESSION.ADOBE_DEFLATE,
+        )
+
+        tif.close()
