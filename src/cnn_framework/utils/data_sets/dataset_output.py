@@ -18,6 +18,7 @@ class DatasetOutput:
         target_array: Optional[np.array] = None,
         additional: Optional[np.array] = None,
         prediction: Optional[np.array] = None,
+        encoded_file_name: Optional[int] = -1,
     ):
         self.index = index
         self.input = input
@@ -31,9 +32,13 @@ class DatasetOutput:
         self.additional = additional
         self.prediction = prediction
 
+        self.encoded_file_name = encoded_file_name
+
     @property
     def target(self):
-        return self.target_image if self.target_is_image() else self.target_array
+        return (
+            self.target_image if self.target_is_image() else self.target_array
+        )
 
     @target.setter
     def target(self, new_target: np.array):
@@ -56,6 +61,7 @@ class DatasetOutput:
         self.target = torch_from_numpy(self.target)
         self.additional = torch_from_numpy(self.additional)
         self.prediction = torch_from_numpy(self.prediction)
+        self.encoded_file_name = torch.tensor(self.encoded_file_name)
 
     def to_dict(self) -> dict:
         return {
@@ -68,8 +74,13 @@ class DatasetOutput:
         self.index = self.index.to(device)
         self.input = self.input.to(device)
         self.target = self.target.to(device)
-        self.additional = self.additional.to(device) if self.additional_is_image() else None
-        self.prediction = self.prediction.to(device) if self.prediction is not None else None
+        self.additional = (
+            self.additional.to(device) if self.additional_is_image() else None
+        )
+        self.prediction = (
+            self.prediction.to(device) if self.prediction is not None else None
+        )
+        self.encoded_file_name = self.encoded_file_name.to(device)
 
     def get_numpy_dataset_output(self):
         numpy_dict = {

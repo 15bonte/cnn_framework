@@ -34,6 +34,7 @@ from ..display_tools import (
     display_progress,
     make_image_tiff_displayable,
 )
+from ..file_name_encoder import FileNameEncoder
 
 
 def adapt_mean_std(mean_std):
@@ -101,6 +102,11 @@ class ModelManager:
             f"{self.params.models_folder}/{self.params.model_save_name}"
         )
         self.model_save_path_early_stopping = f"{self.params.models_folder}/early_stopping_{self.params.model_save_name}"
+
+        # Used to keep track of file names
+        self.file_name_encoder = FileNameEncoder(
+            self.params.names_train, self.params.names_val, self.params.names_test
+        )
 
     def write_images_to_tensorboard(
         self, current_batch: int, dl_element: DatasetOutput, name: str
