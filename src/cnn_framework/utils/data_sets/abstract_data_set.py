@@ -5,19 +5,21 @@ import numpy as np
 from torch.utils.data import Dataset
 from albumentations import Compose
 
-from ...utils.readers.images_reader import ImagesReader
-from .dataset_output import DatasetOutput
+from ..readers.images_reader import ImagesReader
 from ..tools import read_categories_probability_from_name, to_one_hot
+from ..model_params.base_model_params import BaseModelParams
+
+from .dataset_output import DatasetOutput
 
 
 class AbstractDataSet(Dataset):
-    def __init__(self, is_train, names, data_manager, params):
+    def __init__(self, is_train, names, data_manager, params: BaseModelParams):
         # Is train (not val or test)
         self.is_train = is_train
         # Files names
         self.names = names
         # Model parameters
-        self.params = params
+        self.params: BaseModelParams = params
         # Data manager
         self.data_manager = data_manager
         # Transforms
