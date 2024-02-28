@@ -77,12 +77,15 @@ def make_image_matplotlib_displayable(image, mean_std=None):
     if len(image.shape) == 2:
         return image
 
+    if mean_std is None:
+        mean_std = {}
+
     # Switch smallest dimension to the beginning to normalize
     channels_axis = np.argmin(image.shape)
     image = np.moveaxis(image, channels_axis, 0)
 
     # If mean and std are provided, normalize back to initial values
-    if mean_std is not None:
+    if mean_std:
         normalized_image = normalize_array(
             image, mean_std=mean_std, reverse=True
         )
@@ -126,12 +129,15 @@ def make_image_tiff_displayable(image, mean_std):
     if len(image.shape) == 2:
         image = np.expand_dims(image, axis=0)
 
+    if mean_std is None:
+        mean_std = {}
+
     # Switch smallest dimension to the beginning to normalize for tiff
     channels_axis = np.argmin(image.shape)
     image = np.moveaxis(image, channels_axis, 0)
 
     # If mean and std are provided, normalize back to initial values
-    if mean_std is not None and len(mean_std["mean"]) > 0:
+    if mean_std and len(mean_std["mean"]) > 0:
         normalized_image = normalize_array(
             image, mean_std=mean_std, reverse=True
         )

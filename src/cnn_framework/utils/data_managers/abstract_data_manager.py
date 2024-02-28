@@ -4,7 +4,7 @@ from ..dimensions import Dimensions
 
 
 class AbstractDataManager:
-    def __init__(self, data_set_dir):
+    def __init__(self, data_set_dir: str = ""):
         self.data_set_dir = data_set_dir
 
     @staticmethod

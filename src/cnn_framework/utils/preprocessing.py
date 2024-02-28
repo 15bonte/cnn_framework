@@ -2,13 +2,17 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
 
-def normalize_array(input_array, mean_std=None, reverse=False, channel_axis=None):
+def normalize_array(
+    input_array, mean_std=None, reverse=False, channel_axis=None
+):
     """
     Works for both 2D and 3D arrays.
     If reverse, then the normalization is reversed.
 
     mean_std = dict(channel, dict(mean, std))
     """
+    if mean_std is None:
+        mean_std = {}
 
     # Get number of channels
     nb_channels = np.min(input_array.shape)
@@ -20,7 +24,7 @@ def normalize_array(input_array, mean_std=None, reverse=False, channel_axis=None
     # Put channel axis in front
     input_array = np.moveaxis(input_array, channel_axis, 0)
 
-    if mean_std is not None:  # custom mean and std
+    if mean_std:  # custom mean and std
         assert nb_channels == len(mean_std["mean"])
         mean, std = mean_std["mean"], mean_std["std"]
         for _ in range(2):  # 2 for H and W
@@ -64,9 +68,9 @@ def zero_one_scaler(input_array, feature_range=(0, 1)):
     # Reshape to 2D
     as_columns = new_input_array.reshape(-1, nb_channels)
     # Apply min max scaler
-    transformed_columns = MinMaxScaler(feature_range=feature_range).fit_transform(
-        as_columns
-    )
+    transformed_columns = MinMaxScaler(
+        feature_range=feature_range
+    ).fit_transform(as_columns)
     # Reshape to original shape
     transformed = transformed_columns.reshape(new_input_array.shape)
     # Put channel axis back to original position

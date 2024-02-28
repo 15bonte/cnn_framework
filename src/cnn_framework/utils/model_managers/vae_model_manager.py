@@ -196,8 +196,11 @@ class VAEModelManager(ModelManager):
     def save_results(
         self, name: str, dl_element: DatasetOutput, mean_std
     ) -> None:
+        if mean_std is None:
+            mean_std = {}
+
         # Possible target normalization
-        target_mean_std = None
+        target_mean_std = {}
         # Save inputs, targets & predictions as tiff images
         for data_image, data_type in zip(
             [
@@ -211,9 +214,7 @@ class VAEModelManager(ModelManager):
             # C, H, W for data_image
             if data_image is None or np.any(np.array(data_image.shape) == 0):
                 continue
-            if (
-                data_type == "input" and mean_std is not None
-            ):  # input has been normalized
+            if data_type == "input" and mean_std:  # input has been normalized
                 # Case where both input and target have been normalized
                 if data_image.shape[0] != len(mean_std["mean"]):
                     nb_input_channels = len(self.params.c_indexes) * len(
@@ -232,10 +233,7 @@ class VAEModelManager(ModelManager):
                 image_to_save = make_image_tiff_displayable(
                     data_image, input_mean_std
                 )
-            elif (
-                data_type in ["groundtruth", "predicted"]
-                and target_mean_std is not None
-            ):
+            elif data_type in ["groundtruth", "predicted"] and target_mean_std:
                 image_to_save = make_image_tiff_displayable(
                     data_image, target_mean_std
                 )

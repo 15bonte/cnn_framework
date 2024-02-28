@@ -25,7 +25,7 @@ class AbstractDataSet(Dataset):
         # Transforms
         self.transforms: Optional[Compose] = None
         # Initialize means and standard deviations as None, will be set afterwards
-        self.mean_std = None
+        self.mean_std: dict[str, list[float]] = {}
         # Create empty data sources
         self.input_data_source = ImagesReader()
         self.output_data_source = ImagesReader()

@@ -462,10 +462,10 @@ class ModelManager:
         self.compute_loss(dl_element, dl_metric, data_loader)
 
     def save_results(
-        self, name: str, dl_element: DatasetOutput, mean_std
+        self, name: str, dl_element: DatasetOutput, mean_std: dict[str, list[float]]
     ) -> None:
         # Possible target normalization
-        target_mean_std = None
+        target_mean_std = {}
         # Save inputs, targets & predictions as tiff images
         for data_image, data_type in zip(
             [
@@ -480,7 +480,7 @@ class ModelManager:
             if data_image is None:  # case when additional data is None
                 continue
             if (
-                data_type == "input" and mean_std is not None
+                data_type == "input" and mean_std
             ):  # input has been normalized
                 # Case where both input and target have been normalized
                 if data_image.shape[0] != len(mean_std["mean"]):
@@ -502,7 +502,7 @@ class ModelManager:
                 )
             elif (
                 data_type in ["groundtruth", "predicted"]
-                and target_mean_std is not None
+                and target_mean_std
             ):
                 image_to_save = make_image_tiff_displayable(
                     data_image, target_mean_std
@@ -642,7 +642,7 @@ class ModelManager:
         if compute_own_mean_std:
             mean_std = get_mean_and_std([test_dl])
             test_dl.dataset.mean_std = mean_std
-        elif test_dl.dataset.mean_std is None:
+        elif not test_dl.dataset.mean_std:
             self.read_mean_std(test_dl, self.params)
 
         # Initialise transforms before prediction
