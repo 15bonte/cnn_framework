@@ -182,6 +182,7 @@ class BaseModelParams:
         self.z_indexes = [0]  # heights selected as input
         self.out_channels = 0  # output
         self.data_set_size = None  # standard image size in data set
+        self.encoder_name = ""
 
         # Input data set
         self.data_dir = get_folder_path("images")
@@ -299,6 +300,8 @@ class BaseModelParams:
                 self.out_channels = int(args.out_channels)
             if args.data_set_size:
                 self.data_set_size = int(args.data_set_size)
+            if args.encoder_name:
+                self.encoder_name = args.encoder_name
 
         # Create folders dedicated to current run
         now = datetime.now()

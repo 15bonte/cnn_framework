@@ -1,5 +1,4 @@
 from .base_model_params import BaseModelParams
-from ..dimensions import Dimensions
 
 
 class VAEModelParams(BaseModelParams):
@@ -51,8 +50,6 @@ class VAEModelParams(BaseModelParams):
                 self.depth = int(args.depth)
             if args.kld_loss:
                 self.kld_loss = args.kld_loss
-            if args.encoder_name:
-                self.encoder_name = args.encoder_name
 
         super().update(args)
 

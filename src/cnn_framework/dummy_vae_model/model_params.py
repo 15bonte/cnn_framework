@@ -27,7 +27,6 @@ class DummyVAEModelParams(VAEModelParams):
         self.beta2 = 0.995
         self.reconstruction_loss = "mse"  # "mse"
         self.kld_loss = "standard"  # "standard"
-        self.encoder_name = "timm-efficientnet-b0"
 
         self.latent_dim = 16
         self.beta = 1  # weight of KLD loss

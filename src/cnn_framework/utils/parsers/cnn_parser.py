@@ -103,3 +103,6 @@ class CnnParser:
         self.arguments_parser.add_argument(
             "--data_set_size", help="Standard image size in the dataset"
         )
+        self.arguments_parser.add_argument(
+            "--encoder_name", help="Encoder name"
+        )

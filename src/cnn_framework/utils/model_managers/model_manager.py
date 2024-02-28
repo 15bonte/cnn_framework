@@ -105,7 +105,9 @@ class ModelManager:
 
         # Used to keep track of file names
         self.file_name_encoder = FileNameEncoder(
-            self.params.names_train, self.params.names_val, self.params.names_test
+            self.params.names_train,
+            self.params.names_val,
+            self.params.names_test,
         )
 
     def write_images_to_tensorboard(
