@@ -25,8 +25,14 @@ def normalize_array(
     input_array = np.moveaxis(input_array, channel_axis, 0)
 
     if mean_std:  # custom mean and std
-        assert nb_channels == len(mean_std["mean"])
-        mean, std = mean_std["mean"], mean_std["std"]
+        if nb_channels != len(mean_std["mean"]):
+            assert (
+                len(mean_std["mean"]) == 1
+            )  # same mean and std for all channels
+            mean = mean_std["mean"] * nb_channels
+            std = mean_std["std"] * nb_channels
+        else:
+            mean, std = mean_std["mean"], mean_std["std"]
         for _ in range(2):  # 2 for H and W
             mean = np.expand_dims(mean, -1)
             std = np.expand_dims(std, -1)
