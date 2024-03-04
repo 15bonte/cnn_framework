@@ -6,7 +6,7 @@ from .abstract_data_set import AbstractDataSet
 
 class DetectionDataSet(AbstractDataSet):
     @abstractmethod
-    def generate_raw_images(self, filename):
+    def generate_images(self, filename):
         raise NotImplementedError
 
     @staticmethod
@@ -14,7 +14,9 @@ class DetectionDataSet(AbstractDataSet):
         for image in annotations["images"]:
             if image["file_name"] == filename:
                 return image["id"]
-        raise ValueError(f"Image {filename} not found in JSON annotation file.")
+        raise ValueError(
+            f"Image {filename} not found in JSON annotation file."
+        )
 
     def get_target(self, annotations, image_id):
         boxes, labels = [], []
@@ -41,7 +43,9 @@ class DetectionDataSet(AbstractDataSet):
         for image in annotations["images"]:
             if image["id"] == image_id:
                 return image["file_name"]
-        raise ValueError(f"Image {image_id} not found in JSON annotation file.")
+        raise ValueError(
+            f"Image {image_id} not found in JSON annotation file."
+        )
 
     def __getitem__(self, idx):
         _, raw_img_input, raw_img_output, _ = super().__getitem__(idx)

@@ -67,8 +67,15 @@ class AbstractDataSet(Dataset):
         self.check_order()
 
     @abstractmethod
-    def generate_raw_images(self, filename) -> DatasetOutput:
+    def generate_images(self, filename) -> DatasetOutput:
         raise NotImplementedError
+
+    def generate_raw_images(self, filename) -> DatasetOutput:
+        """
+        By default, this function is the same as generate_images.
+        This function is only used in the mean/std computation.
+        """
+        return self.generate_images(filename)
 
     def read_output(self, filename, one_hot=False):
         """
@@ -177,7 +184,7 @@ class AbstractDataSet(Dataset):
 
     def __getitem__(self, idx):
         # Read file and generate images
-        data_set_output = self.generate_raw_images(self.names[idx])
+        data_set_output = self.generate_images(self.names[idx])
 
         # Apply transforms
         self.apply_transforms(data_set_output)

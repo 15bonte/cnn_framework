@@ -39,7 +39,11 @@ class DummyVAEDataSet(AbstractDataSet):
                         max_pixel_value=1,
                     ),
                     A.PadIfNeeded(
-                        min_height=height, min_width=width, border_mode=0, value=0, p=1
+                        min_height=height,
+                        min_width=width,
+                        border_mode=0,
+                        value=0,
+                        p=1,
                     ),
                     A.CenterCrop(height=height, width=width, p=1),
                     A.Rotate(border_mode=0),
@@ -56,13 +60,17 @@ class DummyVAEDataSet(AbstractDataSet):
                         max_pixel_value=1,
                     ),
                     A.PadIfNeeded(
-                        min_height=height, min_width=width, border_mode=0, value=0, p=1
+                        min_height=height,
+                        min_width=width,
+                        border_mode=0,
+                        value=0,
+                        p=1,
                     ),
                     A.CenterCrop(height=height, width=width, p=1),
                 ]
             )
 
-    def generate_raw_images(self, filename):
+    def generate_images(self, filename):
         return DatasetOutput(
             input=self.input_data_source.get_image(filename, axis_to_merge=-1),
         )
@@ -70,7 +78,7 @@ class DummyVAEDataSet(AbstractDataSet):
     def __getitem__(self, idx):
         # Read file and generate images
         filename = self.names[idx]
-        raw_inputs = self.generate_raw_images(filename)
+        raw_inputs = self.generate_images(filename)
 
         # Category (0 for squares, 1 for circles)
         one_hot_probabilities = self.read_output(filename, one_hot=True)

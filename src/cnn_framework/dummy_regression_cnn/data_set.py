@@ -37,7 +37,11 @@ class DummyRegressionCnnDataSet(AbstractDataSet):
                         max_pixel_value=1,
                     ),
                     A.PadIfNeeded(
-                        min_height=height, min_width=width, border_mode=0, value=0, p=1
+                        min_height=height,
+                        min_width=width,
+                        border_mode=0,
+                        value=0,
+                        p=1,
                     ),
                     A.CenterCrop(height=height, width=width, p=1),
                     # A.Rotate(border_mode=0, p=1, value=1),
@@ -55,15 +59,21 @@ class DummyRegressionCnnDataSet(AbstractDataSet):
                         max_pixel_value=1,
                     ),
                     A.PadIfNeeded(
-                        min_height=height, min_width=width, border_mode=0, value=0, p=1
+                        min_height=height,
+                        min_width=width,
+                        border_mode=0,
+                        value=0,
+                        p=1,
                     ),
                     A.CenterCrop(height=height, width=width, p=1),
                 ]
             )
 
-    def generate_raw_images(self, filename):
+    def generate_images(self, filename):
         # Output
-        input_image = self.input_data_source.get_image(filename, axis_to_merge=-1)
+        input_image = self.input_data_source.get_image(
+            filename, axis_to_merge=-1
+        )
         non_zero_area = np.count_nonzero(input_image) / 3
 
         return DatasetOutput(

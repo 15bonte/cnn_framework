@@ -50,7 +50,11 @@ class DummyDataSet(AbstractDataSet):
                         max_pixel_value=1,
                     ),
                     A.PadIfNeeded(
-                        min_height=height, min_width=width, border_mode=0, value=0, p=1
+                        min_height=height,
+                        min_width=width,
+                        border_mode=0,
+                        value=0,
+                        p=1,
                     ),
                     A.CenterCrop(height=height, width=width, p=1),
                     A.Rotate(border_mode=0),
@@ -67,14 +71,20 @@ class DummyDataSet(AbstractDataSet):
                         max_pixel_value=1,
                     ),
                     A.PadIfNeeded(
-                        min_height=height, min_width=width, border_mode=0, value=0, p=1
+                        min_height=height,
+                        min_width=width,
+                        border_mode=0,
+                        value=0,
+                        p=1,
                     ),
                     A.CenterCrop(height=height, width=width, p=1),
                 ]
             )
 
-    def generate_raw_images(self, filename):
+    def generate_images(self, filename):
         return DatasetOutput(
             input=self.input_data_source.get_image(filename, axis_to_merge=-1),
-            target_image=self.output_data_source.get_image(filename, axis_to_merge=-1),
+            target_image=self.output_data_source.get_image(
+                filename, axis_to_merge=-1
+            ),
         )
