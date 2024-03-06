@@ -21,7 +21,13 @@ class CnnModelManager(ModelManager):
     Model manager for CNN classification models.
     """
 
-    def save_results(self, name: str, dl_element: DatasetOutput, mean_std):
+    def save_results(
+        self,
+        name: str,
+        dl_element: DatasetOutput,
+        mean_std: dict[str, list[float]],
+        save_only_wrong: bool = True,
+    ):
         input_np = dl_element.input
         target_np = dl_element.target
         prediction_np = dl_element.prediction
@@ -45,6 +51,8 @@ class CnnModelManager(ModelManager):
             [mean_std, None],  # No normalization for additional data
         ):
             if data_image is None:  # case when additional data is None
+                continue
+            if save_only_wrong and ground_truth_class == prediction_class:
                 continue
             image_to_save = make_image_tiff_displayable(
                 data_image, data_mean_std
