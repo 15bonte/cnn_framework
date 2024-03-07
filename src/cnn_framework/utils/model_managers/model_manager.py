@@ -621,7 +621,7 @@ class ModelManager:
         predict_mode=PredictMode.Standard,
         nb_images_to_save=10,
         compute_own_mean_std=False,
-    ) -> Optional[list]:
+    ) -> list:
         """
         Parameters
         ----------
@@ -686,6 +686,8 @@ class ModelManager:
         )
         print("\n" + accuracy_message)
         self.training_information.score = score
+
+        return predictions
 
     def write_useful_information(self) -> None:
         # Update parameters file with all useful information
