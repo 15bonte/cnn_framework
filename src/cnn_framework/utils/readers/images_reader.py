@@ -22,23 +22,27 @@ class ImagesReader:
             assert len(self.functions) == len(projections)
             self.projections = projections
         else:
-            self.projections = [[Projection(method=ProjectMethods.none)]] * len(
-                self.functions
-            )
+            self.projections = [
+                [Projection(method=ProjectMethods.none)]
+            ] * len(self.functions)
 
         if normalizations is not None:
             assert len(self.functions) == len(normalizations)
             self.normalizations = normalizations
         else:
-            self.normalizations = [Normalization(method=NormalizeMethods.none)] * len(
-                self.functions
-            )
+            self.normalizations = [
+                Normalization(method=NormalizeMethods.none)
+            ] * len(self.functions)
 
     def is_empty(self):
         return len(self.functions) == 0
 
     def get_image(
-        self, filename, respect_initial_type=False, axis_to_merge=1, for_training=True
+        self,
+        filename,
+        respect_initial_type=False,
+        axis_to_merge=1,
+        for_training=True,
     ):
         """
         Expected dimensions order is TCZYX. Hence, axis to merge is usually 1 for channels.
@@ -79,17 +83,15 @@ class ImagesReader:
             # raw_img = np.moveaxis(raw_img, axis_to_merge, -1)  # H, W, C
 
             if for_training:  # need to match YXC
-                concatenated_image = (
-                    concatenated_image.squeeze()
-                )  # squeeze unnecessary dimensions
-                if concatenated_image.ndim == 2:  # YX
-                    concatenated_image = np.expand_dims(
-                        concatenated_image, axis=-1
-                    )  # YXC
-                else:
-                    concatenated_image = np.moveaxis(
-                        concatenated_image, np.argmin(concatenated_image.shape), -1
-                    )  # YXC
+                # From here, expect TCZYX format
+                # TCZ formats will be merged in one single dimension named C
+                new_dim = np.prod(concatenated_image.shape[:3])
+                concatenated_image = concatenated_image.reshape(
+                    new_dim, *concatenated_image.shape[3:]
+                )  # CYX
+                concatenated_image = np.moveaxis(
+                    concatenated_image, 0, -1
+                )  # YXC
 
             return concatenated_image
 

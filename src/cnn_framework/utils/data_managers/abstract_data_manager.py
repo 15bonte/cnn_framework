@@ -7,6 +7,9 @@ class AbstractDataManager:
     def __init__(self, data_set_dir: str = ""):
         self.data_set_dir = data_set_dir
 
+    def get_distinct_files(self):
+        raise NotImplementedError
+
     @staticmethod
     def generate_random_anchor(input_dim, model_dim):
         margin = input_dim.difference(model_dim)
