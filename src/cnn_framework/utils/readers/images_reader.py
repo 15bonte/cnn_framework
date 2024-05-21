@@ -83,14 +83,16 @@ class ImagesReader:
             # raw_img = np.moveaxis(raw_img, axis_to_merge, -1)  # H, W, C
 
             if for_training:  # need to match YXC
-                # From here, expect TCZYX format
-                # TCZ formats will be merged in one single dimension named C
-                new_dim = np.prod(concatenated_image.shape[:3])
+                # From here, expect STCZYX or TCZYX format
+                # STCZ or TCZ formats will be merged in one single dimension named C
+                new_dim = np.prod(concatenated_image.shape[:-2])
                 concatenated_image = concatenated_image.reshape(
-                    new_dim, *concatenated_image.shape[3:]
+                    new_dim, *concatenated_image.shape[-2:]
                 )  # CYX
+                # To be sure that C is first dimension so far
+                channel_dim = np.argmin(concatenated_image.shape)
                 concatenated_image = np.moveaxis(
-                    concatenated_image, 0, -1
+                    concatenated_image, channel_dim, -1
                 )  # YXC
 
             return concatenated_image
