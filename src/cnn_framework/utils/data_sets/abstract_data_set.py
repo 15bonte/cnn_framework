@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from typing import Optional
-
+import os
+import h5py
 import numpy as np
 from torch.utils.data import Dataset
 from albumentations import Compose
@@ -30,6 +31,12 @@ class AbstractDataSet(Dataset):
         self.input_data_source = ImagesReader()
         self.output_data_source = ImagesReader()
         self.additional_data_source = ImagesReader()
+
+        # h5 case
+        if os.path.isfile(self.params.data_dir):
+            self.h5_file = h5py.File(self.params.data_dir)
+        else:
+            self.h5_file = None
 
     def set_transforms(self):
         # No transforms
