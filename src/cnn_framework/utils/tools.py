@@ -3,6 +3,7 @@ from typing import Optional
 import numpy as np
 import fnmatch
 import torch
+from tqdm import tqdm
 
 from aicsimageio.writers import OmeTiffWriter
 from aicsimageio.types import PhysicalPixelSizes
@@ -95,7 +96,8 @@ def handle_image_type(image):
 def extract_patterns(files, patterns):
     """Return files that match any of the given patterns."""
     result = []
-    for name in files:
+    # Iterate over files
+    for name in tqdm(files):
         for pattern in patterns:
             if fnmatch.fnmatch(name, pattern):
                 result.append(name)
