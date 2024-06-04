@@ -1,7 +1,6 @@
 import random
 from typing import Optional
 import numpy as np
-from albumentations.augmentations.utils import MAX_VALUES_BY_DTYPE
 import fnmatch
 import torch
 
@@ -18,6 +17,13 @@ from tifffile import TIFF
 CONSTANT_SEEDED_RD = random.Random(10)
 BUFFER_RANDOM = None
 BUFFER_RANGE = 0
+
+MAX_VALUES_BY_DTYPE = {
+    np.dtype("uint8"): 255,
+    np.dtype("uint16"): 65535,
+    np.dtype("uint32"): 4294967295,
+    np.dtype("float32"): 1.0,
+}
 
 
 def random_sample(range_sample, nb_sample):
