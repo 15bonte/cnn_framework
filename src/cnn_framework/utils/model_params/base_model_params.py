@@ -57,8 +57,6 @@ class DataSplit:
             if os.path.isfile(current_filename):
                 with open(current_filename, "r") as f:
                     patterns = f.read().splitlines()
-                print(len(distinct_files))
-                print(len(patterns))
                 data_set["possible_files"] = extract_patterns(
                     distinct_files, patterns
                 )
