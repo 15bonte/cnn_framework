@@ -6,6 +6,9 @@ import os
 from ..dimensions import Dimensions
 from ..tools import extract_patterns
 from ...data.tools import get_folder_path
+from ..display_tools import (
+    display_progress,
+)
 
 
 class DataSplit:
@@ -41,7 +44,7 @@ class DataSplit:
             },
         }
 
-        for name, data_set in self.data_sets.items():
+        for idx, (name, data_set) in enumerate(self.data_sets.items()):
             # Either number or ratio must be provided, not both
             if data_set["ratio"] * data_set["number"] != 0:
                 raise ValueError(
@@ -54,6 +57,8 @@ class DataSplit:
             if os.path.isfile(current_filename):
                 with open(current_filename, "r") as f:
                     patterns = f.read().splitlines()
+                print(len(distinct_files))
+                print(len(patterns))
                 data_set["possible_files"] = extract_patterns(
                     distinct_files, patterns
                 )
@@ -62,6 +67,11 @@ class DataSplit:
                     data_set["ratio"] = 1
             else:
                 raise ValueError(f"{current_filename} does not exist.")
+            display_progress(
+                "Initializing DataSplit",
+                idx + 1,
+                3,
+            )
 
     @staticmethod
     def display_loading_source(name, data_set, dir_src):
