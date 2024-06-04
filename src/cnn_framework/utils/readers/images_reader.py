@@ -1,8 +1,11 @@
+import os
 from typing import Optional, List
+import h5py
 
 import numpy as np
 
 from ..readers.tiff_reader import TiffReader
+from ..readers.h5_reader import H5Reader
 from ..enum import NormalizeMethods, ProjectMethods
 
 from .utils.projection import Projection
@@ -56,12 +59,22 @@ class ImagesReader:
                 self.functions, self.projections, self.normalizations
             ):
                 image_path = function(filename)
-                image_reader = TiffReader(
-                    image_path,
-                    project=projection,
-                    normalize=normalization,
-                    respect_initial_type=respect_initial_type,
-                )
+
+                if os.path.exists(image_path):
+                    image_reader = TiffReader(
+                        image_path,
+                        project=projection,
+                        normalize=normalization,
+                        respect_initial_type=respect_initial_type,
+                    )
+                else:
+                    image_reader = H5Reader(
+                        image_path,
+                        project=projection,
+                        normalize=normalization,
+                        respect_initial_type=respect_initial_type,
+                    )
+
                 raw_image = image_reader.get_processed_image()
 
                 if raw_image.ndim < 5:
