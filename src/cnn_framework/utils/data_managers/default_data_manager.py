@@ -15,5 +15,5 @@ class DefaultDataManager(AbstractDataManager):
 
     def get_microscopy_image_path(self, file):
         if os.path.isfile(self.data_set_dir):  # h5 file case
-            return self.data_set_dir + file
+            return file
         return os.path.join(self.data_set_dir, file)

@@ -46,6 +46,7 @@ class ImagesReader:
         respect_initial_type=False,
         axis_to_merge=1,
         for_training=True,
+        h5_file=None,
     ):
         """
         Expected dimensions order is TCZYX. Hence, axis to merge is usually 1 for channels.
@@ -60,15 +61,16 @@ class ImagesReader:
             ):
                 image_path = function(filename)
 
-                if os.path.exists(image_path):
-                    image_reader = TiffReader(
+                if h5_file is not None:
+                    image_reader = H5Reader(
+                        h5_file,
                         image_path,
                         project=projection,
                         normalize=normalization,
                         respect_initial_type=respect_initial_type,
                     )
                 else:
-                    image_reader = H5Reader(
+                    image_reader = TiffReader(
                         image_path,
                         project=projection,
                         normalize=normalization,
