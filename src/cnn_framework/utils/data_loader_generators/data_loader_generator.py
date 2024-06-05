@@ -162,6 +162,7 @@ class DataLoaderGenerator:
         """
         files = self.data_manager.get_distinct_files()
         files.sort()
+        print("File names correctly loaded.")
 
         data_split = DataSplit(self.params, files)
         (
@@ -223,9 +224,9 @@ class DataLoaderGenerator:
         # Test (no sampler to keep order)
         test_dl = DataLoader(
             dataset_test,
-            batch_size=1
-            if single_image_test_batch
-            else self.params.batch_size,
+            batch_size=(
+                1 if single_image_test_batch else self.params.batch_size
+            ),
             collate_fn=self.collate_fn,
             pin_memory=True,
         )

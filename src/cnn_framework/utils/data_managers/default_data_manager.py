@@ -8,6 +8,7 @@ class DefaultDataManager(AbstractDataManager):
     def get_distinct_files(self):
         if os.path.isfile(self.data_set_dir):  # h5 file case
             with h5py.File(self.data_set_dir, "r") as h5_file:
+                print("H5 file loaded.")
                 # Get the list of keys
                 keys = list(h5_file.keys())
             return keys
