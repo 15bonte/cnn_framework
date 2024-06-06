@@ -10,7 +10,7 @@ class DefaultDataManager(AbstractDataManager):
             with h5py.File(self.data_set_dir, "r") as h5_file:
                 print("H5 file loaded.")
                 # Get the list of keys
-                keys = list(h5_file.keys())
+                keys = list(h5_file["images"].attrs)
             return keys
         return os.listdir(self.data_set_dir)
 

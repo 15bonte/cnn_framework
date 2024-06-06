@@ -13,5 +13,6 @@ class H5Reader(AbstractReader):
         super().__init__(*args, **kwargs)
 
     def _read_image(self, file_path: str) -> np.ndarray:
-        image = self.h5_file[file_path][()]
+        position = self.h5_file["images"].attrs[file_path]
+        image = self.h5_file["images"][position][()]
         return image
