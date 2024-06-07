@@ -34,7 +34,7 @@ class AbstractDataSet(Dataset):
 
         # h5 case
         if os.path.isfile(self.params.data_dir):
-            self.h5_file = h5py.File(self.params.data_dir)
+            self.h5_file = h5py.File(self.params.data_dir, "r")
         else:
             self.h5_file = None
 
