@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from typing import Optional
 import os
+import json
 import h5py
 import numpy as np
 from torch.utils.data import Dataset
@@ -35,8 +36,19 @@ class AbstractDataSet(Dataset):
         # h5 case
         if os.path.isfile(self.params.data_dir):
             self.h5_file = h5py.File(self.params.data_dir, "r")
+            # Get json path
+            names_json_path = os.path.join(
+                os.path.dirname(self.params.data_dir), "names.json"
+            )
+            assert os.path.isfile(
+                names_json_path
+            ), f"Required {names_json_path} does not exist"
+            # Load json
+            with open(names_json_path, "r") as f:
+                self.h5_names = json.load(f)
         else:
             self.h5_file = None
+            self.h5_names = None
 
     def set_transforms(self):
         # No transforms
