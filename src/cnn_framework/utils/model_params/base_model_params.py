@@ -58,6 +58,10 @@ class DataSplit:
                 data_set["possible_files"] = extract_patterns(
                     distinct_files, patterns
                 )
+                if len(data_set["possible_files"]) == 0:
+                    raise ValueError(
+                        f"No matching found in {current_filename}."
+                    )
                 # In this case, if neither ratio nor number is provided, then ratio is 100%
                 if data_set["ratio"] == 0 and data_set["number"] == 0:
                     data_set["ratio"] = 1
