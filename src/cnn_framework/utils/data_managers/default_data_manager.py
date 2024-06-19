@@ -1,6 +1,5 @@
 import json
 import os
-import h5py
 
 from .abstract_data_manager import AbstractDataManager
 

@@ -462,7 +462,10 @@ class ModelManager:
         self.compute_loss(dl_element, dl_metric, data_loader)
 
     def save_results(
-        self, name: str, dl_element: DatasetOutput, mean_std: dict[str, list[float]]
+        self,
+        name: str,
+        dl_element: DatasetOutput,
+        mean_std: dict[str, list[float]],
     ) -> None:
         # Possible target normalization
         target_mean_std = {}
@@ -479,9 +482,7 @@ class ModelManager:
             # C, H, W for data_image
             if data_image is None:  # case when additional data is None
                 continue
-            if (
-                data_type == "input" and mean_std
-            ):  # input has been normalized
+            if data_type == "input" and mean_std:  # input has been normalized
                 # Case where both input and target have been normalized
                 if data_image.shape[0] != len(mean_std["mean"]):
                     nb_input_channels = len(self.params.c_indexes) * len(
@@ -500,10 +501,7 @@ class ModelManager:
                 image_to_save = make_image_tiff_displayable(
                     data_image, input_mean_std
                 )
-            elif (
-                data_type in ["groundtruth", "predicted"]
-                and target_mean_std
-            ):
+            elif data_type in ["groundtruth", "predicted"] and target_mean_std:
                 image_to_save = make_image_tiff_displayable(
                     data_image, target_mean_std
                 )

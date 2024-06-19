@@ -1,6 +1,4 @@
-import os
 from typing import Optional, List
-import h5py
 
 import numpy as np
 
