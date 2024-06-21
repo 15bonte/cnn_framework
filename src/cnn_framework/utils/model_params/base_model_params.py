@@ -209,7 +209,7 @@ class BaseModelParams:
 
         # Tensorboard parameters
         self.tensorboard_folder_path = get_folder_path("tensorboard")
-        self.plot_step = 10
+        self.plot_step = 100
         # Number of different epochs where to plot images
         self.nb_plot_images = 2
         self.nb_tensorboard_images_max = 8
