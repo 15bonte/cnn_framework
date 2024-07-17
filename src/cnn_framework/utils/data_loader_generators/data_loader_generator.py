@@ -20,6 +20,59 @@ def check_dimensions_order(params, dataset_output):
         assert dataset_output.target.shape[-1] == params.out_channels
 
 
+def post_process_mean_std(mean_std, mode, nb_std=3):
+    """
+    Used to normalize between 0 and 1 instead of -1 and 1.
+
+    - Gaussian mode: suppose data is distributed according to a gaussian distribution
+
+    nb_std = 0 -> do nothing
+    nb_std = 1 -> keep 68% of the data between 0 and 1
+    nb_std = 2 -> keep 95% of the data between 0 and 1
+    nb_std = 3 -> keep 99% of the data between 0 and 1
+
+    - Max mode:
+
+    Just make sure that the max value is 1 and the min value is 0
+
+    """
+    if mode == "standard":
+        return mean_std
+
+    if mode == "gaussian":
+        if nb_std == 0:
+            return mean_std
+
+        new_mean_std = {}
+        new_mean_std["mean"] = [
+            m - nb_std * std
+            for m, std in zip(mean_std["mean"], mean_std["std"])
+        ]
+        new_mean_std["std"] = [std * 2 * nb_std for std in mean_std["std"]]
+
+    elif mode == "max":
+        new_mean_std = {}
+        new_mean_std["mean"] = [0 for _ in mean_std["mean"]]
+        new_mean_std["std"] = list(mean_std["max"])
+
+    elif mode == "isl":  # mimic ISL paper (Christiansen 2018)
+        # Set mean to 0.25 and std to 0.125
+        target_mean = 0.25
+        target_std = 0.125
+
+        new_mean_std = {}
+        new_mean_std["mean"] = [
+            m - target_mean * std / target_std
+            for m, std in zip(mean_std["mean"], mean_std["std"])
+        ]
+        new_mean_std["std"] = [std / target_std for std in mean_std["std"]]
+
+    else:
+        return ValueError("Unknown mean/std mode.")
+
+    return new_mean_std
+
+
 def get_mean_and_std(
     data_loaders: list[DataLoader],
     max_percentile=90,
