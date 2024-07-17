@@ -253,7 +253,7 @@ class BaseModelParams:
                 self.models_folder = args.model_path
             if args.lr:
                 self.learning_rate = float(args.lr)
-            if args.epochs:
+            if args.epochs is not None:
                 self.num_epochs = int(args.epochs)
             if args.plot_step:
                 self.plot_step = int(args.plot_step)
@@ -261,17 +261,17 @@ class BaseModelParams:
                 self.output_dir = args.output_dir
             if args.batch_size:
                 self.batch_size = int(args.batch_size)
-            if args.train_ratio:
+            if args.train_ratio is not None:
                 self.train_ratio = float(args.train_ratio)
-            if args.val_ratio:
+            if args.val_ratio is not None:
                 self.val_ratio = float(args.val_ratio)
-            if args.test_ratio:
+            if args.test_ratio is not None:
                 self.test_ratio = float(args.test_ratio)
-            if args.train_number:
+            if args.train_number is not None:
                 self.train_number = int(args.train_number)
-            if args.val_number:
+            if args.val_number is not None:
                 self.val_number = int(args.val_number)
-            if args.test_number:
+            if args.test_number is not None:
                 self.test_number = int(args.test_number)
             if args.train_file:
                 self.train_file = args.train_file
@@ -283,17 +283,17 @@ class BaseModelParams:
                 self.model_load_path = args.model_load_path
             if args.global_results_path:
                 self.global_results_path = args.global_results_path
-            if args.model_index:
+            if args.model_index is not None:
                 self.model_index = int(args.model_index)
             if args.image_height:
                 self.input_dimensions.height = int(args.image_height)
             if args.image_width:
                 self.input_dimensions.width = int(args.image_width)
-            if args.weight_decay:
+            if args.weight_decay is not None:
                 self.weight_decay = float(args.weight_decay)
-            if args.num_workers:
+            if args.num_workers is not None:
                 self.num_workers = int(args.num_workers)
-            if args.dropout:
+            if args.dropout is not None:
                 self.dropout = float(args.dropout)
             if args.c_indexes:
                 self.c_indexes = args.c_indexes
@@ -301,7 +301,7 @@ class BaseModelParams:
                 self.z_indexes = args.z_indexes
             if args.cross_validation_dir:
                 self.cross_validation_dir = args.cross_validation_dir
-            if args.out_channels:
+            if args.out_channels is not None:
                 self.out_channels = int(args.out_channels)
             if args.data_set_size:
                 self.data_set_size = int(args.data_set_size)
