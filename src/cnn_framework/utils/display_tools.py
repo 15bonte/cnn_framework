@@ -171,6 +171,8 @@ def display_progress(
         )
         cpu_message = f"CPU available: {cpu_available}%"
         display_message += " | " + cpu_message
+    # Add blank spaces at the end to be sure everything is removed
+    display_message = display_message.ljust(100, " ")
     sys.stdout.write(display_message)
     sys.stdout.flush()
 
