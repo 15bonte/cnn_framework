@@ -77,7 +77,7 @@ def get_mean_and_std(
     data_loaders: list[DataLoader],
     max_percentile=90,
     mean_std_path: Optional[str] = None,
-    max_nb_imgs: Optional[int] = None,
+    max_nb_imgs: Optional[int] = 10000,
 ) -> dict[str, list[float]]:
     """
     Args:
