@@ -29,7 +29,7 @@ from ..model_params.base_model_params import BaseModelParams
 from ..data_sets.dataset_output import DatasetOutput
 from ..metrics.abstract_metric import AbstractMetric
 from ..tools import extract_patterns, random_sample
-from ..data_loader_generators.data_loader_generator import get_mean_and_std
+from ..data_loader_generators.data_loader_generator import get_mean_and_std, post_process_mean_std
 from ..display_tools import (
     display_progress,
     make_image_tiff_displayable,
@@ -63,6 +63,7 @@ class ModelManager:
         model: nn.Module,
         params: BaseModelParams,
         metric_class: type[AbstractMetric],
+        mean_std_mode: str = "standard",
     ):
         # Device to train model
         self.device = torch.device(
@@ -109,6 +110,8 @@ class ModelManager:
             self.params.names_val,
             self.params.names_test,
         )
+
+        self.mean_std_mode = mean_std_mode
 
     def write_images_to_tensorboard(
         self, current_batch: int, dl_element: DatasetOutput, name: str
@@ -368,6 +371,11 @@ class ModelManager:
         data_set_mean_std["std"] = data_set_mean_std["std"][
             :current_nb_channels
         ]
+
+        # Apply post-processing
+        data_set_mean_std = post_process_mean_std(
+            data_set_mean_std, mode=self.mean_std_mode
+        )
 
         # Save in model folder
         mean_std_file = os.path.join(
