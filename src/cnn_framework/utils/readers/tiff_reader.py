@@ -1,17 +1,11 @@
 from typing import Optional
-from abc import abstractmethod
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
-from PIL.TiffTags import TAGS
 from aicsimageio import AICSImage
-
-from .utils.projection import Projection
 
 from .abstract_reader import AbstractReader
 from ..display_tools import generate_size_bar
-from ..enum import ProjectMethods
 
 
 class TiffReader(AbstractReader):
@@ -52,15 +46,10 @@ class TiffReader(AbstractReader):
         save_path="",
         dimensions=None,
         show=True,
-        verbose=True,
     ):
-        print("Deprecated.")
-        if verbose:
-            with Image.open(self.file_path) as img:
-                meta_dict = {TAGS[key]: img.tag[key] for key in img.tag_v2}
-                print(meta_dict)
+        image_to_plot = self.get_processed_image().squeeze()
+        assert image_to_plot.ndim in [2, 3]
 
-        image_to_plot = self.get_processed_image()
         if image_to_plot.ndim == 2:
             image_to_plot = np.expand_dims(image_to_plot, 0)
 
@@ -111,33 +100,3 @@ class TiffReader(AbstractReader):
 
         if show:
             plt.show()
-
-
-if __name__ == "__main__":
-    TIFF_FILE_TO_DISPLAY = r"C:\Users\thoma\data\Data Pasteur\main_data\train\t1_NG-MKLP1-clone-1-1.tif"
-
-    # NB: display is ugly with several images...
-    CHANNEL_PROJECTION = Projection(
-        method=ProjectMethods.Channel, channels=[2], axis=3
-    )  # channel 2 on axis 3
-    FRAME_PROJECTION = Projection(
-        method=ProjectMethods.Channel, channels=[57], axis=0
-    )  # channel 57 on axis 0
-
-    UNIT, SCALE = (
-        "µm",
-        0.225,
-    )  # MC "µm", 6.4504 / 63  # "µm", 0.1  # ("µm", 0.1) => 1px = 0.1µm
-    DIMENSIONS = {
-        "min_x": 806 - 200,
-        "max_x": 806 + 200,
-        "min_y": 764 - 120,
-        "max_y": 764 + 200,
-    }
-    SAVE_PATH = None  # only for basic for now
-
-    reader = TiffReader(
-        TIFF_FILE_TO_DISPLAY,
-        project=[CHANNEL_PROJECTION, FRAME_PROJECTION],
-    )
-    reader.display_info(UNIT, SCALE, SAVE_PATH, DIMENSIONS)

@@ -72,7 +72,9 @@ class AbstractReader:
         elif self.normalize.method == NormalizeMethods.ZeroOneScaler:
             self.image = zero_one_scaler(self.image)
         elif self.normalize.method == NormalizeMethods.Standardize:
-            self.image = normalize_array(self.image, channel_axis=self.normalize.axis)
+            self.image = normalize_array(
+                self.image, channel_axis=self.normalize.axis
+            )
         elif self.normalize.method == NormalizeMethods.StandardizeImageNet:
             type_factor = np.iinfo(self.image.dtype).max
             mean_std = {
@@ -116,6 +118,5 @@ class AbstractReader:
         save_path="",
         dimensions=None,
         show=True,
-        verbose=True,
     ):
         pass
