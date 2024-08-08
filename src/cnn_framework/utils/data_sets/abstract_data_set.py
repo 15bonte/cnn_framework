@@ -46,9 +46,12 @@ class AbstractDataSet(Dataset):
             # Load json
             with open(names_json_path, "r") as f:
                 self.h5_names = json.load(f)
+            # Reverse dictionary
+            self.h5_indexes = {v: k for k, v in self.h5_names.items()}
         else:
             self.h5_file = None
             self.h5_names = None
+            self.h5_indexes = None
 
     def set_transforms(self):
         # No transforms
