@@ -154,7 +154,7 @@ class AbstractDataSet(Dataset):
         ):
             transformed = self.transforms(image=data_set_output.input)  # YXC
             data_set_output.input = np.moveaxis(
-                transformed["image"], -3, 0
+                transformed["image"], 2, -3
             )  # CYX
         # Target and no additional images
         elif (
