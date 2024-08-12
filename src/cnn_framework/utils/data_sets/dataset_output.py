@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Optional
 import numpy as np
 import torch
@@ -95,3 +96,36 @@ class DatasetOutput:
 
     def additional_is_image(self):
         return self.additional is not None
+
+    @staticmethod
+    def merge(list_dataset: list[DatasetOutput]) -> DatasetOutput:
+        """
+        Merge a list of DatasetOutput into a single DatasetOutput.
+        """
+        merged = {}
+        for key in list_dataset[0].__dict__.keys():
+            if key in ["index", "target", "encoded_file_name"]:
+                continue
+            if getattr(list_dataset[0], key) is None:
+                merged[key] = None
+            else:
+                merged[key] = np.concatenate(
+                    [getattr(data, key) for data in list_dataset], axis=-1
+                )
+        return DatasetOutput(**merged)
+
+    def split(self, nb_splits: int) -> list[DatasetOutput]:
+        """
+        Split the DatasetOutput into a list of DatasetOutput.
+        """
+        split_size = self.input.shape[-1] // nb_splits
+        split_data = []
+        for i in range(nb_splits):
+            split_dict = {
+                key: value[..., i * split_size : (i + 1) * split_size]
+                for key, value in self.__dict__.items()
+                if value is not None
+                and key not in ["index", "target", "encoded_file_name"]
+            }
+            split_data.append(DatasetOutput(**split_dict))
+        return split_data

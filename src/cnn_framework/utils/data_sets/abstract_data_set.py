@@ -152,8 +152,10 @@ class AbstractDataSet(Dataset):
             not data_set_output.target_is_image()
             and not data_set_output.additional_is_image()
         ):
-            transformed = self.transforms(image=data_set_output.input)
-            data_set_output.input = np.moveaxis(transformed["image"], 2, 0)
+            transformed = self.transforms(image=data_set_output.input)  # YXC
+            data_set_output.input = np.moveaxis(
+                transformed["image"], -3, 0
+            )  # CYX
         # Target and no additional images
         elif (
             data_set_output.target_is_image()
@@ -162,16 +164,20 @@ class AbstractDataSet(Dataset):
             fake_input = np.concatenate(
                 (data_set_output.input, data_set_output.target), axis=-1
             )
-            transformed = self.transforms(image=fake_input)
+            transformed = self.transforms(image=fake_input)  # YXC
             # Split image and target
             transformed_input = transformed["image"][
                 :, :, : data_set_output.input.shape[-1]
-            ]
+            ]  # YXC
             transformed_target = transformed["image"][
                 :, :, data_set_output.input.shape[-1] :
-            ]
-            data_set_output.input = np.moveaxis(transformed_input, 2, 0)
-            data_set_output.target = np.moveaxis(transformed_target, 2, 0)
+            ]  # YXC
+            data_set_output.input = np.moveaxis(
+                transformed_input, 2, -3
+            )  # CYX
+            data_set_output.target = np.moveaxis(
+                transformed_target, 2, -3
+            )  # CYX
         # No target and additional images
         elif (
             not data_set_output.target_is_image()
@@ -179,9 +185,13 @@ class AbstractDataSet(Dataset):
         ):
             transformed = self.transforms(
                 image=data_set_output.input, mask=data_set_output.additional
-            )
-            data_set_output.input = np.moveaxis(transformed["image"], 2, 0)
-            data_set_output.additional = np.moveaxis(transformed["mask"], 2, 0)
+            )  # YXC
+            data_set_output.input = np.moveaxis(
+                transformed["image"], 2, -3
+            )  # CYX
+            data_set_output.additional = np.moveaxis(
+                transformed["mask"], 2, -3
+            )  # CYX
         # Target and additional images
         elif (
             data_set_output.target_is_image()
@@ -189,20 +199,26 @@ class AbstractDataSet(Dataset):
         ):
             fake_input = np.concatenate(
                 (data_set_output.input, data_set_output.target), axis=-1
-            )
+            )  # YXC
             transformed = self.transforms(
                 image=fake_input, mask=data_set_output.additional
-            )
+            )  # YXC
             # Split image and target
             transformed_input = transformed["image"][
                 :, :, : data_set_output.input.shape[-1]
-            ]
+            ]  # YXC
             transformed_target = transformed["image"][
                 :, :, data_set_output.input.shape[-1] :
-            ]
-            data_set_output.input = np.moveaxis(transformed_input, 2, 0)
-            data_set_output.target = np.moveaxis(transformed_target, 2, 0)
-            data_set_output.additional = np.moveaxis(transformed["mask"], 2, 0)
+            ]  # YXC
+            data_set_output.input = np.moveaxis(
+                transformed_input, 2, -3
+            )  # CYX
+            data_set_output.target = np.moveaxis(
+                transformed_target, 2, -3
+            )  # CYX
+            data_set_output.additional = np.moveaxis(
+                transformed["mask"], 2, -3
+            )  # CYX
 
     def __getitem__(self, idx):
         # Read file and generate images
