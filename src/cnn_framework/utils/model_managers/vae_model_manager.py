@@ -15,25 +15,6 @@ from .model_manager import ModelManager
 
 
 class VAEModelManager(ModelManager):
-    def compute_loss(
-        self, dl_element, dl_metric, data_loader: DataLoader, _=None
-    ):
-        # Read data loader element
-        dl_element["data"] = dl_element["data"].to(self.device)
-        dl_element["category"] = dl_element["category"].to(self.device)
-
-        # Compute the model output
-        model_output = self.model(dl_element)
-        dl_element.prediction = model_output["recon_x"]
-
-        # Update metric
-        dl_metric.update(
-            model_output["recon_x"],
-            dl_element["data"],
-            mean_std=data_loader.dataset.mean_std,
-        )
-
-        return model_output["loss"]
 
     def model_prediction(self, dl_element, dl_metric, data_loader: DataLoader):
         """
