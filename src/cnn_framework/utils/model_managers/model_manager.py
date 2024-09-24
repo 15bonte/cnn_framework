@@ -29,7 +29,10 @@ from ..model_params.base_model_params import BaseModelParams
 from ..data_sets.dataset_output import DatasetOutput
 from ..metrics.abstract_metric import AbstractMetric
 from ..tools import extract_patterns, random_sample
-from ..data_loader_generators.data_loader_generator import get_mean_and_std, post_process_mean_std
+from ..data_loader_generators.data_loader_generator import (
+    get_mean_and_std,
+    post_process_mean_std,
+)
 from ..display_tools import (
     display_progress,
     make_image_tiff_displayable,
@@ -531,7 +534,16 @@ class ModelManager:
         num_batches_test: int,
         test_metric: AbstractMetric,
         predict_mode: PredictMode,
+        post_processing=None,
     ):
+        """Batch prediction on test set.
+
+        Parameters
+        ----------
+        post_processing : function, optional
+            Post-processing function to apply to predictions, by default None.
+            Typically, used for UMAP representation.
+        """
         all_predictions_np = []
         for batch_idx, dl_element in enumerate(test_dl):
             # Reshape in case of multiple images stacked together
@@ -560,6 +572,12 @@ class ModelManager:
 
             # Get numpy elements
             dl_element_numpy = dl_element.get_numpy_dataset_output()
+
+            if post_processing is not None:
+                dl_element_numpy.prediction = post_processing(
+                    dl_element_numpy.prediction
+                )
+
             all_predictions_np = all_predictions_np + [
                 *dl_element_numpy.prediction
             ]
@@ -627,6 +645,7 @@ class ModelManager:
         predict_mode=PredictMode.Standard,
         nb_images_to_save=10,
         compute_own_mean_std=False,
+        post_processing=None,
     ) -> list:
         """
         Parameters
@@ -638,7 +657,9 @@ class ModelManager:
         nb_images_to_save : int, optional
             Number of images to save, by default 10
             nb_images_to_save == -1 => save all images
-
+        post_processing : function, optional
+            Post-processing function to apply to predictions, by default None.
+            Typically, used for UMAP representation.
         """
 
         # Create folder to save predictions
@@ -676,6 +697,7 @@ class ModelManager:
                 num_batches_test,
                 test_metric,
                 predict_mode,
+                post_processing,
             )
 
         if predict_mode != PredictMode.Standard:

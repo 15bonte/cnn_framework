@@ -97,7 +97,7 @@ def extract_patterns(files, patterns):
     """Return files that match any of the given patterns."""
     result = []
     # Iterate over files
-    for name in tqdm(files):
+    for name in files:
         for pattern in patterns:
             if fnmatch.fnmatch(name, pattern):
                 result.append(name)

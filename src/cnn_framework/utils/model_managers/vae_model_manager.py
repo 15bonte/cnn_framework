@@ -45,6 +45,7 @@ class VAEModelManager(ModelManager):
         num_batches_test,
         test_metric,
         predict_mode: PredictMode,
+        post_processing=None,
     ):
         all_predictions_np = []
         for batch_idx, dl_element in enumerate(test_dl):
@@ -52,10 +53,13 @@ class VAEModelManager(ModelManager):
             if predict_mode == PredictMode.Standard:  # standard use
                 self.model_prediction(dl_element, test_metric, test_dl)
                 predictions = dl_element.prediction["recon_x"]
+                predictions_np = predictions.cpu().numpy()
             else:  # return embedding
                 predictions = self.get_embedding(dl_element)
+                predictions_np = predictions.cpu().numpy()
+                if post_processing is not None:
+                    predictions_np = post_processing(predictions_np)
 
-            predictions_np = predictions.cpu().numpy()
             all_predictions_np = all_predictions_np + [*predictions_np]
 
             display_progress(
