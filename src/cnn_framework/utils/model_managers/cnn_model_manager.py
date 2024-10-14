@@ -6,6 +6,10 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
+from pytorch_grad_cam import GradCAM
+from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
+from pytorch_grad_cam.utils.image import show_cam_on_image
+
 from ..metrics.abstract_metric import AbstractMetric
 from ..data_sets.dataset_output import DatasetOutput
 from .model_manager import ModelManager
@@ -125,9 +129,33 @@ class CnnModelManager(ModelManager):
         """
         dl_element.to_device(self.device)
 
-        predictions = torch.softmax(
-            self.model(dl_element.input.float()), dim=-1
-        )
+        # Perform GradCam analysis
+        target_layers = [
+            self.model.encoder.conv_layers.layer4[-1]
+        ]  # typically for resnet18 and resnet50
+
+        # Construct the CAM object once, and then re-use it on many images.
+        with GradCAM(model=self.model, target_layers=target_layers) as cam:
+            # You can also pass aug_smooth=True and eigen_smooth=True, to apply smoothing.
+            # If targets is None, the highest scoring category (for every member in the batch) will be used.
+            grayscale_cam = cam(
+                input_tensor=dl_element.input.float(), targets=None
+            )
+            predictions = torch.softmax(cam.outputs, dim=-1)
+            # In this example grayscale_cam has only one image in the batch:
+            grad_cam_images = []
+            for input_img, grad_cam_img in zip(
+                dl_element.input, grayscale_cam
+            ):
+                input_img = np.max(input_img.cpu().numpy(), axis=0)
+                input_img_rgb = np.stack([input_img] * 3, axis=-1)
+                processed = show_cam_on_image(
+                    input_img_rgb, grad_cam_img, use_rgb=True
+                )
+                processed = torch.from_numpy(np.moveaxis(processed, -1, 0))
+                grad_cam_images.append(processed)
+
+        dl_element.additional = torch.stack(grad_cam_images)
         dl_element.prediction = predictions
 
         # Update metric

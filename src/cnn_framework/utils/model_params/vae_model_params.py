@@ -7,7 +7,7 @@ class VAEModelParams(BaseModelParams):
     """
 
     def __init__(self, name="vae"):
-        super().__init__(name)
+        BaseModelParams.__init__(self, name)
 
         self.c_indexes = [0, 1]
         self.z_indexes = [0]
@@ -35,7 +35,7 @@ class VAEModelParams(BaseModelParams):
 
         if args is not None:
             if args.latent_dim:
-                self.latent_dim = args.latent_dim
+                self.latent_dim = int(args.latent_dim)
             if args.beta:
                 self.beta = float(args.beta)
             if args.gamma:
