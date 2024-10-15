@@ -1,5 +1,6 @@
 import os
 import warnings
+import re
 from matplotlib import pyplot as plt
 from skimage import io
 import numpy as np
@@ -7,7 +8,6 @@ import torch
 from torch.utils.data import DataLoader
 
 from pytorch_grad_cam import GradCAM
-from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
 
 from ..metrics.abstract_metric import AbstractMetric
@@ -18,6 +18,23 @@ from ..display_tools import (
     make_image_matplotlib_displayable,
     make_image_tiff_displayable,
 )
+
+
+def get_nested_attribute(obj, attr_string):
+    # Split the attribute string by '.' to handle nested attributes
+    attributes = attr_string.split(".")
+
+    for attr in attributes:
+        # Check if the attribute contains list indexing, e.g., "c[-1]"
+        match = re.match(r"(\w+)\[(\-?\d+)\]", attr)
+        if match:
+            attr_name, index = match.groups()
+            obj = getattr(obj, attr_name)  # Get the attribute (a list)
+            obj = obj[int(index)]  # Access the specific index in the list
+        else:
+            obj = getattr(obj, attr)  # Normal attribute access
+
+    return obj
 
 
 class CnnModelManager(ModelManager):
@@ -129,33 +146,42 @@ class CnnModelManager(ModelManager):
         """
         dl_element.to_device(self.device)
 
-        # Perform GradCam analysis
-        target_layers = [
-            self.model.encoder.conv_layers.layer4[-1]
-        ]  # typically for resnet18 and resnet50
+        if hasattr(
+            self.model, "target_layer"
+        ):  # apply GradCam only if target_layer is defined
 
-        # Construct the CAM object once, and then re-use it on many images.
-        with GradCAM(model=self.model, target_layers=target_layers) as cam:
-            # You can also pass aug_smooth=True and eigen_smooth=True, to apply smoothing.
-            # If targets is None, the highest scoring category (for every member in the batch) will be used.
-            grayscale_cam = cam(
-                input_tensor=dl_element.input.float(), targets=None
-            )
-            predictions = torch.softmax(cam.outputs, dim=-1)
-            # In this example grayscale_cam has only one image in the batch:
-            grad_cam_images = []
-            for input_img, grad_cam_img in zip(
-                dl_element.input, grayscale_cam
-            ):
-                input_img = np.max(input_img.cpu().numpy(), axis=0)
-                input_img_rgb = np.stack([input_img] * 3, axis=-1)
-                processed = show_cam_on_image(
-                    input_img_rgb, grad_cam_img, use_rgb=True
+            target_layers = [
+                get_nested_attribute(self.model, self.model.target_layer)
+            ]
+
+            # Construct the CAM object once, and then re-use it on many images.
+            with GradCAM(model=self.model, target_layers=target_layers) as cam:
+                # You can also pass aug_smooth=True and eigen_smooth=True, to apply smoothing.
+                # If targets is None, the highest scoring category (for every member in the batch) will be used.
+                grayscale_cam = cam(
+                    input_tensor=dl_element.input.float(), targets=None
                 )
-                processed = torch.from_numpy(np.moveaxis(processed, -1, 0))
-                grad_cam_images.append(processed)
+                predictions = torch.softmax(cam.outputs, dim=-1)
+                # In this example grayscale_cam has only one image in the batch:
+                grad_cam_images = []
+                for input_img, grad_cam_img in zip(
+                    dl_element.input, grayscale_cam
+                ):
+                    input_img = np.max(input_img.cpu().numpy(), axis=0)
+                    input_img_rgb = np.stack([input_img] * 3, axis=-1)
+                    processed = show_cam_on_image(
+                        input_img_rgb, grad_cam_img, use_rgb=True
+                    )
+                    processed = torch.from_numpy(np.moveaxis(processed, -1, 0))
+                    grad_cam_images.append(processed)
 
-        dl_element.additional = torch.stack(grad_cam_images)
+            dl_element.additional = torch.stack(grad_cam_images)
+
+        else:
+            predictions = torch.softmax(
+                self.model(dl_element.input.float()), dim=-1
+            )
+
         dl_element.prediction = predictions
 
         # Update metric
