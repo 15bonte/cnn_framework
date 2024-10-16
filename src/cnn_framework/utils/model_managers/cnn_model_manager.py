@@ -45,7 +45,7 @@ class CnnModelManager(ModelManager):
         name: str,
         dl_element: DatasetOutput,
         mean_std: dict[str, list[float]],
-        save_only_wrong: bool = True,
+        save_only_wrong: bool = False,
     ):
         input_np = dl_element.input
         target_np = dl_element.target
