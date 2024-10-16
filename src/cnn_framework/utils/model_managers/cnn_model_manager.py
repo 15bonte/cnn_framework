@@ -7,8 +7,6 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from pytorch_grad_cam import GradCAM
-from pytorch_grad_cam.utils.image import show_cam_on_image
 
 from ..metrics.abstract_metric import AbstractMetric
 from ..data_sets.dataset_output import DatasetOutput
@@ -149,6 +147,10 @@ class CnnModelManager(ModelManager):
         if hasattr(
             self.model, "target_layer"
         ):  # apply GradCam only if target_layer is defined
+
+            # Import here since tests crash when inside cnn_framework, for some reason
+            from pytorch_grad_cam import GradCAM
+            from pytorch_grad_cam.utils.image import show_cam_on_image
 
             target_layers = [
                 get_nested_attribute(self.model, self.model.target_layer)
