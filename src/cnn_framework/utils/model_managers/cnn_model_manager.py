@@ -7,6 +7,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
+from ..preprocessing import normalize_array
 
 from ..metrics.abstract_metric import AbstractMetric
 from ..data_sets.dataset_output import DatasetOutput
@@ -171,6 +172,15 @@ class CnnModelManager(ModelManager):
                 ):
                     input_img = np.max(input_img.cpu().numpy(), axis=0)
                     input_img_rgb = np.stack([input_img] * 3, axis=-1)
+                    input_img_rgb = normalize_array(
+                        input_img_rgb,
+                        mean_std={
+                            "mean": [0.5 for _ in range(3)],
+                            "std": [0.5 / 3 for _ in range(3)],
+                        },
+                        reverse=True,
+                    )
+                    input_img_rgb = np.clip(input_img_rgb, 0, 1)
                     processed = show_cam_on_image(
                         input_img_rgb, grad_cam_img, use_rgb=True
                     )
