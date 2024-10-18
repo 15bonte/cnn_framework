@@ -75,7 +75,10 @@ class CnnModelManager(ModelManager):
                 continue
             image_to_save = make_image_tiff_displayable(
                 data_image, data_mean_std
-            )
+            )  # CYX
+
+            if data_type == "input":
+                image_to_save = np.max(image_to_save, axis=0)
 
             # Save inputs with prediction and ground truth in name
             with warnings.catch_warnings():
