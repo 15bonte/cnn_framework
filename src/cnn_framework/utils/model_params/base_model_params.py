@@ -160,7 +160,7 @@ class BaseModelParams:
         self.name = name
 
         # Input dimensions to the model
-        self.input_dimensions = Dimensions(height=32, width=32)
+        self.input_dimensions = Dimensions(height=128, width=128)
 
         # Optimizer
         self.beta1 = (

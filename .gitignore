@@ -86,7 +86,7 @@ venv/
 **/_version.py
 
 # Local
-src/cnn_framework/data/images
+src/cnn_framework/data/images*
 src/cnn_framework/data/models
 src/cnn_framework/data/tensorboard
 src/cnn_framework/data/predictions
