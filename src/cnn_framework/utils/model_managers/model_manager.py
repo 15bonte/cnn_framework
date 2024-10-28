@@ -689,15 +689,16 @@ class ModelManager:
         # Reset metric
         test_metric = self.metric_class(self.device, self.params.nb_classes)
     
-        # Use trained model to predict on test set
-        predictions = self.batch_predict(
-            test_dl,
-            images_to_save,
-            num_batches_test,
-            test_metric,
-            predict_mode,
-            post_processing,
-        )
+        with torch.no_grad():
+            # Use trained model to predict on test set
+            predictions = self.batch_predict(
+                test_dl,
+                images_to_save,
+                num_batches_test,
+                test_metric,
+                predict_mode,
+                post_processing,
+            )
 
         if predict_mode != PredictMode.Standard:
             return predictions
