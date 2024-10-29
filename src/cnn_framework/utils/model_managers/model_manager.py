@@ -688,7 +688,7 @@ class ModelManager:
 
         # Reset metric
         test_metric = self.metric_class(self.device, self.params.nb_classes)
-    
+
         with torch.no_grad():
             # Use trained model to predict on test set
             predictions = self.batch_predict(
@@ -699,9 +699,6 @@ class ModelManager:
                 predict_mode,
                 post_processing,
             )
-
-        if predict_mode != PredictMode.Standard:
-            return predictions
 
         # Display box plot
         score, additional_results = test_metric.get_score()

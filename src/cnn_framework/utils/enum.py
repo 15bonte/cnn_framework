@@ -20,3 +20,4 @@ class PredictMode(Enum):
     Standard = 1
     GetPrediction = 2
     GetEmbedding = 3
+    GetEmbeddingMSE = 4  # typical for VAE
