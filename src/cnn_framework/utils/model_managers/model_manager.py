@@ -707,7 +707,7 @@ class ModelManager:
 
         # Compute accuracy
         accuracy_message = (
-            f"Average {test_metric.get_name()}: {round(score, 2)}"
+            f"Average {test_metric.get_name()}: {round(score, 3)}"
         )
         print("\n" + accuracy_message)
         self.training_information.score = score
