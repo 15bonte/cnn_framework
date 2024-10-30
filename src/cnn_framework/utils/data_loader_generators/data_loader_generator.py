@@ -205,7 +205,10 @@ class DataLoaderGenerator:
         return [1 for _ in data_set_train.names]
 
     def generate_data_loader(
-        self, single_image_test_batch=False, train_as_test=False
+        self,
+        single_image_test_batch=False,
+        train_as_test=False,
+        shuffle_test=False,
     ):
         """
         single_image_test_batch should be set to True to force batch_size=1 for test set.
@@ -274,7 +277,16 @@ class DataLoaderGenerator:
             pin_memory=True,
         )
 
-        # Test (no sampler to keep order)
+        # Test
+        sampler_test = (
+            WeightedRandomSampler(
+                torch.DoubleTensor([1 for _ in dataset_test.names]),
+                len(names_test),
+            )
+            if shuffle_test and len(names_test)
+            else None
+        )
+
         test_dl = DataLoader(
             dataset_test,
             batch_size=(
@@ -282,6 +294,7 @@ class DataLoaderGenerator:
             ),
             collate_fn=self.collate_fn,
             pin_memory=True,
+            sampler=sampler_test,
         )
 
         return train_dl, val_dl, test_dl
