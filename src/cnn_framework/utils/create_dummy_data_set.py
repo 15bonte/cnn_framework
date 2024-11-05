@@ -56,7 +56,7 @@ def generate_circle(image_size, nb_channels, color):
 
 def generate_data_set(
     save_dir,
-    image_size=32,
+    image_size=128,
     nb_channels=3,
     nb_elements_per_class=1000,
     extension="tiff",
@@ -68,7 +68,9 @@ def generate_data_set(
 
     for idx in range(nb_elements_per_class):
         square_image = generate_square(
-            image_size, nb_channels, color=[255, 255, 0] if same_color else None
+            image_size,
+            nb_channels,
+            color=[255, 255, 0] if same_color else None,
         )
         # Save image without warnings
         with warnings.catch_warnings():
@@ -76,7 +78,9 @@ def generate_data_set(
             io.imsave(f"{save_dir}/random_{idx}_c0.{extension}", square_image)
 
         circle_image = generate_circle(
-            image_size, nb_channels, color=[255, 0, 255] if same_color else None
+            image_size,
+            nb_channels,
+            color=[255, 0, 255] if same_color else None,
         )
         with warnings.catch_warnings():
             warnings.filterwarnings(action="ignore", category=UserWarning)

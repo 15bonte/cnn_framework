@@ -16,5 +16,8 @@ class DummyCnn(nn.Module):
         num_features = self.cnn.fc.in_features
         self.cnn.fc = nn.Linear(num_features, nb_classes)
 
+        # Target layer for GradCam - typically for resnet18 and resnet50
+        self.target_layer = "cnn.layer4[-1]"
+
     def forward(self, x):
         return self.cnn(x)
