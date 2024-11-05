@@ -110,7 +110,9 @@ class AbstractDataSet(Dataset):
             probabilities = None  # case where name is not adapted
         else:
             category = int(categories_and_probabilities[0])
-            if category == 0:
+            if category == 1:
+                category = 0
+            if category == 2:
                 category = 1
             # Are there probabilities for classes?
             if len(categories_and_probabilities) > 1 and not one_hot:
