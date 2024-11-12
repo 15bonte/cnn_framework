@@ -20,7 +20,7 @@ def check_dimensions_order(params, dataset_output):
         assert dataset_output.target.shape[-1] == params.out_channels
 
 
-def post_process_mean_std(mean_std, mode, nb_std=3):
+def post_process_mean_std(mean_std, mode, nb_std=3, float_conversion=True):
     """
     Used to normalize between 0 and 1 instead of -1 and 1.
 
@@ -69,6 +69,11 @@ def post_process_mean_std(mean_std, mode, nb_std=3):
 
     else:
         return ValueError("Unknown mean/std mode.")
+
+    # Convert values to float
+    if float_conversion:
+        new_mean_std["mean"] = [float(m) for m in new_mean_std["mean"]]
+        new_mean_std["std"] = [float(std) for std in new_mean_std["std"]]
 
     return new_mean_std
 
