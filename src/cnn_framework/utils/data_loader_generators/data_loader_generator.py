@@ -155,7 +155,9 @@ def get_mean_and_std(
     std = np.sqrt((channels_squared_sum / nb_pixels - np.square(mean)))
     channels_percent_max = np.percentile(
         np.array(channels_max), max_percentile, axis=0
-    )
+    ).astype(
+        "float64"
+    )  # to enable json serialization
 
     return {
         "mean": list(mean),

@@ -256,7 +256,7 @@ class ModelManager:
     def fit_core(self, optimizer: Optimizer) -> None:
         # Batch information
         self.training_information.num_batches_train = len(self.dl["train"])
-        best_val_loss, best_val_score = np.Infinity, -np.Infinity
+        best_val_loss, best_val_score = np.inf, -np.inf
         model_epoch = -1
 
         # Create train metric
