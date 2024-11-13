@@ -106,3 +106,12 @@ class CnnParser:
         self.arguments_parser.add_argument(
             "--encoder_name", help="Encoder name"
         )
+
+    def get_default_args(self):
+        return argparse.Namespace(
+            **{
+                k[2:]: v.default
+                for k, v in self.arguments_parser._option_string_actions.items()
+                if v.default is not argparse.SUPPRESS
+            }
+        )

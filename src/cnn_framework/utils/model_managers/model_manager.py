@@ -67,6 +67,7 @@ class ModelManager:
         params: BaseModelParams,
         metric_class: type[AbstractMetric],
         mean_std_mode: str = "standard",
+        enable_grad_cam: bool = False,
     ):
         # Device to train model
         self.device = torch.device(
@@ -115,6 +116,7 @@ class ModelManager:
         )
 
         self.mean_std_mode = mean_std_mode
+        self.enable_grad_cam = enable_grad_cam
 
     def write_images_to_tensorboard(
         self, current_batch: int, dl_element: DatasetOutput, name: str

@@ -144,8 +144,8 @@ class CnnModelManager(ModelManager):
         """
         dl_element.to_device(self.device)
 
-        if hasattr(
-            self.model, "target_layer"
+        if (
+            hasattr(self.model, "target_layer") and self.enable_grad_cam
         ):  # apply GradCam only if target_layer is defined
 
             # Import here since tests crash when inside cnn_framework, for some reason
