@@ -12,12 +12,15 @@ from ..utils.data_loader_generators.classifier_data_loader_generator import (
 from ..utils.model_managers.cnn_model_manager import CnnModelManager
 from ..utils.data_managers.default_data_manager import DefaultDataManager
 from ..utils.metrics.classification_accuracy import ClassificationAccuracy
+from ..utils.create_dummy_data_set import generate_data_set
 
 
 def training(params):
     """
     Training function for dummy classification.
     """
+    # Generate data if needed
+    generate_data_set(params.data_dir)
 
     loader_generator = ClassifierDataLoaderGenerator(
         params, DummyCnnDataSet, DefaultDataManager

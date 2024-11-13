@@ -13,12 +13,15 @@ from ..utils.metrics.mean_error_metric import MeanErrorMetric
 
 from .model import DummyCnn
 from .data_set import DummyRegressionCnnDataSet
+from ..utils.create_dummy_data_set import generate_data_set
 
 
 def training(params):
     """
     Training function for dummy regression.
     """
+    # Generate data if needed
+    generate_data_set(params.data_dir)
 
     loader_generator = DataLoaderGenerator(
         params, DummyRegressionCnnDataSet, DefaultDataManager

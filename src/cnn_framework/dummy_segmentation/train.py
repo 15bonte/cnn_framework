@@ -1,21 +1,28 @@
 from torch import optim
 from torch import nn
 
-from ..utils.data_loader_generators.data_loader_generator import DataLoaderGenerator
+from ..utils.data_loader_generators.data_loader_generator import (
+    DataLoaderGenerator,
+)
 from ..utils.model_managers.model_manager import ModelManager
 from ..utils.data_managers.default_data_manager import DefaultDataManager
 from ..utils.metrics.pcc import PCC
 
 from .data_set import DummyDataSet
 from .model import UNet
+from ..utils.create_dummy_data_set import generate_data_set
 
 
 def training(params):
     """
     Training function for dummy segmentation.
     """
+    # Generate data if needed
+    generate_data_set(params.data_dir)
 
-    loader_generator = DataLoaderGenerator(params, DummyDataSet, DefaultDataManager)
+    loader_generator = DataLoaderGenerator(
+        params, DummyDataSet, DefaultDataManager
+    )
     train_dl, val_dl, test_dl = loader_generator.generate_data_loader()
 
     # Load pretrained model
