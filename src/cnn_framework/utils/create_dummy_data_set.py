@@ -62,10 +62,11 @@ def generate_data_set(
     extension="tiff",
     same_color=False,  # if True, square are all yellow and circle are all purple, if False, random colors
 ):
-    if os.path.exists(save_dir):  # ignore if folder already exists
-        return
+    os.makedirs(save_dir, exist_ok=True)
 
-    os.makedirs(save_dir)
+    # If folder is not empty, no need to generate data
+    if os.listdir(save_dir):
+        return
 
     for idx in range(nb_elements_per_class):
         square_image = generate_square(
