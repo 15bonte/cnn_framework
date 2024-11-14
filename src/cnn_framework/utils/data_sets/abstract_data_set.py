@@ -50,8 +50,10 @@ class AbstractDataSet(Dataset):
             self.h5_indexes = {v: k for k, v in self.h5_names.items()}
         else:
             self.h5_file = None
-            self.h5_names = None
-            self.h5_indexes = None
+            unsorted_names = os.listdir(self.params.data_dir)
+            unsorted_names.sort()
+            self.h5_indexes = dict(enumerate(unsorted_names))
+            self.h5_names = {v: k for k, v in self.h5_indexes.items()}
 
     def set_transforms(self):
         # No transforms
