@@ -56,7 +56,11 @@ def display_confusion_matrix(
     _, ax = plt.subplots(1, 1, figsize=(5, 5))
     disp = ConfusionMatrixDisplay(m, display_labels=class_names)
     disp.plot(
-        ax=ax, cmap="Blues", colorbar=False, xticks_rotation=xticks_rotation
+        ax=ax,
+        cmap="Blues",
+        colorbar=False,
+        xticks_rotation=xticks_rotation,
+        values_format="d",
     )
 
     # Adjust text inside the matrix
