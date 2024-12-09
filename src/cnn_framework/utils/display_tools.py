@@ -54,9 +54,22 @@ def display_confusion_matrix(
         xticks_rotation = 0
 
     _, ax = plt.subplots(1, 1, figsize=(5, 5))
-    ConfusionMatrixDisplay(m, display_labels=class_names).plot(
+    disp = ConfusionMatrixDisplay(m, display_labels=class_names)
+    disp.plot(
         ax=ax, cmap="Blues", colorbar=False, xticks_rotation=xticks_rotation
     )
+
+    # Adjust text inside the matrix
+    for text in disp.text_.ravel():
+        text.set_fontsize(12)
+
+    # Customize font sizes
+    ax.set_xlabel("Predicted Label", fontsize=16)  # X-axis label
+    ax.set_ylabel("True Label", fontsize=16)  # Y-axis label
+
+    # Change tick label font sizes
+    ax.tick_params(axis="x", labelsize=14)
+    ax.tick_params(axis="y", labelsize=14)
 
     # Save plot
     if save_path is not None:
