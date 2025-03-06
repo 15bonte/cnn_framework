@@ -646,7 +646,7 @@ class ModelManager:
         test_dl: DataLoader,
         predict_mode=PredictMode.Standard,
         nb_images_to_save=10,
-        compute_own_mean_std=False,
+        compute_own_mean_std="no",
         post_processing=None,
     ) -> list:
         """
@@ -668,8 +668,11 @@ class ModelManager:
         os.makedirs(self.params.output_dir, exist_ok=True)
 
         # Update test_dl with saved mean and std
-        if compute_own_mean_std:
+        if compute_own_mean_std != "no":
             mean_std = get_mean_and_std([test_dl])
+            mean_std = post_process_mean_std(
+                mean_std, mode=compute_own_mean_std
+            )
             test_dl.dataset.mean_std = mean_std
         elif not test_dl.dataset.mean_std:
             self.read_mean_std(test_dl, self.params)
@@ -713,6 +716,8 @@ class ModelManager:
         )
         print("\n" + accuracy_message)
         self.training_information.score = score
+
+        # test_metric.plot_roc_curve()
 
         return predictions
 

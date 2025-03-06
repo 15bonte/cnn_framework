@@ -68,7 +68,7 @@ def post_process_mean_std(mean_std, mode, nb_std=3):
         new_mean_std["std"] = [std / target_std for std in mean_std["std"]]
 
     else:
-        return ValueError("Unknown mean/std mode.")
+        return ValueError(f"Unknown mean/std mode {mode}.")
 
     return new_mean_std
 
