@@ -1,7 +1,6 @@
 import sys
 from matplotlib import pyplot as plt
 import numpy as np
-import psutil
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import ConfusionMatrixDisplay
 from skimage.exposure import equalize_adapthist
@@ -171,7 +170,6 @@ def display_progress(
     total,
     precision=1,
     additional_message="",
-    cpu_memory=False,
 ):
     percentage = round(current / total * 100, precision)
     padded_percentage = str(percentage).ljust(precision + 3, "0")
@@ -179,15 +177,6 @@ def display_progress(
     # Display additional message
     if additional_message:
         display_message += " | " + additional_message
-    # Display CPU memory usage
-    if cpu_memory:
-        cpu_available = round(
-            psutil.virtual_memory().available
-            * 100
-            / psutil.virtual_memory().total
-        )
-        cpu_message = f"CPU available: {cpu_available}%"
-        display_message += " | " + cpu_message
     # Add blank spaces at the end to be sure everything is removed
     display_message = display_message.ljust(100, " ")
     sys.stdout.write(display_message)
