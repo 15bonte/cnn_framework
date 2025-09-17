@@ -708,13 +708,15 @@ class ModelManager:
         # Display box plot
         score, additional_results = test_metric.get_score()
 
-        self.plot_confusion_matrix(additional_results)
+        if additional_results is not None:
+            self.plot_confusion_matrix(additional_results)
 
-        # Compute accuracy
-        accuracy_message = (
-            f"Average {test_metric.get_name()}: {round(score, 3)}"
-        )
-        print("\n" + accuracy_message)
+        if score > 0:
+            # Compute accuracy
+            accuracy_message = (
+                f"Average {test_metric.get_name()}: {round(score, 3)}"
+            )
+            print("\n" + accuracy_message)
         self.training_information.score = score
 
         # test_metric.plot_roc_curve()
