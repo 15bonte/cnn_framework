@@ -108,8 +108,9 @@ class AbstractDataSet(Dataset):
         """
         # Read category from name
         categories_and_probabilities = filename.split(".")[0].split("_c")[1:]
-        if len(categories_and_probabilities) == 0 or not isinstance(
-            categories_and_probabilities[0], int
+        if (
+            len(categories_and_probabilities) == 0
+            or not categories_and_probabilities[0].isdigit()
         ):
             probabilities = None  # case where name is not adapted
         else:
