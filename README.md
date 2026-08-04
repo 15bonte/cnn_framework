@@ -28,6 +28,12 @@ cd cnn_framework
 pip install -e .
 ```
 
+Independently install pytorch-related packages
+
+```bash
+pip install torch>=1.12.1 torchvision>=0.13.1 torchmetrics>=0.11.4 segmentation-models-pytorch>=0.3.0
+```
+
 If you want to run jupyter tutorials, you also need to install ipykernel
 
 ```bash
